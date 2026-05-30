@@ -72,16 +72,16 @@ npx wrangler whoami
 
 ### Pre-flight checklist
 
-- [ ] Cloudflare account exists at dash.cloudflare.com (free tier is sufficient)
-- [ ] Account ID noted from Workers & Pages overview sidebar
-- [ ] `npx wrangler whoami` confirms the correct account
-- [ ] Supabase project `obitracker` exists and is fully provisioned
-- [ ] Supabase Email auth is enabled (Authentication → Providers → Email)
-- [ ] `SUPABASE_URL` and `SUPABASE_KEY` values are in hand
+- [x] Cloudflare account exists at dash.cloudflare.com (free tier is sufficient)
+- [x] Account ID noted from Workers & Pages overview sidebar
+- [x] `npx wrangler whoami` confirms the correct account
+- [x] Supabase project `obitracker` exists and is fully provisioned
+- [x] Supabase Email auth is enabled (Authentication → Providers → Email)
+- [x] `SUPABASE_URL` and `SUPABASE_KEY` values are in hand
 
 ---
 
-## Phase 1 — Config fixes `[ ]`
+## Phase 1 — Config fixes `[x]`
 
 **Files:** `wrangler.jsonc`, `package.json`
 
@@ -118,7 +118,7 @@ Needed if you ever run `supabase` CLI commands locally (`supabase db push`, `sup
 
 ---
 
-## Phase 2 — Cloudflare API token `[ ]`
+## Phase 2 — Cloudflare API token `[x]`
 
 1. Cloudflare dashboard → My Profile → API Tokens → **Create Token**
 2. Choose **Custom token** (the "Edit Cloudflare Workers" preset includes unnecessary KV/R2
@@ -137,7 +137,7 @@ Needed if you ever run `supabase` CLI commands locally (`supabase db push`, `sup
 
 ---
 
-## Phase 3 — Supabase URL configuration `[ ]`
+## Phase 3 — Supabase URL configuration `[x]`
 
 **Must be done before the first deploy.** Email confirmation callbacks fail silently if
 missing — users can sign up but the verification link in the email does not redirect back.
@@ -154,7 +154,7 @@ missing — users can sign up but the verification link in the email does not re
 
 ---
 
-## Phase 4 — Set Cloudflare Workers Secrets `[ ]`
+## Phase 4 — Set Cloudflare Workers Secrets `[x]`
 
 Run these from the project root (interactive — each prompts for the value):
 
@@ -181,7 +181,7 @@ wrangler secret list
 
 ---
 
-## Phase 5 — First manual deploy `[ ]`
+## Phase 5 — First manual deploy `[x]`
 
 ```bash
 npm run build          # produces dist/ — the Astro SSR bundle for Workers
@@ -208,15 +208,15 @@ If this is your first deploy, the Worker is created automatically — no dashboa
 
 ---
 
-## Phase 6 — Verification `[ ]`
+## Phase 6 — Verification `[x]`
 
-- [ ] Open `https://obitracker.<account>.workers.dev` — confirm app loads
-- [ ] Navigate to `/auth/signin` — confirm page renders without errors
-- [ ] Create a test account via sign-up — confirm confirmation email arrives
-- [ ] Click the confirmation link in the email — confirm redirect lands back on the app
-       (validates Phase 3 Supabase URL config)
-- [ ] Sign in with the confirmed account — confirm redirect to `/dashboard`
-- [ ] Run `wrangler tail` and reproduce a sign-in to confirm no runtime errors in the stream
+- [x] Open `https://obitracker.monika-krella.workers.dev` — confirm app loads
+- [x] Navigate to `/auth/signin` — confirm page renders without errors
+- [x] Create a test account via sign-up — confirm confirmation email arrives
+- [x] Click the confirmation link in the email — confirm redirect lands back on the app
+       (Phase 3 Supabase Site URL corrected to `https://obitracker.monika-krella.workers.dev`)
+- [x] Sign in with the confirmed account — confirm redirect to `/dashboard`
+- [x] Run `wrangler tail` and reproduce a sign-in to confirm no runtime errors in the stream
 
 > ⚠️ **Auth works locally but fails in production (sign-in page loads but login fails):**
 > Supabase secrets are not set or have wrong values. Run `wrangler secret list` — both
