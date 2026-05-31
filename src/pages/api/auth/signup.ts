@@ -26,7 +26,11 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(`/auth/signup?error=${encodeURIComponent("Supabase is not configured")}`);
   }
 
-  const { error } = await supabase.auth.signUp({ email, password });
+  // Route the PKCE confirmation code back to our confirm handler.
+  // Derived from the request origin so it works in both dev and production
+  // without hardcoding a URL.
+  const emailRedirectTo = `${new URL(context.request.url).origin}/api/auth/confirm`;
+  const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo } });
 
   if (error) {
     return context.redirect(`/auth/signup?error=${encodeURIComponent(error.message)}`);

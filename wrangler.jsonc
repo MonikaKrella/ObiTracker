@@ -12,4 +12,7 @@
   "observability": {
     "enabled": true,
   },
+  "dev": {
+    "port": 4321,
+  },
 }

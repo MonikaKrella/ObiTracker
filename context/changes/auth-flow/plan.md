@@ -274,27 +274,27 @@ N/A — no hot paths; all auth routes are infrequently called by nature.
 
 #### Automated
 
-- [x] 2.1 Lint passes: `npm run lint`
-- [x] 2.2 Build succeeds: `npm run build`
+- [x] 2.1 Lint passes: `npm run lint` — c4cd0d3
+- [x] 2.2 Build succeeds: `npm run build` — c4cd0d3
 
 #### Manual
 
-- [x] 2.3 POST directly to `/api/auth/signin` with empty email → redirects with readable validation message
-- [x] 2.4 Sign in with unconfirmed account → sign-in page shows "Please confirm your email first — check your inbox."
-- [x] 2.5 Sign in with valid confirmed credentials → `/dashboard` (regression)
-- [x] 2.6 POST directly to `/api/auth/signup` with 3-char password → redirects with readable zod message
+- [x] 2.3 POST directly to `/api/auth/signin` with empty email → redirects with readable validation message — c4cd0d3
+- [x] 2.4 Sign in with unconfirmed account → sign-in page shows "Please confirm your email first — check your inbox." — c4cd0d3
+- [x] 2.5 Sign in with valid confirmed credentials → `/dashboard` (regression) — c4cd0d3
+- [x] 2.6 POST directly to `/api/auth/signup` with 3-char password → redirects with readable zod message — c4cd0d3
 
 ### Phase 3: Email Confirmation Callback
 
 #### Automated
 
-- [ ] 3.1 Lint passes: `npm run lint`
-- [ ] 3.2 Build succeeds: `npm run build`
+- [x] 3.1 Lint passes: `npm run lint`
+- [x] 3.2 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 3.3 Supabase Redirect URLs updated in dashboard
-- [ ] 3.4 Sign up with real email → click confirmation link → land on `/dashboard` with active session
-- [ ] 3.5 Visit `/api/auth/confirm` with no query params → redirect to `/auth/signin` with error message
-- [ ] 3.6 Visit `/api/auth/confirm` with tampered token → redirect to `/auth/signin` with Supabase error message
-- [ ] 3.7 Full end-to-end checklist from Testing Strategy passes
+- [x] 3.3 Supabase Redirect URLs updated in dashboard
+- [x] 3.4 Sign up with real email → click confirmation link → land on `/dashboard` with active session
+- [x] 3.5 Visit `/api/auth/confirm` with no query params → redirect to `/auth/signin` with error message
+- [x] 3.6 Visit `/api/auth/confirm` with tampered token → redirect to `/auth/signin` with Supabase error message
+- [x] 3.7 Full end-to-end checklist from Testing Strategy passes
