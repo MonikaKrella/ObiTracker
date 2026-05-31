@@ -379,8 +379,8 @@ To apply to production: `npx supabase db push` (requires `SUPABASE_ACCESS_TOKEN`
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes on `src/types.ts`
-- [ ] 2.2 `npm run build` completes with no TypeScript errors
+- [x] 2.1 `npm run lint` passes on `src/types.ts`
+- [x] 2.2 `npm run build` completes with no TypeScript errors
 
 #### Manual
 
