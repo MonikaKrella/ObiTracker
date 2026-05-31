@@ -1,7 +1,7 @@
 ---
 change_id: auth-flow
 title: Complete and verify email + password auth end-to-end
-status: implementing
+status: implemented
 created: 2026-05-31
 updated: 2026-05-31
 archived_at: null

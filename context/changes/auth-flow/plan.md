@@ -288,13 +288,13 @@ N/A — no hot paths; all auth routes are infrequently called by nature.
 
 #### Automated
 
-- [x] 3.1 Lint passes: `npm run lint`
-- [x] 3.2 Build succeeds: `npm run build`
+- [x] 3.1 Lint passes: `npm run lint` — 2ff4a82
+- [x] 3.2 Build succeeds: `npm run build` — 2ff4a82
 
 #### Manual
 
-- [x] 3.3 Supabase Redirect URLs updated in dashboard
-- [x] 3.4 Sign up with real email → click confirmation link → land on `/dashboard` with active session
-- [x] 3.5 Visit `/api/auth/confirm` with no query params → redirect to `/auth/signin` with error message
-- [x] 3.6 Visit `/api/auth/confirm` with tampered token → redirect to `/auth/signin` with Supabase error message
-- [x] 3.7 Full end-to-end checklist from Testing Strategy passes
+- [x] 3.3 Supabase Redirect URLs updated in dashboard — 2ff4a82
+- [x] 3.4 Sign up with real email → click confirmation link → land on `/dashboard` with active session — 2ff4a82
+- [x] 3.5 Visit `/api/auth/confirm` with no query params → redirect to `/auth/signin` with error message — 2ff4a82
+- [x] 3.6 Visit `/api/auth/confirm` with tampered token → redirect to `/auth/signin` with Supabase error message — 2ff4a82
+- [x] 3.7 Full end-to-end checklist from Testing Strategy passes — 2ff4a82
