@@ -1,0 +1,33 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { createClient } from "@/lib/supabase";
+import { getDogsList } from "@/lib/services/dogs";
+
+// selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
+// if the dog is not found, soft-deleted, or owned by another user.
+// The null guard below is a defensive fallback for TypeScript's benefit.
+const { selectedDog } = Astro.locals;
+if (!selectedDog) {
+  return Astro.redirect("/dashboard");
+}
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const dogs = supabase ? await getDogsList(supabase) : [];
+---
+
+<AuthLayout title={selectedDog.name} dogs={dogs}>
+  <div class="space-y-6">
+    <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+      {selectedDog.name}
+    </h1>
+
+    <!-- Training elements tile — content added in S-03 -->
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+      <h2 class="mb-2 text-lg font-semibold text-white">Training elements</h2>
+      <p class="text-sm text-blue-100/40">Coming soon…</p>
+    </div>
+
+    <!-- DeleteDogModal React island mounted here in Phase 3 -->
+    <div data-delete-dog></div>
+  </div>
+</AuthLayout>

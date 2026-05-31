@@ -419,35 +419,35 @@ Add the two interactive React islands (`DogSwitcher` and `DeleteDogModal`), inst
 
 #### Automated
 
-- [x] 1.1 TypeScript compiles without errors: `npm run build`
-- [x] 1.2 Lint passes: `npm run lint`
-- [x] 1.3 Migration file exists: `supabase/migrations/20260531000001_dogs_soft_delete.sql`
+- [x] 1.1 TypeScript compiles without errors: `npm run build` — e777ecb
+- [x] 1.2 Lint passes: `npm run lint` — e777ecb
+- [x] 1.3 Migration file exists: `supabase/migrations/20260531000001_dogs_soft_delete.sql` — e777ecb
 
 #### Manual
 
-- [x] 1.4 Migration applies cleanly; `dogs` table gains `is_deleted` (default `false`) and `deleted_at` (default `null`) columns
-- [x] 1.5 Existing rows show `is_deleted = false, deleted_at = null` after migration
-- [x] 1.6 POST to `/api/dog` with a valid name creates a row with `is_deleted = false`
-- [x] 1.7 POST to `/api/dog` with a duplicate name returns an error redirect
-- [x] 1.8 DELETE to `/api/dog/<id>` sets `is_deleted = true` and a non-null `deleted_at`
-- [x] 1.9 Soft-deleted dog is not returned by a direct Supabase SELECT (RLS enforces `is_deleted = FALSE`)
+- [x] 1.4 Migration applies cleanly; `dogs` table gains `is_deleted` (default `false`) and `deleted_at` (default `null`) columns — e777ecb
+- [x] 1.5 Existing rows show `is_deleted = false, deleted_at = null` after migration — e777ecb
+- [x] 1.6 POST to `/api/dog` with a valid name creates a row with `is_deleted = false` — e777ecb
+- [x] 1.7 POST to `/api/dog` with a duplicate name returns an error redirect — e777ecb
+- [x] 1.8 DELETE to `/api/dog/<id>` sets `is_deleted = true` and a non-null `deleted_at` — e777ecb
+- [x] 1.9 Soft-deleted dog is not returned by a direct Supabase SELECT (RLS enforces `is_deleted = FALSE`) — e777ecb
 
 ### Phase 2: Routing skeleton — middleware, layout, pages
 
 #### Automated
 
-- [ ] 2.1 TypeScript compiles: `npm run build`
-- [ ] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 TypeScript compiles: `npm run build`
+- [x] 2.2 Lint passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.3 Unauthenticated GET `/dogs/new` redirects to `/auth/signin`
-- [ ] 2.4 Unauthenticated GET `/dogs/<uuid>/dashboard` redirects to `/auth/signin`
-- [ ] 2.5 Authenticated GET `/dashboard` renders dog cards (or empty state + "Add dog") using `AuthLayout`
-- [ ] 2.6 GET `/dogs/<id>/dashboard` renders dog name, "Training elements — coming soon" tile, and delete placeholder
-- [ ] 2.7 GET `/dogs/<id>/dashboard` for a soft-deleted dog redirects to `/dashboard`
-- [ ] 2.8 GET `/dogs/<id>/dashboard` for another user's dog redirects to `/dashboard`
-- [ ] 2.9 GET `/dogs/new` does not trigger the selectedDog UUID lookup
+- [x] 2.3 Unauthenticated GET `/dogs/new` redirects to `/auth/signin`
+- [x] 2.4 Unauthenticated GET `/dogs/<uuid>/dashboard` redirects to `/auth/signin`
+- [x] 2.5 Authenticated GET `/dashboard` renders dog cards (or empty state + "Add dog") using `AuthLayout`
+- [x] 2.6 GET `/dogs/<id>/dashboard` renders dog name, "Training elements — coming soon" tile, and delete placeholder
+- [x] 2.7 GET `/dogs/<id>/dashboard` for a soft-deleted dog redirects to `/dashboard`
+- [x] 2.8 GET `/dogs/<id>/dashboard` for another user's dog redirects to `/dashboard`
+- [x] 2.9 GET `/dogs/new` does not trigger the selectedDog UUID lookup
 
 ### Phase 3: React islands & full integration
 

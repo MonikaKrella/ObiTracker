@@ -1,27 +1,53 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { createClient } from "@/lib/supabase";
+import { getDogsList } from "@/lib/services/dogs";
 
-const { user } = Astro.locals;
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const dogs = supabase ? await getDogsList(supabase) : [];
 ---
 
-<Layout title="Dashboard">
-  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
-    <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-center text-white backdrop-blur-xl">
-      <h1 class="mb-4 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
-        Dashboard
+<AuthLayout title="Dashboard" dogs={dogs}>
+  <div class="space-y-6">
+    <div class="flex items-center justify-between">
+      <h1
+        class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent"
+      >
+        My Dogs
       </h1>
-      <p class="text-blue-100/80">
-        Welcome, <span class="font-semibold text-white">{user?.email}</span>
-      </p>
-      <p class="mt-2 text-sm text-blue-100/50">This page is only for authenticated users.</p>
-      <form method="POST" action="/api/auth/signout" class="mt-6">
-        <button
-          type="submit"
-          class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
-        >
-          Sign out
-        </button>
-      </form>
+      <a
+        href="/dogs/new"
+        class="rounded-lg border border-purple-400/40 bg-purple-500/20 px-4 py-2 text-sm font-medium transition-colors hover:bg-purple-500/30"
+      >
+        + Add dog
+      </a>
     </div>
+
+    {
+      dogs.length === 0 ? (
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-12 text-center backdrop-blur-xl">
+          <p class="mb-2 text-lg text-blue-100/70">No dogs yet</p>
+          <p class="mb-6 text-sm text-blue-100/40">Add your first dog to start tracking training.</p>
+          <a
+            href="/dogs/new"
+            class="rounded-lg border border-purple-400/40 bg-purple-500/20 px-5 py-2.5 text-sm font-medium transition-colors hover:bg-purple-500/30"
+          >
+            + Add dog
+          </a>
+        </div>
+      ) : (
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {dogs.map((dog) => (
+            <a
+              href={`/dogs/${dog.id}/dashboard`}
+              class="group rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition-colors hover:border-purple-400/40 hover:bg-white/10"
+            >
+              <h2 class="text-xl font-semibold text-white group-hover:text-purple-200">{dog.name}</h2>
+              <p class="mt-1 text-sm text-blue-100/40">View training →</p>
+            </a>
+          ))}
+        </div>
+      )
+    }
   </div>
-</Layout>
+</AuthLayout>
