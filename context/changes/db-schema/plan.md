@@ -379,11 +379,11 @@ To apply to production: `npx supabase db push` (requires `SUPABASE_ACCESS_TOKEN`
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes on `src/types.ts`
-- [ ] 2.2 `npm run build` completes with no TypeScript errors
+- [x] 2.1 `npm run lint` passes on `src/types.ts` — 03565af
+- [x] 2.2 `npm run build` completes with no TypeScript errors — 03565af
 
 #### Manual
 
-- [ ] 2.3 `src/types.ts` fields match Schema Reference exactly (names, types, order)
-- [ ] 2.4 DTO types omit `id`, `created_at`, `updated_at`
-- [ ] 2.5 `supabase db reset` still exits 0 after `seed.sql` is added
+- [x] 2.3 `src/types.ts` fields match Schema Reference exactly (names, types, order)
+- [x] 2.4 DTO types omit `id`, `created_at`, `updated_at`
+- [x] 2.5 `supabase db reset` still exits 0 after `seed.sql` is added

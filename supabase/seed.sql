@@ -1,0 +1,46 @@
+-- ObiTracker seed data
+--
+-- All INSERT statements below are commented out.
+-- They require a real auth.users UUID from a running local Supabase instance.
+--
+-- To activate:
+--   1. Run `npx supabase start` and let the stack come up.
+--   2. Copy your local test user UUID from the Supabase Studio
+--      (Authentication → Users) or from the output of:
+--        SELECT id FROM auth.users LIMIT 1;
+--   3. Replace <your-user-uuid> with that UUID in the blocks below.
+--   4. Uncomment the INSERT statements.
+--   5. Run `npx supabase db reset` — seed.sql runs automatically after migrations.
+--
+-- Note: training_logs.account_id must match dogs.account_id for the same row's dog.
+-- Always populate element_id, dog_id, and account_id consistently on insert.
+
+-- ---------------------------------------------------------------------------
+-- dogs
+-- ---------------------------------------------------------------------------
+-- INSERT INTO public.dogs (id, account_id, name)
+-- VALUES
+--   ('11111111-1111-1111-1111-111111111111', '<your-user-uuid>', 'Rex'),
+--   ('22222222-2222-2222-2222-222222222222', '<your-user-uuid>', 'Luna');
+
+-- ---------------------------------------------------------------------------
+-- training_elements
+-- ---------------------------------------------------------------------------
+-- INSERT INTO public.training_elements (id, dog_id, name, sort_position)
+-- VALUES
+--   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Heel', 0),
+--   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', 'Sit-stay', 1),
+--   ('cccccccc-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Retrieve', 2);
+
+-- ---------------------------------------------------------------------------
+-- training_logs
+-- ---------------------------------------------------------------------------
+-- account_id must equal dogs.account_id for the referenced dog (intentional denormalization).
+-- trained_on is an ISO date ("YYYY-MM-DD") — the day of the training cell, not the time of entry.
+--
+-- INSERT INTO public.training_logs (element_id, dog_id, account_id, trained_on)
+-- VALUES
+--   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', '<your-user-uuid>', '2026-05-28'),
+--   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', '<your-user-uuid>', '2026-05-28'),
+--   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', '<your-user-uuid>', '2026-05-29'),
+--   ('cccccccc-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', '<your-user-uuid>', '2026-05-30');
