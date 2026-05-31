@@ -260,29 +260,29 @@ N/A — no hot paths; all auth routes are infrequently called by nature.
 
 #### Automated
 
-- [x] 1.1 Lint passes: `npm run lint`
-- [x] 1.2 Build succeeds: `npm run build`
+- [x] 1.1 Lint passes: `npm run lint` — e314dcb
+- [x] 1.2 Build succeeds: `npm run build` — e314dcb
 
 #### Manual
 
-- [x] 1.3 Sign in with valid credentials → browser lands on `/dashboard`
-- [x] 1.4 While signed in, navigate to `/auth/signin` → redirects to `/dashboard`
-- [x] 1.5 While signed in, navigate to `/auth/signup` → redirects to `/dashboard`
-- [x] 1.6 While signed out, navigate to `/dashboard` → still redirects to `/auth/signin` (regression check)
+- [x] 1.3 Sign in with valid credentials → browser lands on `/dashboard` — e314dcb
+- [x] 1.4 While signed in, navigate to `/auth/signin` → redirects to `/dashboard` — e314dcb
+- [x] 1.5 While signed in, navigate to `/auth/signup` → redirects to `/dashboard` — e314dcb
+- [x] 1.6 While signed out, navigate to `/dashboard` → still redirects to `/auth/signin` (regression check) — e314dcb
 
 ### Phase 2: API Route Hardening
 
 #### Automated
 
-- [ ] 2.1 Lint passes: `npm run lint`
-- [ ] 2.2 Build succeeds: `npm run build`
+- [x] 2.1 Lint passes: `npm run lint`
+- [x] 2.2 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 2.3 POST directly to `/api/auth/signin` with empty email → redirects with readable validation message
-- [ ] 2.4 Sign in with unconfirmed account → sign-in page shows "Please confirm your email first — check your inbox."
-- [ ] 2.5 Sign in with valid confirmed credentials → `/dashboard` (regression)
-- [ ] 2.6 POST directly to `/api/auth/signup` with 3-char password → redirects with readable zod message
+- [x] 2.3 POST directly to `/api/auth/signin` with empty email → redirects with readable validation message
+- [x] 2.4 Sign in with unconfirmed account → sign-in page shows "Please confirm your email first — check your inbox."
+- [x] 2.5 Sign in with valid confirmed credentials → `/dashboard` (regression)
+- [x] 2.6 POST directly to `/api/auth/signup` with 3-char password → redirects with readable zod message
 
 ### Phase 3: Email Confirmation Callback
 
