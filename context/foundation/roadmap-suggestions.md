@@ -24,6 +24,7 @@ Implementation notes and resolved-unknown follow-ups to carry into `/10x-plan` s
 - **Window-scoped counting:** the highlight algorithm counts only ticks whose date falls within the currently selected window (7, 14, or 30 days ending today inclusive). Switching the window selector must re-run the algorithm immediately — highlights are always a function of the visible date range, not all historical data.
 - **Algorithm input/output contract:** `rankElements(ticks: Tick[], windowDays: number, today: Date) → { elementId, count, highlight: 'green' | 'red' | null }[]`. Keep it a pure function so edge cases (all elements tied, fewer than 3 elements, zero ticks) are unit-testable without a database.
 - **Grid is configurable 7/14/30 days** (FR-005 authoritative; US-01 "30-day" wording is a doc gap, not a spec).
+- **`training_logs.account_id` integrity (risk from F-01):** the INSERT handler must always source `account_id` from `auth.uid()` — never from user input or a copied value. No FK enforces that `training_logs.account_id` matches `dogs.account_id` for the same dog; a mismatch silently breaks RLS, potentially hiding or mis-attributing log rows. This is the sole app-code guard for a database-level gap.
 
 ---
 
@@ -35,3 +36,4 @@ Implementation notes and resolved-unknown follow-ups to carry into `/10x-plan` s
 
 - The delete endpoint must cascade-delete all `training_logs` rows for that element (either via a `CASCADE` foreign key constraint in the schema, or an explicit delete in the service layer before removing the element row).
 - The element management screen should include a confirmation step before deletion — the action is irreversible and the tick history cannot be recovered. This is a deliberate exception to the "no confirmation dialog" rule that applies to the training grid (FR-006/US-01 acceptance criteria); the grid tick is low-stakes and easily reversed by unticking, whereas element deletion is permanent.
+- **`sort_position` uniqueness (risk from F-01):** the CREATE element handler must never let `sort_position DEFAULT 0` fire as-is. Every new element must be assigned an explicit position (e.g. `MAX(sort_position) + 1` across the dog's existing elements) so that `ORDER BY sort_position` is deterministic from the first insert. Elements sharing position `0` produce a random, query-dependent order in the grid.
