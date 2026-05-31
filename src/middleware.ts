@@ -42,7 +42,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // The UUID regex intentionally excludes named segments like "new".
   // API routes under /api/dog/* use a different prefix and are not affected.
   const dogMatch = DOG_ID_REGEX.exec(context.url.pathname);
-  if (dogMatch && dogMatch[1] && supabase && context.locals.user) {
+  if (dogMatch?.[1] && supabase && context.locals.user) {
     const dogId = dogMatch[1];
     const dog = await getDogById(supabase, dogId);
     if (!dog) {

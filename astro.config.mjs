@@ -12,6 +12,12 @@ export default defineConfig({
   integrations: [react(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      // Prevent Vite from creating separate React copies for SSR and client
+      // bundles, which causes "Cannot read properties of null (reading 'useState')"
+      // when React DOM server tries to render islands.
+      dedupe: ["react", "react-dom", "react-dom/server"],
+    },
   },
   adapter: cloudflare(),
   env: {

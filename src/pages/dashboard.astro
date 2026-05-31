@@ -2,17 +2,17 @@
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import { createClient } from "@/lib/supabase";
 import { getDogsList } from "@/lib/services/dogs";
+import { FlashToast } from "@/components/FlashToast";
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 const dogs = supabase ? await getDogsList(supabase) : [];
 ---
 
 <AuthLayout title="Dashboard" dogs={dogs}>
+  <FlashToast client:only="react" />
   <div class="space-y-6">
     <div class="flex items-center justify-between">
-      <h1
-        class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent"
-      >
+      <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
         My Dogs
       </h1>
       <a

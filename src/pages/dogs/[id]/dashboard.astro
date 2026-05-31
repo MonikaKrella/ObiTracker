@@ -2,6 +2,7 @@
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import { createClient } from "@/lib/supabase";
 import { getDogsList } from "@/lib/services/dogs";
+import { DeleteDogModal } from "@/components/dogs/DeleteDogModal";
 
 // selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
 // if the dog is not found, soft-deleted, or owned by another user.
@@ -27,7 +28,6 @@ const dogs = supabase ? await getDogsList(supabase) : [];
       <p class="text-sm text-blue-100/40">Coming soon…</p>
     </div>
 
-    <!-- DeleteDogModal React island mounted here in Phase 3 -->
-    <div data-delete-dog></div>
+    <DeleteDogModal dogId={selectedDog.id} dogName={selectedDog.name} client:load />
   </div>
 </AuthLayout>

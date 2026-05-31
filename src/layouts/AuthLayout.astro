@@ -1,6 +1,8 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import Topbar from "@/components/Topbar.astro";
+import { DogSwitcher } from "@/components/dogs/DogSwitcher";
+import { Toaster } from "@/components/ui/sonner";
 import type { Dog } from "@/types";
 
 interface Props {
@@ -15,37 +17,11 @@ const { title, dogs } = Astro.props;
   <div class="bg-cosmic min-h-screen text-white">
     <div class="mx-auto max-w-4xl px-4 py-6">
       <Topbar />
-      <!-- Dog switcher — replaced by DogSwitcher React island in Phase 3 -->
-      <div data-dog-switcher class="mb-6">
-        {
-          dogs.length > 0 ? (
-            <div class="flex flex-wrap gap-2">
-              {dogs.map((dog) => (
-                <a
-                  href={`/dogs/${dog.id}/dashboard`}
-                  class="rounded-lg border border-white/20 bg-white/10 px-3 py-1 text-sm transition-colors hover:bg-white/20"
-                >
-                  {dog.name}
-                </a>
-              ))}
-              <a
-                href="/dogs/new"
-                class="rounded-lg border border-purple-400/40 bg-purple-500/20 px-3 py-1 text-sm transition-colors hover:bg-purple-500/30"
-              >
-                + Add dog
-              </a>
-            </div>
-          ) : (
-            <a
-              href="/dogs/new"
-              class="rounded-lg border border-purple-400/40 bg-purple-500/20 px-3 py-1 text-sm transition-colors hover:bg-purple-500/30"
-            >
-              + Add dog
-            </a>
-          )
-        }
+      <div class="mb-6">
+        <DogSwitcher dogs={dogs} selectedDogId={Astro.locals.selectedDog?.id} client:load />
       </div>
       <slot />
     </div>
   </div>
+  <Toaster client:only="react" />
 </Layout>

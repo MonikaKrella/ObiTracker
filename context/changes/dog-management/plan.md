@@ -436,41 +436,41 @@ Add the two interactive React islands (`DogSwitcher` and `DeleteDogModal`), inst
 
 #### Automated
 
-- [x] 2.1 TypeScript compiles: `npm run build`
-- [x] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 TypeScript compiles: `npm run build` — 8130ee4
+- [x] 2.2 Lint passes: `npm run lint` — 8130ee4
 
 #### Manual
 
-- [x] 2.3 Unauthenticated GET `/dogs/new` redirects to `/auth/signin`
-- [x] 2.4 Unauthenticated GET `/dogs/<uuid>/dashboard` redirects to `/auth/signin`
-- [x] 2.5 Authenticated GET `/dashboard` renders dog cards (or empty state + "Add dog") using `AuthLayout`
-- [x] 2.6 GET `/dogs/<id>/dashboard` renders dog name, "Training elements — coming soon" tile, and delete placeholder
-- [x] 2.7 GET `/dogs/<id>/dashboard` for a soft-deleted dog redirects to `/dashboard`
-- [x] 2.8 GET `/dogs/<id>/dashboard` for another user's dog redirects to `/dashboard`
-- [x] 2.9 GET `/dogs/new` does not trigger the selectedDog UUID lookup
+- [x] 2.3 Unauthenticated GET `/dogs/new` redirects to `/auth/signin` — 8130ee4
+- [x] 2.4 Unauthenticated GET `/dogs/<uuid>/dashboard` redirects to `/auth/signin` — 8130ee4
+- [x] 2.5 Authenticated GET `/dashboard` renders dog cards (or empty state + "Add dog") using `AuthLayout` — 8130ee4
+- [x] 2.6 GET `/dogs/<id>/dashboard` renders dog name, "Training elements — coming soon" tile, and delete placeholder — 8130ee4
+- [x] 2.7 GET `/dogs/<id>/dashboard` for a soft-deleted dog redirects to `/dashboard` — 8130ee4
+- [x] 2.8 GET `/dogs/<id>/dashboard` for another user's dog redirects to `/dashboard` — 8130ee4
+- [x] 2.9 GET `/dogs/new` does not trigger the selectedDog UUID lookup — 8130ee4
 
 ### Phase 3: React islands & full integration
 
 #### Automated
 
-- [ ] 3.1 TypeScript compiles: `npm run build`
-- [ ] 3.2 Lint passes: `npm run lint`
+- [x] 3.1 TypeScript compiles: `npm run build`
+- [x] 3.2 Lint passes: `npm run lint`
 
 #### Manual
 
-- [ ] 3.3 Dog switcher dropdown appears in the header on all authenticated screens
-- [ ] 3.4 Active dog is visually indicated in the dropdown when on `/dogs/[id]/dashboard`
-- [ ] 3.5 Clicking a dog in the dropdown navigates to `/dogs/[id]/dashboard`
-- [ ] 3.6 "Add dog" in the dropdown navigates to `/dogs/new`
-- [ ] 3.7 "Delete dog" button appears at the bottom of `/dogs/[id]/dashboard`, below the training elements tile; clicking opens the AlertDialog naming the dog
-- [ ] 3.8 Cancelling the dialog closes it; user stays on the dog's dashboard page
-- [ ] 3.9 Confirming soft-deletes the dog; browser navigates to `/dashboard`; Sonner success toast shown; dog absent from list and switcher
-- [ ] 3.10 Confirm button shows loading state during the fetch
-- [ ] 3.11 API error on delete: dialog closes; Sonner error toast shown; user stays on dog's dashboard page
-- [ ] 3.12 Full mobile round-trip: add → switch → delete works without layout issues
-- [ ] 3.13 Submitting `/dogs/new` with a valid name creates a dog and navigates to `/dashboard`; new dog card appears
-- [ ] 3.14 Submitting `/dogs/new` with a duplicate name shows a Sonner toast; page does not navigate
-- [ ] 3.15 Submitting `/dogs/new` with empty/invalid name shows a Sonner validation toast; page does not navigate
-- [ ] 3.16 Submitting `/dogs/new` while session expired navigates to `/auth/signin`
-- [ ] 3.17 `AddDogForm` submit button shows loading state during fetch
-- [ ] 3.18 Sonner success toast appears on `/dashboard` after dog deletion (FlashToast reads sessionStorage)
+- [x] 3.3 Dog switcher dropdown appears in the header on all authenticated screens
+- [x] 3.4 Active dog is visually indicated in the dropdown when on `/dogs/[id]/dashboard`
+- [x] 3.5 Clicking a dog in the dropdown navigates to `/dogs/[id]/dashboard`
+- [x] 3.6 "Add dog" in the dropdown navigates to `/dogs/new`
+- [x] 3.7 "Delete dog" button appears at the bottom of `/dogs/[id]/dashboard`, below the training elements tile; clicking opens the AlertDialog naming the dog
+- [x] 3.8 Cancelling the dialog closes it; user stays on the dog's dashboard page
+- [x] 3.9 Confirming soft-deletes the dog; browser navigates to `/dashboard`; Sonner success toast shown; dog absent from list and switcher
+- [x] 3.10 Confirm button shows loading state during the fetch
+- [x] 3.11 API error on delete: dialog closes; Sonner error toast shown; user stays on dog's dashboard page
+- [x] 3.12 Full mobile round-trip: add → switch → delete works without layout issues
+- [x] 3.13 Submitting `/dogs/new` with a valid name creates a dog and navigates to `/dashboard`; new dog card appears
+- [x] 3.14 Submitting `/dogs/new` with a duplicate name shows a Sonner toast; page does not navigate
+- [x] 3.15 Submitting `/dogs/new` with empty/invalid name shows a Sonner validation toast; page does not navigate
+- [x] 3.16 Submitting `/dogs/new` while session expired navigates to `/auth/signin`
+- [x] 3.17 `AddDogForm` submit button shows loading state during fetch
+- [x] 3.18 Sonner success toast appears on `/dashboard` after dog deletion (FlashToast reads sessionStorage)
