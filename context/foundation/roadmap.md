@@ -95,6 +95,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** — *(resolved 2026-05-27: dog switcher is a header dropdown on all screen sizes)*
 - **Risk:** The dog-switcher UX determines the information architecture for every screen that follows; choosing a pattern that doesn't scale to 3+ dogs will require a refactor before launch.
+- **Implementation notes:**
+  - *(F3, db-schema review)* `NewDog` in `src/types.ts` currently omits `account_id` (`Pick<Dog, "name">`) even though `account_id` is `NOT NULL` in the schema. S-02 must resolve this before shipping any dog-insert code: either update the type to `Pick<Dog, "name" | "account_id">` (preferred — gives compile-time safety) or explicitly inject `account_id` from the session in the insert service and add a JSDoc note on `NewDog` explaining the injection pattern. Leaving it as-is produces a NOT NULL violation at runtime with no TypeScript warning.
 - **Status:** proposed
 
 ### S-03: Training elements

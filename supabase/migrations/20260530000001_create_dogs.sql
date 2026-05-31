@@ -54,7 +54,9 @@ CREATE TRIGGER dogs_set_updated_at
 
 -- Rollback (execute in order to undo this migration):
 -- DROP TRIGGER  IF EXISTS dogs_set_updated_at ON dogs;
--- DROP FUNCTION IF EXISTS set_updated_at();
+-- NOTE: set_updated_at() is a shared utility (CREATE OR REPLACE). Only drop it if no other
+--       table's trigger references it. If this is the last migration using it:
+--       DROP FUNCTION IF EXISTS set_updated_at();
 -- DROP POLICY   IF EXISTS dogs_delete_authenticated ON dogs;
 -- DROP POLICY   IF EXISTS dogs_update_authenticated ON dogs;
 -- DROP POLICY   IF EXISTS dogs_insert_authenticated ON dogs;

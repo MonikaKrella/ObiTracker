@@ -26,7 +26,10 @@ CREATE POLICY training_logs_select_authenticated
   ON training_logs FOR SELECT TO authenticated
   USING ((select auth.uid()) = account_id);
 
--- INSERT also verifies dog_id ownership to prevent cross-account data pollution.
+-- INSERT verifies account ownership, dog_id ownership, and element-to-dog consistency.
+-- The third clause ensures element_id actually belongs to the dog referenced by dog_id,
+-- preventing intra-account data corruption (e.g. a log row whose element belongs to dog A
+-- but dog_id points to dog B, which would silently corrupt per-dog training counts).
 CREATE POLICY training_logs_insert_authenticated
   ON training_logs FOR INSERT TO authenticated
   WITH CHECK (
@@ -35,6 +38,11 @@ CREATE POLICY training_logs_insert_authenticated
       SELECT 1 FROM dogs
       WHERE dogs.id = dog_id
         AND dogs.account_id = (select auth.uid())
+    )
+    AND EXISTS (
+      SELECT 1 FROM training_elements
+      WHERE training_elements.id = element_id
+        AND training_elements.dog_id = dog_id
     )
   );
 
