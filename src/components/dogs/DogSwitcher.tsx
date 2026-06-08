@@ -19,24 +19,14 @@ const BUTTON_CLASS =
   "min-w-[140px] justify-between border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white";
 
 export function DogSwitcher({ dogs, selectedDogId }: Props) {
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => {
-    setMounted(true);
+  // Remove the server-rendered placeholder before the first browser paint so
+  // there is no visible swap between the static button and the live dropdown.
+  React.useLayoutEffect(() => {
+    document.getElementById("dog-switcher-placeholder")?.remove();
   }, []);
 
   const selectedDog = dogs.find((d) => d.id === selectedDogId);
   const triggerLabel = selectedDog?.name ?? "Select dog";
-
-  // SSR pass: plain button — identical appearance, no Radix hooks → no crash.
-  // Replaced by the interactive dropdown on the first client-side render.
-  if (!mounted) {
-    return (
-      <Button variant="outline" className={BUTTON_CLASS} disabled>
-        <span className="truncate">{triggerLabel}</span>
-        <ChevronsUpDownIcon className="ml-2 size-4 shrink-0 opacity-60" />
-      </Button>
-    );
-  }
 
   return (
     <DropdownMenu>

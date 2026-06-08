@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
 import { softDeleteDog } from "@/lib/services/dogs";
@@ -9,10 +10,11 @@ export const DELETE: APIRoute = async (context) => {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const dogId = context.params.id;
-  if (!dogId) {
+  const parsed = z.string().uuid().safeParse(context.params.id);
+  if (!parsed.success) {
     return Response.json({ error: "Not found" }, { status: 404 });
   }
+  const dogId = parsed.data;
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {

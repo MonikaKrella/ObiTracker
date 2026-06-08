@@ -19,13 +19,16 @@ interface Props {
 }
 
 export function DeleteDogModal({ dogId, dogName }: Props) {
-  const [mounted, setMounted] = React.useState(false);
+  // Swap the server-rendered placeholder for the live dialog trigger before
+  // the first browser paint. The island wrapper starts hidden so it takes no
+  // space — no double-button flash is possible.
+  React.useLayoutEffect(() => {
+    document.getElementById("delete-dog-placeholder")?.remove();
+    document.getElementById("delete-dog-island")?.removeAttribute("hidden");
+  }, []);
+
   const [loading, setLoading] = React.useState(false);
   const [open, setOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleConfirm = async (e: React.MouseEvent) => {
     // Prevent AlertDialog from closing immediately while fetch is in flight
@@ -48,12 +51,6 @@ export function DeleteDogModal({ dogId, dogName }: Props) {
       toast.error("Failed to delete dog");
     }
   };
-
-  // SSR pass: render only the trigger button — identical appearance, no Radix
-  // hooks → no crash. Replaced by the full dialog on the first client render.
-  if (!mounted) {
-    return <Button variant="destructive">Delete dog</Button>;
-  }
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>

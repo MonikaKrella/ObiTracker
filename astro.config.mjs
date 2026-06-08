@@ -13,10 +13,16 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     resolve: {
-      // Prevent Vite from creating separate React copies for SSR and client
-      // bundles, which causes "Cannot read properties of null (reading 'useState')"
-      // when React DOM server tries to render islands.
       dedupe: ["react", "react-dom", "react-dom/server"],
+    },
+    ssr: {
+      // Bundle Radix UI packages into the SSR output instead of externalizing
+      // them. When externalized, each Radix sub-package resolves React through
+      // its own node_modules traversal, producing a second React copy that has
+      // a null fiber context — causing "Cannot read properties of null
+      // (reading 'useState')" during SSR. Bundling them ensures one shared
+      // React instance across the entire SSR render.
+      noExternal: [/^@radix-ui\//, "radix-ui"],
     },
   },
   adapter: cloudflare(),

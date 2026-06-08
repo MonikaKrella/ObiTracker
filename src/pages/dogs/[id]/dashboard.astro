@@ -28,6 +28,20 @@ const dogs = supabase ? await getDogsList(supabase) : [];
       <p class="text-sm text-blue-100/40">Coming soon…</p>
     </div>
 
-    <DeleteDogModal dogId={selectedDog.id} dogName={selectedDog.name} client:load />
+    <!--
+      Placeholder shown until DeleteDogModal mounts. The island is wrapped in
+      a hidden element so it occupies no space until useLayoutEffect swaps them,
+      preventing any double-button flash.
+    -->
+    <button
+      id="delete-dog-placeholder"
+      disabled
+      class="inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 bg-destructive text-white opacity-50 cursor-not-allowed"
+    >
+      Delete dog
+    </button>
+    <span id="delete-dog-island" hidden>
+      <DeleteDogModal dogId={selectedDog.id} dogName={selectedDog.name} client:only="react" />
+    </span>
   </div>
 </AuthLayout>

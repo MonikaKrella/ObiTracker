@@ -12,6 +12,7 @@ export function FlashToast() {
     if (!raw) return;
     try {
       const { type, message } = JSON.parse(raw) as { type: "success" | "error"; message: string };
+      if (type !== "success" && type !== "error") return;
       toast[type](message);
     } catch {
       // Malformed flash — silently ignore
