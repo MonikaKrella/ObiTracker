@@ -11,7 +11,7 @@ export function FlashToast() {
     const raw = sessionStorage.getItem("flash");
     if (!raw) return;
     try {
-      const { type, message } = JSON.parse(raw) as { type: "success" | "error"; message: string };
+      const { type, message } = JSON.parse(raw) as { type: string; message: string };
       if (type !== "success" && type !== "error") return;
       toast[type](message);
     } catch {

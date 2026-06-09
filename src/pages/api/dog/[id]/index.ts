@@ -10,7 +10,7 @@ export const DELETE: APIRoute = async (context) => {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const parsed = z.string().uuid().safeParse(context.params.id);
+  const parsed = z.uuid().safeParse(context.params.id);
   if (!parsed.success) {
     return Response.json({ error: "Not found" }, { status: 404 });
   }

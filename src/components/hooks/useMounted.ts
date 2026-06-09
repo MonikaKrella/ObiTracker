@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 
 // Subscribe is a no-op: mounted state never changes after the initial render.
-const emptySubscribe = () => () => {};
+const emptySubscribe = () => () => undefined;
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
