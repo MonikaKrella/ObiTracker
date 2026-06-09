@@ -67,6 +67,7 @@ Add soft-delete columns to `dogs`, update the RLS SELECT policy, extend the Type
 **Intent**: Add `is_deleted` and `deleted_at` to the `dogs` table and replace the SELECT RLS policy so soft-deleted dogs are invisible at the database level. A new migration file is required because the original is already applied.
 
 **Contract**:
+
 - `ALTER TABLE dogs ADD COLUMN is_deleted boolean NOT NULL DEFAULT FALSE`
 - `ALTER TABLE dogs ADD COLUMN deleted_at timestamptz NULL`
 - `DROP POLICY dogs_select_authenticated ON dogs` then `CREATE POLICY dogs_select_authenticated ON dogs FOR SELECT TO authenticated USING ((select auth.uid()) = account_id AND is_deleted = FALSE)`
@@ -96,6 +97,7 @@ Add soft-delete columns to `dogs`, update the RLS SELECT policy, extend the Type
 **Intent**: Centralise all dog-related Supabase queries. API routes and pages call these functions; no inline query construction elsewhere.
 
 **Contract** — four exported async functions:
+
 - `getDogsList(supabase)` → `Promise<Dog[]>` — selects all non-deleted dogs for the authenticated user (`is_deleted = FALSE`), ordered `created_at ASC`; RLS scopes to the session account
 - `getDogById(supabase, dogId: string)` → `Promise<Dog | null>` — fetches one dog by ID for the authenticated user where `is_deleted = FALSE`; returns `null` if not found, wrong owner, or soft-deleted
 - `isDogNameTaken(supabase, name: string)` → `Promise<boolean>` — case-insensitive check for a live dog with the same name for the authenticated user (`is_deleted = FALSE`); use `.ilike('name', escapedName)` where `escapedName = name.replace(/%/g, '\\%').replace(/_/g, '\\_')` so that `%` and `_` characters in the dog name are not interpreted as SQL wildcard patterns
@@ -109,6 +111,7 @@ Add soft-delete columns to `dogs`, update the RLS SELECT policy, extend the Type
 **Intent**: Accept a form POST with `name`, validate it, check for duplicates, create the dog, and redirect. Follows the pattern established in `src/pages/api/auth/signin.ts`.
 
 **Contract**:
+
 - `export const prerender = false`
 - `POST` handler: returns `Response.json({ error: "Unauthorized" }, { status: 401 })` if `context.locals.user` is null (the `AddDogForm` island navigates to `/auth/signin` on 401 — no server-side redirect); parses `name` from `formData`; validates with zod (non-empty string, trimmed, max 100 chars); on validation failure returns `Response.json({ error: "<message>" }, { status: 400 })`; calls `isDogNameTaken` — if true returns `Response.json({ error: "A dog with that name already exists" }, { status: 409 })`; calls `createDog` with `context.locals.user.id` as `accountId`; on Supabase error returns `Response.json({ error: "<message>" }, { status: 500 })`; on success returns `Response.json({ success: true })` (the island navigates to `/dashboard`)
 
@@ -119,6 +122,7 @@ Add soft-delete columns to `dogs`, update the RLS SELECT policy, extend the Type
 **Intent**: Accept a `DELETE` fetch from the `DeleteDogModal` React island and soft-delete the dog. Returns JSON (not a redirect) so the island can handle success and error states client-side.
 
 **Contract**:
+
 - `export const prerender = false`
 - `DELETE` handler: returns `Response.json({ error: "Unauthorized" }, { status: 401 })` if `context.locals.user` is null; reads `context.params.id`; calls `softDeleteDog` — if it returns `false`, returns `Response.json({ error: "Not found" }, { status: 404 })`; returns `Response.json({ success: true })` on success; returns `Response.json({ error: "..." }, { status: 500 })` on Supabase error
 
@@ -156,6 +160,7 @@ Wire the data layer into the application: extend the middleware for dog route pr
 **Intent**: Protect all `/dogs/*` routes and, for URL segments that contain a UUID dog ID, validate ownership and attach the dog to `context.locals.selectedDog` so every downstream page and layout has type-safe access.
 
 **Contract**:
+
 - Add `"/dogs"` to `PROTECTED_ROUTES` (the existing `startsWith` check covers `/dogs/new`, `/dogs/[id]/dashboard`, etc.). Note: API routes under `/api/dog/*` live at a different prefix and are **not** covered by this entry — each API route is responsible for its own auth guard (check `context.locals.user`, redirect or return 401 if null; do not assume PROTECTED_ROUTES handles it).
 - After the existing user auth check, test `context.url.pathname` against the UUID regex (see Critical Implementation Details); if matched, call `getDogById(supabase, dogId)` — if it returns `null` redirect to `/dashboard`; otherwise set `context.locals.selectedDog = dog`
 - For non-ID paths (e.g. `/dogs/new`, `/dashboard`) set `context.locals.selectedDog = null`
@@ -168,6 +173,7 @@ Wire the data layer into the application: extend the middleware for dog route pr
 **Intent**: The layout for all authenticated screens. Composes `Layout.astro`, renders `Topbar.astro` and a dog-switcher slot. In Phase 2 the switcher slot is a static `<div>` placeholder; Phase 3 replaces it with the `DogSwitcher` React island.
 
 **Contract**:
+
 - Props: `{ title?: string; dogs: Dog[] }` — pages fetch the dog list themselves and pass it in; `selectedDog` is read from `Astro.locals.selectedDog` directly (no prop needed)
 - Renders `<Layout title={title}>` wrapping a header block (Topbar + switcher placeholder) above `<slot />`
 - The switcher placeholder `<div data-dog-switcher />` is the insertion point Phase 3 targets
@@ -179,6 +185,7 @@ Wire the data layer into the application: extend the middleware for dog route pr
 **Intent**: Replace the bare placeholder with the dog-list home page. Fetches the dog list, renders one card per dog (linking to the dog's dashboard URL), and shows an "Add dog" CTA. No delete button here — deletion lives on the individual dog's dashboard page.
 
 **Contract**:
+
 - Switches import from `Layout` to `AuthLayout`; passes the fetched `dogs` array as the `dogs` prop
 - Calls `getDogsList(supabase)` server-side
 - Each dog card links to `/dogs/{dog.id}/dashboard`; no delete button on this page — delete lives on the dog's own dashboard page
@@ -192,6 +199,7 @@ Wire the data layer into the application: extend the middleware for dog route pr
 **Intent**: Server-rendered page shell for the dog creation form. Renders a placeholder `<div>` that `AddDogForm` replaces in Phase 3. No HTML form, no `?error=` query-param handling — all form interaction is client-side and deferred to Phase 3 (importing `AddDogForm` before it exists would break the Phase 2 TypeScript build).
 
 **Contract**:
+
 - Uses `AuthLayout`; fetches dog list for the switcher
 - Renders a static `<div data-add-dog-form />` placeholder where `AddDogForm` will be mounted in Phase 3; no form markup or error-query-param handling in this phase
 
@@ -202,6 +210,7 @@ Wire the data layer into the application: extend the middleware for dog route pr
 **Intent**: The per-dog authenticated screen. A verified placeholder for this slice; S-03 and S-04 will add content.
 
 **Contract**:
+
 - Uses `AuthLayout`; reads `Astro.locals.selectedDog` for the dog name; fetches dog list for the switcher
 - Renders the dog name as an `<h1>`
 - Renders a card/tile with the title "Training elements — coming soon" (placeholder for S-03 content)
@@ -257,6 +266,7 @@ Add the two interactive React islands (`DogSwitcher` and `DeleteDogModal`), inst
 **Intent**: A React island rendering the dog-switcher dropdown in the authenticated header. Each dog entry is a navigation link; no client-side state mutation occurs — switching dogs is a full-page navigation.
 
 **Contract**:
+
 - Props: `dogs: Dog[]`, `selectedDogId?: string`
 - Renders a shadcn `DropdownMenu`; trigger label is the selected dog's name or `"Select dog"` when `selectedDogId` is undefined or unmatched
 - Each dog renders as a `DropdownMenuItem` containing `<a href={"/dogs/" + dog.id + "/dashboard"}>`; the active dog is visually indicated (e.g. checkmark or bold)
@@ -270,6 +280,7 @@ Add the two interactive React islands (`DogSwitcher` and `DeleteDogModal`), inst
 **Intent**: A React island per dog card on `/dashboard` that opens a shadcn AlertDialog for delete confirmation and calls the soft-delete API route on confirm.
 
 **Contract**:
+
 - Props: `dogId: string`, `dogName: string`
 - Trigger: a destructive-variant `Button` labelled "Delete dog" (red/destructive styling)
 - Dialog body: confirmation prompt naming the dog, e.g. "Are you sure you want to delete [dog name]?" — do not promise permanent data removal (soft delete leaves training data in the DB; only future cleanup tooling can fully erase it)
@@ -316,6 +327,7 @@ Add the two interactive React islands (`DogSwitcher` and `DeleteDogModal`), inst
 **Intent**: A React island for `/dogs/new` that submits via `fetch`, shows Sonner toasts on error, and navigates client-side on success or 401. Replaces the Phase 2 placeholder `<div>`.
 
 **Contract**:
+
 - Props: none
 - Renders a controlled text input for `name` and a submit button
 - On submit: calls `fetch("/api/dog", { method: "POST", body: new FormData(formRef.current) })`; disables the submit button during the fetch (loading state)
@@ -339,6 +351,7 @@ Add the two interactive React islands (`DogSwitcher` and `DeleteDogModal`), inst
 **Intent**: A zero-UI island that reads a flash message written to `sessionStorage` before a cross-page navigation, fires the appropriate Sonner toast on mount, then clears the entry. Used by any page that needs to surface a toast after a redirect.
 
 **Contract**:
+
 - Props: none
 - Renders nothing (`return null`)
 - On mount: reads `sessionStorage.getItem('flash')`; if present, parses `{ type: 'success' | 'error', message: string }`, calls `toast[type](message)` via Sonner, then calls `sessionStorage.removeItem('flash')`

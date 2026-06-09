@@ -22,22 +22,23 @@ can import immediately. The schema is the single source of truth for the data mo
 
 ## Key Decisions Made
 
-| Decision | Choice | Why (1 sentence) | Source |
-|---|---|---|---|
-| Naming convention | snake_case for tables + columns | Postgres default; no quoting needed anywhere | Plan |
-| Tick data model | Presence-only rows (insert = tick, delete = untick) | Matches FR-006 ("records presence only"); simplest read path (`COUNT(*)`) | Plan |
-| `training_logs.account_id` | Denormalized from `dogs.account_id` | Enables direct RLS check + `(account_id, dog_id, trained_on)` index without a JOIN | Plan |
-| Index on `training_logs` | `(account_id, dog_id, trained_on)` | Covers the highlight-algorithm query: all tick counts for a dog within a date window | Plan |
-| Element ordering | `sort_position integer` column | Handler can reorder elements; reorder UI/API lands in S-03 | Plan |
-| Element name uniqueness | `UNIQUE(dog_id, name)` | Prevents two identically named rows confusing the grid | Plan |
-| anon role policies | Implicit deny (no policies written) | RLS-on + no policy = deny; explicit DENY boilerplate adds zero security | Plan |
-| TypeScript types | Hand-written in `src/types.ts` | No CLI step, no generated file; fits small-scale project | Plan |
-| Rollback SQL | Commented block at bottom of each file | Documents revert intent without adding CLI complexity | Plan |
-| Scope boundary | Migrations + TS types only (no service layer) | Service functions belong to S-02/S-03/S-04 which define the call patterns | Plan |
+| Decision                   | Choice                                              | Why (1 sentence)                                                                     | Source |
+| -------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------ | ------ |
+| Naming convention          | snake_case for tables + columns                     | Postgres default; no quoting needed anywhere                                         | Plan   |
+| Tick data model            | Presence-only rows (insert = tick, delete = untick) | Matches FR-006 ("records presence only"); simplest read path (`COUNT(*)`)            | Plan   |
+| `training_logs.account_id` | Denormalized from `dogs.account_id`                 | Enables direct RLS check + `(account_id, dog_id, trained_on)` index without a JOIN   | Plan   |
+| Index on `training_logs`   | `(account_id, dog_id, trained_on)`                  | Covers the highlight-algorithm query: all tick counts for a dog within a date window | Plan   |
+| Element ordering           | `sort_position integer` column                      | Handler can reorder elements; reorder UI/API lands in S-03                           | Plan   |
+| Element name uniqueness    | `UNIQUE(dog_id, name)`                              | Prevents two identically named rows confusing the grid                               | Plan   |
+| anon role policies         | Implicit deny (no policies written)                 | RLS-on + no policy = deny; explicit DENY boilerplate adds zero security              | Plan   |
+| TypeScript types           | Hand-written in `src/types.ts`                      | No CLI step, no generated file; fits small-scale project                             | Plan   |
+| Rollback SQL               | Commented block at bottom of each file              | Documents revert intent without adding CLI complexity                                | Plan   |
+| Scope boundary             | Migrations + TS types only (no service layer)       | Service functions belong to S-02/S-03/S-04 which define the call patterns            | Plan   |
 
 ## Scope
 
 **In scope:**
+
 - `supabase/migrations/` directory with 3 SQL files
 - RLS enabled + 4 policies on `dogs`, 4 on `training_elements`, 3 on `training_logs`
 - `(account_id, dog_id, trained_on)` index on `training_logs`
@@ -45,6 +46,7 @@ can import immediately. The schema is the single source of truth for the data mo
 - `supabase/seed.sql` — commented placeholder
 
 **Out of scope:**
+
 - Service layer (`src/lib/services/`) — downstream slices
 - `updated_at` trigger — app code updates it on rename
 - User-orderable reorder API — S-03
@@ -61,10 +63,10 @@ checks via `EXISTS (SELECT 1 FROM dogs WHERE …)`.
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-|---|---|---|
-| 1. Database migrations | 3 SQL files, RLS live, index present | Misconfigured RLS policy silently allows cross-account reads — caught by the two-user spot-check in manual verification |
-| 2. TypeScript types + seed | `src/types.ts` importable, `seed.sql` placeholder | Types drifting from schema if a future migration isn't reflected here |
+| Phase                      | What it delivers                                  | Key risk                                                                                                                |
+| -------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 1. Database migrations     | 3 SQL files, RLS live, index present              | Misconfigured RLS policy silently allows cross-account reads — caught by the two-user spot-check in manual verification |
+| 2. TypeScript types + seed | `src/types.ts` importable, `seed.sql` placeholder | Types drifting from schema if a future migration isn't reflected here                                                   |
 
 **Prerequisites:** Local Supabase CLI installed and `npx supabase start` able to run  
 **Estimated effort:** ~1 session across 2 phases

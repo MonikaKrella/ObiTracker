@@ -19,24 +19,25 @@ The stack already uses `@astrojs/cloudflare` and targets the `workerd` runtime �
 
 ## Platform Comparison
 
-| Platform | CLI-first | Managed/Serverless | Agent docs | Stable deploy API | MCP/Integration | Total |
-|---|---|---|---|---|---|---|
-| **Cloudflare Workers** | Pass | Pass | Pass | Pass | Pass | **5/5** |
-| Netlify | Partial | Pass | Pass | Pass | Pass | **4.5/5** |
-| Vercel | Pass† | Pass | Pass | Pass | Pass | **4.5/5**† |
-| Render | Partial | Partial | Pass | Pass | Pass | **4/5** |
-| Railway | Partial | Partial | Partial | Pass | Partial | **3/5** |
-| Fly.io | Partial | Partial | **Fail** | Pass | Partial | **2.5/5** |
+| Platform               | CLI-first | Managed/Serverless | Agent docs | Stable deploy API | MCP/Integration | Total      |
+| ---------------------- | --------- | ------------------ | ---------- | ----------------- | --------------- | ---------- |
+| **Cloudflare Workers** | Pass      | Pass               | Pass       | Pass              | Pass            | **5/5**    |
+| Netlify                | Partial   | Pass               | Pass       | Pass              | Pass            | **4.5/5**  |
+| Vercel                 | Pass†     | Pass               | Pass       | Pass              | Pass            | **4.5/5**† |
+| Render                 | Partial   | Partial            | Pass       | Pass              | Pass            | **4/5**    |
+| Railway                | Partial   | Partial            | Partial    | Pass              | Partial         | **3/5**    |
+| Fly.io                 | Partial   | Partial            | **Fail**   | Pass              | Partial         | **2.5/5**  |
 
 † Vercel scores a nominal 5/5 but carries two material penalties: an open untriaged Astro 6 esbuild build failure (issue #16258, 2026-05-24) and a Hobby-plan commercial-use prohibition. On the cost constraint alone it is disqualified from production use without the $20/user/month Pro plan.
 
 **Partial scores explained:**
-- *CLI-first Partial*: Netlify, Render, Railway, Fly.io all lack a one-command CLI rollback. Rollback requires dashboard interaction or a scripted multi-step workaround.
-- *Managed/Serverless Partial*: Fly.io and Railway deploy containers, not pure serverless — they abstract OS management but require Dockerfiles, `fly.toml`/`railway.json`, and operator knowledge of persistent process lifecycle.
-- *Agent docs Partial (Railway)*: Docs are accessible via `.md` URL suffix and GitHub source but no root `llms.txt` file. Functional for agents but requires knowing the URL pattern.
-- *Agent docs Fail (Fly.io)*: No `llms.txt`, no GitHub-hosted markdown docs. Documentation lives in a rendered HTML site only.
-- *MCP Partial (Fly.io)*: `fly mcp server` is explicitly `--experimental` as of 2026-05-24.
-- *MCP Partial (Railway)*: MCP server is documented as "a work in progress" by Railway's own team.
+
+- _CLI-first Partial_: Netlify, Render, Railway, Fly.io all lack a one-command CLI rollback. Rollback requires dashboard interaction or a scripted multi-step workaround.
+- _Managed/Serverless Partial_: Fly.io and Railway deploy containers, not pure serverless — they abstract OS management but require Dockerfiles, `fly.toml`/`railway.json`, and operator knowledge of persistent process lifecycle.
+- _Agent docs Partial (Railway)_: Docs are accessible via `.md` URL suffix and GitHub source but no root `llms.txt` file. Functional for agents but requires knowing the URL pattern.
+- _Agent docs Fail (Fly.io)_: No `llms.txt`, no GitHub-hosted markdown docs. Documentation lives in a rendered HTML site only.
+- _MCP Partial (Fly.io)_: `fly mcp server` is explicitly `--experimental` as of 2026-05-24.
+- _MCP Partial (Railway)_: MCP server is documented as "a work in progress" by Railway's own team.
 
 ### Shortlisted Platforms
 
@@ -74,7 +75,7 @@ Six months after launch, ObiTracker has quietly stalled on Cloudflare. The initi
 
 - **`deployment_target: cloudflare-pages` in `tech-stack.md` will route the deploy plan to the wrong command**: `wrangler pages deploy` and `wrangler deploy` produce different build artifacts, use different `wrangler.jsonc` schemas, and write to different Cloudflare products. The deploy plan must explicitly specify Workers, not Pages.
 
-- **`astro:env/server` env vars on Cloudflare are Workers *bindings*, not process env**: Setting `SUPABASE_URL` in a `.env` file does nothing at runtime on Workers. Variables must be declared in `wrangler.jsonc` under `[vars]` (non-secret) or set via `wrangler secret put` (secret). A first deploy commonly fails silently because the developer expected `.env` to work at runtime as it does locally.
+- **`astro:env/server` env vars on Cloudflare are Workers _bindings_, not process env**: Setting `SUPABASE_URL` in a `.env` file does nothing at runtime on Workers. Variables must be declared in `wrangler.jsonc` under `[vars]` (non-secret) or set via `wrangler secret put` (secret). A first deploy commonly fails silently because the developer expected `.env` to work at runtime as it does locally.
 
 - **Preview deployments on Workers are publicly accessible by default**: Workers preview URLs (`*.workers.dev` preview builds) have no authentication. Protecting them requires Cloudflare Access (a separate Zero Trust product), not a simple per-URL password like Vercel/Netlify offer on free tiers.
 
@@ -96,18 +97,18 @@ Six months after launch, ObiTracker has quietly stalled on Cloudflare. The initi
 
 ## Risk Register
 
-| Risk | Source | Likelihood | Impact | Mitigation |
-|---|---|---|---|---|
-| Deploy wired to `wrangler pages deploy` instead of `wrangler deploy` | Unknown unknowns | High | Medium | Deploy plan must explicitly specify `wrangler deploy`; confirm `wrangler.jsonc` uses Workers schema before first deploy |
-| `@supabase/ssr` auth breaks without `nodejs_compat` flag | Devil's advocate | High | High | Add `"compatibility_flags": ["nodejs_compat"]` to `wrangler.jsonc` before first deploy; validate in `astro dev` (workerd) not just Node.js |
-| `astro:env/server` vars undefined at runtime because dev set them in `.env` | Unknown unknowns | High | High | Document in deploy plan: runtime secrets go in Cloudflare Workers Secrets (`wrangler secret put`), not `.env` |
-| Astro 6 bug #16553 blocks builds if a prerendered route is added | Devil's advocate | Medium | High | Keep all routes dynamic (`prerender = false` or `output: "server"`); check issue status before adding any prerendered page |
-| CPU time limit (10ms/req) causes silent 1101 errors on complex queries | Devil's advocate | Low | Medium | Profile training-grid sort/rank logic locally; upgrade to Workers Paid ($5/month) if CPU usage approaches 10ms |
-| `wrangler secret put` cannot be run non-interactively by agent | Devil's advocate | Medium | Low | Pre-seed secrets in the Cloudflare dashboard before agent-driven deploys; use `echo "VALUE" \| wrangler secret put KEY` for CI pipelines |
-| Preview URLs are publicly accessible without Cloudflare Access | Unknown unknowns | Medium | Low | Accept for MVP (no sensitive data in preview builds); add Cloudflare Access if preview builds contain auth-gated data |
-| Pages vs Workers deployment history isolated — rollback may miss Pages-era deploys | Unknown unknowns | Low | Low | Ensure project is Workers-only from day one; never use `wrangler pages deploy` |
-| Free tier daily cap (100k req/day) causes 1101 errors on traffic spike | Devil's advocate | Low | Medium | Monitor via Cloudflare Analytics; upgrade to Workers Paid ($5/month) if daily request count approaches 80k |
-| Astro 6 bug #15684 crashes builds if Wasm-dependent library is added | Research finding | Low | Medium | Avoid Wasm-dependent packages (e.g., Satori for OG images) until bug is resolved; mark affected routes `prerender = false` as workaround |
+| Risk                                                                               | Source           | Likelihood | Impact | Mitigation                                                                                                                                 |
+| ---------------------------------------------------------------------------------- | ---------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Deploy wired to `wrangler pages deploy` instead of `wrangler deploy`               | Unknown unknowns | High       | Medium | Deploy plan must explicitly specify `wrangler deploy`; confirm `wrangler.jsonc` uses Workers schema before first deploy                    |
+| `@supabase/ssr` auth breaks without `nodejs_compat` flag                           | Devil's advocate | High       | High   | Add `"compatibility_flags": ["nodejs_compat"]` to `wrangler.jsonc` before first deploy; validate in `astro dev` (workerd) not just Node.js |
+| `astro:env/server` vars undefined at runtime because dev set them in `.env`        | Unknown unknowns | High       | High   | Document in deploy plan: runtime secrets go in Cloudflare Workers Secrets (`wrangler secret put`), not `.env`                              |
+| Astro 6 bug #16553 blocks builds if a prerendered route is added                   | Devil's advocate | Medium     | High   | Keep all routes dynamic (`prerender = false` or `output: "server"`); check issue status before adding any prerendered page                 |
+| CPU time limit (10ms/req) causes silent 1101 errors on complex queries             | Devil's advocate | Low        | Medium | Profile training-grid sort/rank logic locally; upgrade to Workers Paid ($5/month) if CPU usage approaches 10ms                             |
+| `wrangler secret put` cannot be run non-interactively by agent                     | Devil's advocate | Medium     | Low    | Pre-seed secrets in the Cloudflare dashboard before agent-driven deploys; use `echo "VALUE" \| wrangler secret put KEY` for CI pipelines   |
+| Preview URLs are publicly accessible without Cloudflare Access                     | Unknown unknowns | Medium     | Low    | Accept for MVP (no sensitive data in preview builds); add Cloudflare Access if preview builds contain auth-gated data                      |
+| Pages vs Workers deployment history isolated — rollback may miss Pages-era deploys | Unknown unknowns | Low        | Low    | Ensure project is Workers-only from day one; never use `wrangler pages deploy`                                                             |
+| Free tier daily cap (100k req/day) causes 1101 errors on traffic spike             | Devil's advocate | Low        | Medium | Monitor via Cloudflare Analytics; upgrade to Workers Paid ($5/month) if daily request count approaches 80k                                 |
+| Astro 6 bug #15684 crashes builds if Wasm-dependent library is added               | Research finding | Low        | Medium | Avoid Wasm-dependent packages (e.g., Satori for OG images) until bug is resolved; mark affected routes `prerender = false` as workaround   |
 
 ## Getting Started
 
@@ -126,6 +127,7 @@ The stack already targets Cloudflare Workers via `@astrojs/cloudflare`. Before t
 ## Out of Scope
 
 The following were not evaluated in this research:
+
 - Docker image configuration
 - CI/CD pipeline setup (covered in the deploy plan)
 - Production-scale architecture (multi-region, HA, DR)

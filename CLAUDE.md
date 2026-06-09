@@ -17,15 +17,16 @@ No test suite is configured — do not add one unless asked.
 
 ## Project: ObiTracker
 
-A competitive dog obedience training tracker. The core product value: one glance at a training grid tells the handler *what to train next* — green rows are the 3 most-trained elements, red rows are the 3 least-trained, within a configurable 7/14/30-day rolling window. Custom training elements per dog (not a fixed exercise list) are the differentiating feature.
+A competitive dog obedience training tracker. The core product value: one glance at a training grid tells the handler _what to train next_ — green rows are the 3 most-trained elements, red rows are the 3 least-trained, within a configurable 7/14/30-day rolling window. Custom training elements per dog (not a fixed exercise list) are the differentiating feature.
 
 See `context/foundation/prd.md` for the full requirements. Key scoping decisions:
+
 - Competition results (scores, rankings) are explicitly **v2 only**.
 - No session notes or comments — the grid records presence only (tick/untick).
 - No OAuth; email + password auth only.
 - No sharing, no multi-user access to a dog's data.
 
-**Green/red highlight business rule (non-obvious):** top 3 and bottom 3 by tick count within the selected window. Ties at rank 1 (or last) expand the highlighted set — all tied rows are shown. Ties at rank 2 or 3 do *not* expand it.
+**Green/red highlight business rule (non-obvious):** top 3 and bottom 3 by tick count within the selected window. Ties at rank 1 (or last) expand the highlighted set — all tied rows are shown. Ties at rank 2 or 3 do _not_ expand it.
 
 ## Architecture
 
@@ -65,12 +66,12 @@ Review AI-generated code before merge with the **implementation review chain**:
 
 ### Task Router - Where to start
 
-| Skill | Use it when |
-| --- | --- |
-| **Code review (lesson focus)** | |
+| Skill                          | Use it when                                                                                                                                                                                                                             |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Code review (lesson focus)** |                                                                                                                                                                                                                                         |
 | `/10x-impl-review <change-id>` | You have implemented code and want a structured review before merge. The skill checks plan adherence, scope discipline, safety and quality, architecture, pattern consistency, and success criteria, then presents findings for triage. |
-| **Recurring lesson outcome** | |
-| `/10x-lesson` | A finding reveals a recurring project rule or agent failure pattern. Record it in `context/foundation/lessons.md` instead of treating it as a one-off note. |
+| **Recurring lesson outcome**   |                                                                                                                                                                                                                                         |
+| `/10x-lesson`                  | A finding reveals a recurring project rule or agent failure pattern. Record it in `context/foundation/lessons.md` instead of treating it as a one-off note.                                                                             |
 
 ### Triage discipline
 

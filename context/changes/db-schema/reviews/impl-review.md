@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: Database Schema Implementation Plan
 
 - **Plan**: context/changes/db-schema/plan.md
@@ -9,14 +10,14 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | PASS |
-| Scope Discipline | WARNING |
-| Safety & Quality | WARNING |
-| Architecture | PASS |
+| Dimension           | Verdict |
+| ------------------- | ------- |
+| Plan Adherence      | PASS    |
+| Scope Discipline    | WARNING |
+| Safety & Quality    | WARNING |
+| Architecture        | PASS    |
 | Pattern Consistency | WARNING |
-| Success Criteria | PASS |
+| Success Criteria    | PASS    |
 
 ## Notes
 
@@ -60,6 +61,7 @@ Plan Adherence: zero DRIFT, zero MISSING across all 5 planned files. The three m
       AND training_elements.dog_id = dog_id
   )
   ```
+
   - Strength: Closes the gap at the DB layer; zero schema change needed.
   - Tradeoff: Adds one subquery to INSERT RLS — negligible for write-path ops.
   - Confidence: HIGH — narrow and additive fix.
@@ -87,6 +89,7 @@ Plan Adherence: zero DRIFT, zero MISSING across all 5 planned files. The three m
    *  the authenticated user's id (from the session). */
   export type NewDog = Pick<Dog, "name" | "account_id">;
   ```
+
   - Strength: TypeScript enforces that callers pass account_id; omission caught at compile time.
   - Tradeoff: Service layer must thread account_id through (it does anyway — this makes it explicit).
   - Confidence: HIGH — standard Supabase pattern for user-scoped rows.
@@ -97,6 +100,7 @@ Plan Adherence: zero DRIFT, zero MISSING across all 5 planned files. The three m
    *  do not include in client-provided data. */
   export type NewDog = Pick<Dog, "name">;
   ```
+
   - Strength: No type change; service layer still injects freely.
   - Tradeoff: Type remains incomplete; compiler cannot warn on omission.
   - Confidence: MEDIUM — documentation-only; relies on future implementers reading the comment.

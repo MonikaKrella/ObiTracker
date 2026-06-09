@@ -16,24 +16,25 @@ An authenticated user lands on `/dashboard` and sees their dogs listed as cards.
 
 ## Key Decisions Made
 
-| Decision | Choice | Why |
-|---|---|---|
-| Selected dog persistence | URL routing (`/dogs/[id]/...`) | Stateless, no stale-state risk; dog ID always in the URL |
-| Middleware dog validation | Validate + attach `context.locals.selectedDog` | Centralises ownership check; every page gets the dog for free |
-| Authenticated layout | New `AuthLayout.astro` | Clean separation from public screens; no conditional logic in base layout |
-| `/dashboard` role | Dog-list home page | Inline landing with all dogs visible; no extra selector screen |
-| Add dog | Dedicated `/dogs/new` page | Consistent with auth page pattern; simple form |
-| Scope | Add + list + switch + soft delete | Delete needed to avoid accumulating test dogs; hard delete deferred |
-| `NewDog` type | Keep `Pick<Dog, "name">`; inject `account_id` at service layer | `account_id` structurally cannot come from user input |
-| Dog name uniqueness | App-level check (one extra query) | Prevents ambiguous switcher labels; no DB migration needed |
-| Delete confirmation | shadcn `AlertDialog` React island | Modal pattern matches shadcn conventions; action is irreversible |
-| Post-delete redirect | Always `/dashboard` | Single predictable target regardless of remaining dog count |
-| Dog switcher | shadcn `DropdownMenu` React island | Polished, accessible, extensible; navigation links only (no client state) |
-| Soft delete shape | `is_deleted boolean` (filter) + `deleted_at timestamptz` (audit) | Boolean is fast to index/query; timestamp preserves audit trail |
+| Decision                  | Choice                                                           | Why                                                                       |
+| ------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Selected dog persistence  | URL routing (`/dogs/[id]/...`)                                   | Stateless, no stale-state risk; dog ID always in the URL                  |
+| Middleware dog validation | Validate + attach `context.locals.selectedDog`                   | Centralises ownership check; every page gets the dog for free             |
+| Authenticated layout      | New `AuthLayout.astro`                                           | Clean separation from public screens; no conditional logic in base layout |
+| `/dashboard` role         | Dog-list home page                                               | Inline landing with all dogs visible; no extra selector screen            |
+| Add dog                   | Dedicated `/dogs/new` page                                       | Consistent with auth page pattern; simple form                            |
+| Scope                     | Add + list + switch + soft delete                                | Delete needed to avoid accumulating test dogs; hard delete deferred       |
+| `NewDog` type             | Keep `Pick<Dog, "name">`; inject `account_id` at service layer   | `account_id` structurally cannot come from user input                     |
+| Dog name uniqueness       | App-level check (one extra query)                                | Prevents ambiguous switcher labels; no DB migration needed                |
+| Delete confirmation       | shadcn `AlertDialog` React island                                | Modal pattern matches shadcn conventions; action is irreversible          |
+| Post-delete redirect      | Always `/dashboard`                                              | Single predictable target regardless of remaining dog count               |
+| Dog switcher              | shadcn `DropdownMenu` React island                               | Polished, accessible, extensible; navigation links only (no client state) |
+| Soft delete shape         | `is_deleted boolean` (filter) + `deleted_at timestamptz` (audit) | Boolean is fast to index/query; timestamp preserves audit trail           |
 
 ## Scope
 
 **In scope:**
+
 - New migration: `is_deleted` + `deleted_at` columns, updated SELECT RLS policy
 - Dog service: list, get, uniqueness check, create, soft-delete
 - POST `/api/dogs` (create) and DELETE `/api/dogs/[id]` (soft-delete)
@@ -44,6 +45,7 @@ An authenticated user lands on `/dashboard` and sees their dogs listed as cards.
 - Middleware: dog route protection + `selectedDog` injection
 
 **Out of scope:**
+
 - Dog rename
 - Hard delete / cascade cleanup of elements and logs
 - Restoring soft-deleted dogs
@@ -56,11 +58,11 @@ Dog identity lives entirely in the URL (`/dogs/[id]/...`). The middleware extrac
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-|---|---|---|
-| 1. Data layer | Migration, types, dog service, create + delete API routes | RLS SELECT policy must drop-and-replace (not patch) the existing policy |
-| 2. Routing skeleton | Middleware, AuthLayout, all page files (with static switcher) | UUID regex in middleware must not match `/dogs/new` |
-| 3. React islands | DogSwitcher + DeleteDogModal wired into layout and dashboard | shadcn components not yet installed; must be added before islands compile |
+| Phase               | What it delivers                                              | Key risk                                                                  |
+| ------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 1. Data layer       | Migration, types, dog service, create + delete API routes     | RLS SELECT policy must drop-and-replace (not patch) the existing policy   |
+| 2. Routing skeleton | Middleware, AuthLayout, all page files (with static switcher) | UUID regex in middleware must not match `/dogs/new`                       |
+| 3. React islands    | DogSwitcher + DeleteDogModal wired into layout and dashboard  | shadcn components not yet installed; must be added before islands compile |
 
 **Prerequisites:** F-01 (`db-schema`) and S-01 (`auth-flow`) both marked `ready` in the roadmap.  
 **Estimated effort:** ~2 sessions across 3 phases.

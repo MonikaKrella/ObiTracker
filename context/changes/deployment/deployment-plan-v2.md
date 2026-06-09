@@ -86,34 +86,47 @@ npx wrangler whoami
 **Files:** `wrangler.jsonc`, `package.json`
 
 ### 1a. Rename Worker
+
 In `wrangler.jsonc`, change:
+
 ```jsonc
 "name": "10x-astro-starter"
 ```
+
 to:
+
 ```jsonc
 "name": "obitracker"
 ```
+
 Do this before any `wrangler deploy`. If deployed under the old name first, a new Worker named
 `obitracker` is created on the next deploy and the old `10x-astro-starter` Worker persists,
 consuming quota and causing confusion.
 
 ### 1b. Add deploy script
+
 In `package.json`, add to `scripts`:
+
 ```json
 "deploy": "wrangler deploy"
 ```
+
 Used for local deploys and readable as `npm run deploy`.
 
 ### 1c. Rename local Supabase project_id
+
 In `supabase/config.toml`, change:
+
 ```toml
 project_id = "10x-astro-starter"
 ```
+
 to:
+
 ```toml
 project_id = "obitracker"
 ```
+
 Needed if you ever run `supabase` CLI commands locally (`supabase db push`, `supabase migration`) — a mismatched `project_id` targets the wrong cloud project.
 
 ---
@@ -167,6 +180,7 @@ wrangler secret put SUPABASE_KEY
 ```
 
 Verify both are stored:
+
 ```bash
 wrangler secret list
 # Should show: SUPABASE_URL, SUPABASE_KEY
@@ -189,6 +203,7 @@ npm run deploy         # wrangler deploy — uploads to Cloudflare Workers
 ```
 
 Expected output from `wrangler deploy`:
+
 ```
 Total Upload: XX KiB / gzip: XX KiB
 Uploaded obitracker (X sec)
@@ -214,7 +229,7 @@ If this is your first deploy, the Worker is created automatically — no dashboa
 - [x] Navigate to `/auth/signin` — confirm page renders without errors
 - [x] Create a test account via sign-up — confirm confirmation email arrives
 - [x] Click the confirmation link in the email — confirm redirect lands back on the app
-       (Phase 3 Supabase Site URL corrected to `https://obitracker.monika-krella.workers.dev`)
+      (Phase 3 Supabase Site URL corrected to `https://obitracker.monika-krella.workers.dev`)
 - [x] Sign in with the confirmed account — confirm redirect to `/dashboard`
 - [x] Run `wrangler tail` and reproduce a sign-in to confirm no runtime errors in the stream
 

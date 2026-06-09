@@ -46,81 +46,81 @@ Use this section as a checklist when reviewing the generated migrations.
 
 ### `dogs`
 
-| Column       | Type        | Constraints / Default                                   |
-|--------------|-------------|---------------------------------------------------------|
-| `id`         | `uuid`      | `PRIMARY KEY DEFAULT gen_random_uuid()`                 |
-| `account_id` | `uuid`      | `NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE`  |
-| `name`       | `text`      | `NOT NULL`                                              |
-| `created_at` | `timestamptz` | `NOT NULL DEFAULT NOW()`                              |
-| `updated_at` | `timestamptz` | `NOT NULL DEFAULT NOW()`                              |
+| Column       | Type          | Constraints / Default                                  |
+| ------------ | ------------- | ------------------------------------------------------ |
+| `id`         | `uuid`        | `PRIMARY KEY DEFAULT gen_random_uuid()`                |
+| `account_id` | `uuid`        | `NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE` |
+| `name`       | `text`        | `NOT NULL`                                             |
+| `created_at` | `timestamptz` | `NOT NULL DEFAULT NOW()`                               |
+| `updated_at` | `timestamptz` | `NOT NULL DEFAULT NOW()`                               |
 
 RLS policies (4, all role `authenticated`):
 
-| Policy name                   | Operation | Expression                          |
-|-------------------------------|-----------|-------------------------------------|
-| `dogs_select_authenticated`   | SELECT    | `USING ((select auth.uid()) = account_id)`   |
-| `dogs_insert_authenticated`   | INSERT    | `WITH CHECK ((select auth.uid()) = account_id)` |
-| `dogs_update_authenticated`   | UPDATE    | `USING + WITH CHECK ((select auth.uid()) = account_id)` |
-| `dogs_delete_authenticated`   | DELETE    | `USING ((select auth.uid()) = account_id)`   |
+| Policy name                 | Operation | Expression                                              |
+| --------------------------- | --------- | ------------------------------------------------------- |
+| `dogs_select_authenticated` | SELECT    | `USING ((select auth.uid()) = account_id)`              |
+| `dogs_insert_authenticated` | INSERT    | `WITH CHECK ((select auth.uid()) = account_id)`         |
+| `dogs_update_authenticated` | UPDATE    | `USING + WITH CHECK ((select auth.uid()) = account_id)` |
+| `dogs_delete_authenticated` | DELETE    | `USING ((select auth.uid()) = account_id)`              |
 
 ---
 
 ### `training_elements`
 
-| Column          | Type        | Constraints / Default                                    |
-|-----------------|-------------|----------------------------------------------------------|
-| `id`            | `uuid`      | `PRIMARY KEY DEFAULT gen_random_uuid()`                  |
-| `dog_id`        | `uuid`      | `NOT NULL REFERENCES dogs(id) ON DELETE CASCADE`         |
-| `name`          | `text`      | `NOT NULL`                                               |
-| `sort_position` | `integer`   | `NOT NULL DEFAULT 0`                                     |
-| `created_at`    | `timestamptz` | `NOT NULL DEFAULT NOW()`                               |
+| Column          | Type          | Constraints / Default                            |
+| --------------- | ------------- | ------------------------------------------------ |
+| `id`            | `uuid`        | `PRIMARY KEY DEFAULT gen_random_uuid()`          |
+| `dog_id`        | `uuid`        | `NOT NULL REFERENCES dogs(id) ON DELETE CASCADE` |
+| `name`          | `text`        | `NOT NULL`                                       |
+| `sort_position` | `integer`     | `NOT NULL DEFAULT 0`                             |
+| `created_at`    | `timestamptz` | `NOT NULL DEFAULT NOW()`                         |
 
 Table constraints:
 
-| Constraint name                              | Definition                    |
-|----------------------------------------------|-------------------------------|
-| `training_elements_dog_id_name_unique`       | `UNIQUE (dog_id, name)`       |
+| Constraint name                        | Definition              |
+| -------------------------------------- | ----------------------- |
+| `training_elements_dog_id_name_unique` | `UNIQUE (dog_id, name)` |
 
 RLS policies (4, all role `authenticated`):
 
-| Policy name                                | Operation | Expression                                                       |
-|--------------------------------------------|-----------|------------------------------------------------------------------|
-| `training_elements_select_authenticated`   | SELECT    | `USING (EXISTS (SELECT 1 FROM dogs WHERE dogs.id = dog_id AND dogs.account_id = (select auth.uid())))` |
-| `training_elements_insert_authenticated`   | INSERT    | `WITH CHECK (EXISTS (…same…))`                                   |
-| `training_elements_update_authenticated`   | UPDATE    | `USING + WITH CHECK (EXISTS (…same…))`                           |
-| `training_elements_delete_authenticated`   | DELETE    | `USING (EXISTS (…same…))`                                        |
+| Policy name                              | Operation | Expression                                                                                             |
+| ---------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------ |
+| `training_elements_select_authenticated` | SELECT    | `USING (EXISTS (SELECT 1 FROM dogs WHERE dogs.id = dog_id AND dogs.account_id = (select auth.uid())))` |
+| `training_elements_insert_authenticated` | INSERT    | `WITH CHECK (EXISTS (…same…))`                                                                         |
+| `training_elements_update_authenticated` | UPDATE    | `USING + WITH CHECK (EXISTS (…same…))`                                                                 |
+| `training_elements_delete_authenticated` | DELETE    | `USING (EXISTS (…same…))`                                                                              |
 
 ---
 
 ### `training_logs`
 
-| Column       | Type        | Constraints / Default                                             |
-|--------------|-------------|-------------------------------------------------------------------|
-| `id`         | `uuid`      | `PRIMARY KEY DEFAULT gen_random_uuid()`                           |
-| `element_id` | `uuid`      | `NOT NULL REFERENCES training_elements(id) ON DELETE CASCADE`     |
-| `dog_id`     | `uuid`      | `NOT NULL REFERENCES dogs(id) ON DELETE CASCADE`                  |
-| `account_id` | `uuid`      | `NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE`            |
-| `trained_on` | `date`      | `NOT NULL`                                                        |
+| Column       | Type   | Constraints / Default                                         |
+| ------------ | ------ | ------------------------------------------------------------- |
+| `id`         | `uuid` | `PRIMARY KEY DEFAULT gen_random_uuid()`                       |
+| `element_id` | `uuid` | `NOT NULL REFERENCES training_elements(id) ON DELETE CASCADE` |
+| `dog_id`     | `uuid` | `NOT NULL REFERENCES dogs(id) ON DELETE CASCADE`              |
+| `account_id` | `uuid` | `NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE`        |
+| `trained_on` | `date` | `NOT NULL`                                                    |
 
 Table constraints:
 
-| Constraint name                                 | Definition                           |
-|-------------------------------------------------|--------------------------------------|
-| `training_logs_element_id_trained_on_unique`    | `UNIQUE (element_id, trained_on)`    |
+| Constraint name                              | Definition                        |
+| -------------------------------------------- | --------------------------------- |
+| `training_logs_element_id_trained_on_unique` | `UNIQUE (element_id, trained_on)` |
 
 Indexes:
 
-| Index name                           | Definition                                         |
-|--------------------------------------|----------------------------------------------------|
-| `training_logs_account_dog_date_idx` | `(account_id, dog_id, trained_on)`                 |
+| Index name                           | Definition                         |
+| ------------------------------------ | ---------------------------------- |
+| `training_logs_account_dog_date_idx` | `(account_id, dog_id, trained_on)` |
 
 RLS policies (3, role `authenticated` — **no UPDATE policy**):
 
-| Policy name                             | Operation | Expression                                    |
-|-----------------------------------------|-----------|-----------------------------------------------|
-| `training_logs_select_authenticated`    | SELECT    | `USING ((select auth.uid()) = account_id)`             |
-| `training_logs_insert_authenticated`    | INSERT    | `WITH CHECK ((select auth.uid()) = account_id AND EXISTS (SELECT 1 FROM dogs WHERE dogs.id = dog_id AND dogs.account_id = (select auth.uid())))` |
-| `training_logs_delete_authenticated`    | DELETE    | `USING ((select auth.uid()) = account_id)`             |
+| Policy name                          | Operation | Expression                                                                                                                                       |
+| ------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `training_logs_select_authenticated` | SELECT    | `USING ((select auth.uid()) = account_id)`                                                                                                       |
+| `training_logs_insert_authenticated` | INSERT    | `WITH CHECK ((select auth.uid()) = account_id AND EXISTS (SELECT 1 FROM dogs WHERE dogs.id = dog_id AND dogs.account_id = (select auth.uid())))` |
+| `training_logs_delete_authenticated` | DELETE    | `USING ((select auth.uid()) = account_id)`                                                                                                       |
 
 > UPDATE intentionally omitted — rows are inserted (tick) or deleted (untick) only.
 
@@ -283,9 +283,9 @@ export interface TrainingLog {
 }
 
 // DTO types — fields required on INSERT (id, created_at, updated_at omitted):
-export type NewDog = Pick<Dog, 'name'>;
-export type NewTrainingElement = Pick<TrainingElement, 'dog_id' | 'name' | 'sort_position'>;
-export type NewTrainingLog = Pick<TrainingLog, 'element_id' | 'dog_id' | 'account_id' | 'trained_on'>;
+export type NewDog = Pick<Dog, "name">;
+export type NewTrainingElement = Pick<TrainingElement, "dog_id" | "name" | "sort_position">;
+export type NewTrainingLog = Pick<TrainingLog, "element_id" | "dog_id" | "account_id" | "trained_on">;
 ```
 
 Add a JSDoc comment on `TrainingLog.trained_on` noting it is the day of the cell, not the time of entry (FR-006).

@@ -16,17 +16,18 @@ A handler can sign up, receive and click the confirmation email, land on `/dashb
 
 ## Key Decisions Made
 
-| Decision | Choice | Why (1 sentence) | Source |
-|---|---|---|---|
-| Post-confirmation UX | Auto-sign-in → `/dashboard` | Zero-friction; token exchange via `verifyOtp` sets session cookies automatically before the redirect fires | Plan |
-| Auth-page guard | Redirect authenticated users to `/dashboard` | Prevents the confusing "sign in again" state; mirrors the existing `PROTECTED_ROUTES` pattern | Plan |
-| Zod validation scope | Mirror client-side rules (email format, 6-char min) | Client and server agree — bypassed forms can't produce opaque Supabase 422s | Plan |
-| Unconfirmed email error | Custom friendly message | "Please confirm your email first — check your inbox." gives the user an action; Supabase's raw string does not | Plan |
-| Post-sign-in redirect | `/dashboard` | Authenticated users belong on the app, not the welcome page | Plan |
+| Decision                | Choice                                              | Why (1 sentence)                                                                                               | Source |
+| ----------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------ |
+| Post-confirmation UX    | Auto-sign-in → `/dashboard`                         | Zero-friction; token exchange via `verifyOtp` sets session cookies automatically before the redirect fires     | Plan   |
+| Auth-page guard         | Redirect authenticated users to `/dashboard`        | Prevents the confusing "sign in again" state; mirrors the existing `PROTECTED_ROUTES` pattern                  | Plan   |
+| Zod validation scope    | Mirror client-side rules (email format, 6-char min) | Client and server agree — bypassed forms can't produce opaque Supabase 422s                                    | Plan   |
+| Unconfirmed email error | Custom friendly message                             | "Please confirm your email first — check your inbox." gives the user an action; Supabase's raw string does not | Plan   |
+| Post-sign-in redirect   | `/dashboard`                                        | Authenticated users belong on the app, not the welcome page                                                    | Plan   |
 
 ## Scope
 
 **In scope:**
+
 - `src/middleware.ts` — add outbound guard for `/auth/signin` and `/auth/signup`
 - `src/pages/api/auth/signin.ts` — fix redirect + add zod + friendly unconfirmed error
 - `src/pages/api/auth/signup.ts` — add zod validation
@@ -34,6 +35,7 @@ A handler can sign up, receive and click the confirmation email, land on `/dashb
 - Supabase dashboard: update Redirect URLs allowlist (manual step)
 
 **Out of scope:**
+
 - No UI changes to any `.astro` auth pages
 - No password reset / forgot-password flow
 - No resend-confirmation-email feature
@@ -46,11 +48,11 @@ All changes are in the API/middleware layer — no new UI components. The `@supa
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-|---|---|---|
-| 1. Auth redirects + guard | Sign-in lands on `/dashboard`; authenticated users can't visit auth pages | Regression: protected-route guard must still work after adding outbound guard |
-| 2. API route hardening | Zod validation + friendly "email not confirmed" error | Supabase error string matching — if Supabase changes wording, friendly message stops matching (falls back to raw string, still readable) |
-| 3. Email confirmation callback | Complete production sign-up flow; `/api/auth/confirm` exchanges token → session | Supabase dashboard config (manual step) must be done before production testing can pass |
+| Phase                          | What it delivers                                                                | Key risk                                                                                                                                 |
+| ------------------------------ | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Auth redirects + guard      | Sign-in lands on `/dashboard`; authenticated users can't visit auth pages       | Regression: protected-route guard must still work after adding outbound guard                                                            |
+| 2. API route hardening         | Zod validation + friendly "email not confirmed" error                           | Supabase error string matching — if Supabase changes wording, friendly message stops matching (falls back to raw string, still readable) |
+| 3. Email confirmation callback | Complete production sign-up flow; `/api/auth/confirm` exchanges token → session | Supabase dashboard config (manual step) must be done before production testing can pass                                                  |
 
 **Prerequisites:** Supabase project is accessible; `SUPABASE_URL` and `SUPABASE_KEY` env vars are set locally and in the Cloudflare Workers secret store.  
 **Estimated effort:** ~1 session across 3 phases (small, targeted changes; 3 files edited, 1 file created)

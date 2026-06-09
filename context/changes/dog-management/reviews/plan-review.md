@@ -1,4 +1,5 @@
 <!-- PLAN-REVIEW-REPORT -->
+
 # Plan Review: Dog Management Implementation Plan
 
 - **Plan**: context/changes/dog-management/plan.md
@@ -9,13 +10,13 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| End-State Alignment | PASS |
-| Lean Execution | PASS |
-| Architectural Fitness | PASS |
-| Blind Spots | WARNING |
-| Plan Completeness | WARNING |
+| Dimension             | Verdict |
+| --------------------- | ------- |
+| End-State Alignment   | PASS    |
+| Lean Execution        | PASS    |
+| Architectural Fitness | PASS    |
+| Blind Spots           | WARNING |
+| Plan Completeness     | WARNING |
 
 ## Grounding
 
@@ -33,11 +34,11 @@ Symbols verified: `PROTECTED_ROUTES` (middleware.ts:4), `createClient` (middlewa
 - **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
 - **Dimension**: Plan Completeness
 - **Location**: Phase 1 — Dog service contract for `isDogNameTaken`
-- **Detail**: The service contract says "case-insensitive check for a live dog with the same name" but doesn't specify the Supabase client method. The natural reach-for is `.ilike('name', name)`, which is correct for typical dog names — but `.ilike()` maps directly to PostgreSQL ILIKE, where `%` and `_` in the input string are interpreted as SQL wildcards. A dog named "Rex" could be blocked by an existing dog named "Re_" (underscore matches any single character). Edge case for MVP, but the correct approach costs nothing to specify now.
+- **Detail**: The service contract says "case-insensitive check for a live dog with the same name" but doesn't specify the Supabase client method. The natural reach-for is `.ilike('name', name)`, which is correct for typical dog names — but `.ilike()` maps directly to PostgreSQL ILIKE, where `%` and `_` in the input string are interpreted as SQL wildcards. A dog named "Rex" could be blocked by an existing dog named "Re\_" (underscore matches any single character). Edge case for MVP, but the correct approach costs nothing to specify now.
 - **Fix**: Update the `isDogNameTaken` contract to specify the query: use `.filter('name', 'ilike', escapedName)` where `escapedName = name.replace(/%/g, '\\%').replace(/_/g, '\\_')` — or note that for MVP the risk is accepted and the check uses plain `.ilike('name', name)`.
 - **Decision**: FIXED — added ILIKE escaping contract to `isDogNameTaken` in Phase 1 dog service
 
-### F2 — Middleware dog-route guard may not catch /api/dogs/* mutations
+### F2 — Middleware dog-route guard may not catch /api/dogs/\* mutations
 
 - **Severity**: ⚠️ WARNING
 - **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
