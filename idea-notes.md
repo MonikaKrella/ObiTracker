@@ -1,7 +1,8 @@
 # ObiTracker - MVP Ideas
 
 ### Main idea
-A web app that provides a compact way to manage obedience dog training - for people that train obedience with their dogs on different levels 
+
+A web app that provides a compact way to manage obedience dog training - for people that train obedience with their dogs on different levels
 Each user should be able to add multiple dogs, and all views described below should be available separately for each dog.
 
 First view – daily training tracker
@@ -38,6 +39,7 @@ later switch to another class and start adding results there as well.
 Average scores should be calculated separately for each class. For example, if both Class 1 and Class 2 contain the exercise “heelwork,” the averages for that exercise should be tracked independently for each class.
 
 ### Basic functionalities (MVP)
+
 - Each user has their own account with login functionality.
 - Each user can add multiple dogs.
 - For each dog, the user can define training elements.
@@ -46,6 +48,7 @@ Average scores should be calculated separately for each class. For example, if b
 - For each dog, the user can add competition results. Based on all competitions in the current class, the app calculates the average score for each exercise and highlights the strongest and weakest exercises.
 
 ### What is not a part of MVP
+
 - Marking elements as priorities or excluding them from frequency calculations.
 - Linking training elements with competition exercises.
 - Suggesting what should be trained based on competition results.

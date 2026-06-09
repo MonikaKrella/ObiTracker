@@ -9,6 +9,14 @@
 - **Rule**: Use `(select auth.uid())` in RLS policy expressions instead of `auth.uid()` directly. The subquery form is evaluated once per statement, not once per row, eliminating the linter warning and improving performance.
 - **Applies to**: plan, implement, impl-review
 
+## Use `useMounted` (useSyncExternalStore) instead of `useState + useEffect` for SSR hydration guards
+
+- **Context**: Any React island that needs to suppress or swap SSR-rendered content until the client has hydrated (e.g. Radix UI dropdowns, dialogs, tooltips rendered with `client:load`)
+- **Problem**: The classic `useState(false) + useEffect(() => setMounted(true), [])` pattern triggers the `react-compiler/react-compiler` lint rule ("Calling setState synchronously within an effect can trigger cascading renders") and causes an extra render cycle on every mount.
+- **Rule**: Use the `useMounted()` hook from `src/components/hooks/useMounted.ts` instead. It is backed by `useSyncExternalStore` with a no-op subscribe, a client snapshot of `true`, and a server snapshot of `false`. React integrates this directly into its rendering lifecycle — no extra render cycle, no lint violation, SSR-safe.
+- **Alternative for DOM-swap patterns**: If the server already renders a placeholder element and the island needs to remove it before the first paint, `useLayoutEffect` with DOM manipulation (no state) is also compiler-clean.
+- **Applies to**: plan, implement, impl-review
+
 ## Revoke anon SELECT on every new public table
 
 - **Context**: Any Supabase migration that creates a table in the public schema

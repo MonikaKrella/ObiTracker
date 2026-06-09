@@ -1,0 +1,20 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { createClient } from "@/lib/supabase";
+import { getDogsList } from "@/lib/services/dogs";
+import { AddDogForm } from "@/components/dogs/AddDogForm";
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const dogs = supabase ? await getDogsList(supabase) : [];
+---
+
+<AuthLayout title="Add dog" dogs={dogs}>
+  <div class="mx-auto max-w-md">
+    <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+      Add a dog
+    </h1>
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+      <AddDogForm client:only="react" />
+    </div>
+  </div>
+</AuthLayout>

@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: Auth Flow — Complete and Verify Email + Password Auth End-to-End
 
 - **Plan**: context/changes/auth-flow/plan.md
@@ -9,14 +10,14 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | PASS |
-| Scope Discipline | PASS (2 unplanned files — supabase/config.toml and wrangler.jsonc — both in-scope support changes) |
-| Safety & Quality | PASS (after triage fixes) |
-| Architecture | PASS |
-| Pattern Consistency | PASS (after triage fixes) |
-| Success Criteria | PASS |
+| Dimension           | Verdict                                                                                            |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
+| Plan Adherence      | PASS                                                                                               |
+| Scope Discipline    | PASS (2 unplanned files — supabase/config.toml and wrangler.jsonc — both in-scope support changes) |
+| Safety & Quality    | PASS (after triage fixes)                                                                          |
+| Architecture        | PASS                                                                                               |
+| Pattern Consistency | PASS (after triage fixes)                                                                          |
+| Success Criteria    | PASS                                                                                               |
 
 ## Findings
 

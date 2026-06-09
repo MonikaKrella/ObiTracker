@@ -31,7 +31,7 @@ checkpoint:
 
 Competitive obedience handlers training after hours have no fast way to log what they worked on or decide what to focus on next. After a session, writing notes takes too long to be sustainable; before a session, reviewing those notes takes too long to be useful. The current tool — a squared notebook or Excel used as a plain grid — captures nothing the handler can act on without re-reading everything.
 
-The insight: other tools optimize for documentation. ObiTracker optimizes for the moment *before* training — one glance tells the handler what to train next. The training grid uses the handler's own custom sub-drill breakdown (not a fixed list), so it fits how they actually train, not how the rulebook categorizes exercises. Competition results use the standard exercise list and surface the weakest scores directly, giving a second signal independent of training frequency.
+The insight: other tools optimize for documentation. ObiTracker optimizes for the moment _before_ training — one glance tells the handler what to train next. The training grid uses the handler's own custom sub-drill breakdown (not a fixed list), so it fits how they actually train, not how the rulebook categorizes exercises. Competition results use the standard exercise list and surface the weakest scores directly, giving a second signal independent of training frequency.
 
 ## User & Persona
 
@@ -58,12 +58,15 @@ The rule consumes two user-facing inputs: the tick records (which element was tr
 ## Success Criteria
 
 ### Primary
+
 - Handler opens the app, sees the training grid for their dog, and can identify what to train next in under 10 seconds — without reading any history or notes.
 
 ### Secondary
+
 - Handler adopts ObiTracker as their default log and stops using notebook or Excel within the first two weeks of use.
 
 ### Guardrails
+
 - No data loss — a tick entered must persist; losing training history destroys trust in the product.
 - Full usability on both phone (field use) and laptop (review at home) — no degraded mobile experience.
 
@@ -78,6 +81,7 @@ Single-user, account-based. Each handler signs up with email + password. All dat
 ## Functional Requirements
 
 ### Authentication
+
 ## Non-Goals
 
 - **No competition results page in v1** — score entry, averages, and strongest/weakest exercise highlights are explicitly v2, contingent on MVP adoption. (Decided in Phase 3.)
@@ -89,25 +93,32 @@ Single-user, account-based. Each handler signs up with email + password. All dat
 ## Functional Requirements
 
 ### Authentication
+
 - FR-001: Handler can sign up and log in with email + password. Priority: must-have
   > Socrates: Counter-argument considered: local-only storage to skip auth complexity. Resolution: rejected — app is web-based and must persist data per account across phone and laptop. Auth is load-bearing.
 
 ### Dog management
+
 - FR-002: Handler can add a dog with a name. Priority: must-have
+
   > Socrates: No counter-argument. Many handlers train more than one dog; single-dog MVP would exclude a real part of the persona from day one.
 
 - FR-003: Handler can switch between dogs. Priority: must-have
   > Socrates: No counter-argument. Follows directly from FR-002; multi-dog support requires a selection mechanism.
 
 ### Training element setup
+
 - FR-004: Handler can add, rename, and remove custom training elements for a dog. Priority: must-have
   > Socrates: No counter-argument. Custom elements are the product's core value — a fixed list does not fit how individual handlers train.
 
 ### Training grid
+
 - FR-005: Handler can view a training grid for the selected dog — element names in the first column, one column per day, with a configurable window of 7, 14, or 30 days; grid scrolls horizontally on mobile. Priority: must-have
+
   > Socrates: Counter-argument considered: fixed 30 days is arbitrary and too wide for phone. Resolution: configurable window (7/14/30) added; horizontal scroll on mobile for wider windows.
 
 - FR-006: Handler can tick or untick any visible cell in the training grid — current day or any past day within the visible window. Priority: must-have
+
   > Socrates: Counter-argument considered: handler may log the morning after training (wrong day), or enter a tick by mistake. Resolution: any visible cell is togglable; the tick records the day of the cell, not the day of entry.
 
 - FR-007: Handler can see row highlights indicating training frequency — the 3 most-trained rows highlighted green, the 3 least-trained rows highlighted red; if multiple rows tie at the highest (or lowest) frequency, all tied rows are highlighted; ties at 2nd or 3rd rank are not highlighted. Priority: must-have
@@ -122,6 +133,7 @@ Single-user, account-based. Each handler signs up with email + password. All dat
 - **Then** they see a loading indicator while data is fetched, and once loaded, a 30-day grid with green and red row highlights they can read at a glance and tick within seconds
 
 #### Acceptance Criteria
+
 - A visible spinner or progress indicator is shown while grid data is loading
 - Once loaded, the grid scrolls smoothly in both directions (up-down and left-right) with no jank
 - Green/red highlight is immediately visible without hovering or extra taps

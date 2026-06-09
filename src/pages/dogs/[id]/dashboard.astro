@@ -1,0 +1,47 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { createClient } from "@/lib/supabase";
+import { getDogsList } from "@/lib/services/dogs";
+import { DeleteDogModal } from "@/components/dogs/DeleteDogModal";
+
+// selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
+// if the dog is not found, soft-deleted, or owned by another user.
+// The null guard below is a defensive fallback for TypeScript's benefit.
+const { selectedDog } = Astro.locals;
+if (!selectedDog) {
+  return Astro.redirect("/dashboard");
+}
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const dogs = supabase ? await getDogsList(supabase) : [];
+---
+
+<AuthLayout title={selectedDog.name} dogs={dogs}>
+  <div class="space-y-6">
+    <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+      {selectedDog.name}
+    </h1>
+
+    <!-- Training elements tile — content added in S-03 -->
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+      <h2 class="mb-2 text-lg font-semibold text-white">Training elements</h2>
+      <p class="text-sm text-blue-100/40">Coming soon…</p>
+    </div>
+
+    <!--
+      Placeholder shown until DeleteDogModal mounts. The island is wrapped in
+      a hidden element so it occupies no space until useLayoutEffect swaps them,
+      preventing any double-button flash.
+    -->
+    <button
+      id="delete-dog-placeholder"
+      disabled
+      class="bg-destructive inline-flex h-9 shrink-0 cursor-not-allowed items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap text-white opacity-50"
+    >
+      Delete dog
+    </button>
+    <span id="delete-dog-island" hidden>
+      <DeleteDogModal dogId={selectedDog.id} dogName={selectedDog.name} client:only="react" />
+    </span>
+  </div>
+</AuthLayout>

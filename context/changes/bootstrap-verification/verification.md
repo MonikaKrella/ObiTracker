@@ -40,10 +40,10 @@ ObiTracker is a solo, after-hours web app with a 3-week MVP timeline and email+p
 
 ## Pre-scaffold verification
 
-| Signal      | Value                                                   | Severity | Notes                               |
-| ----------- | ------------------------------------------------------- | -------- | ----------------------------------- |
-| npm package | not run (cmd_template uses git clone, not npm create)   | n/a      | git-clone strategy; npm step skipped |
-| GitHub repo | przeprogramowani/10x-astro-starter last pushed 2026-05-17 | fresh  | 6 days ago; from card docs_url      |
+| Signal      | Value                                                     | Severity | Notes                                |
+| ----------- | --------------------------------------------------------- | -------- | ------------------------------------ |
+| npm package | not run (cmd_template uses git clone, not npm create)     | n/a      | git-clone strategy; npm step skipped |
+| GitHub repo | przeprogramowani/10x-astro-starter last pushed 2026-05-17 | fresh    | 6 days ago; from card docs_url       |
 
 ## Scaffold log
 
@@ -87,27 +87,28 @@ None.
 
 ## Hints recorded but not acted on
 
-| Hint                    | Value             |
-| ----------------------- | ----------------- |
-| bootstrapper_confidence | first-class       |
-| quality_override        | false             |
-| path_taken              | standard          |
-| self_check_answers      | null              |
-| team_size               | solo              |
-| deployment_target       | cloudflare-pages  |
-| ci_provider             | github-actions    |
+| Hint                    | Value                |
+| ----------------------- | -------------------- |
+| bootstrapper_confidence | first-class          |
+| quality_override        | false                |
+| path_taken              | standard             |
+| self_check_answers      | null                 |
+| team_size               | solo                 |
+| deployment_target       | cloudflare-pages     |
+| ci_provider             | github-actions       |
 | ci_default_flow         | auto-deploy-on-merge |
-| has_auth                | true              |
-| has_payments            | false             |
-| has_realtime            | false             |
-| has_ai                  | false             |
-| has_background_jobs     | false             |
+| has_auth                | true                 |
+| has_payments            | false                |
+| has_realtime            | false                |
+| has_ai                  | false                |
+| has_background_jobs     | false                |
 
 ## Next steps
 
 Next: a future skill will set up agent context (CLAUDE.md, AGENTS.md). For now, your project is scaffolded and verified — happy hacking.
 
 Useful manual steps in the meantime:
+
 - `git init` (if you have not already) to start your own repo history.
 - Review `CLAUDE.md.scaffold` — the starter shipped its own CLAUDE.md; your existing lesson CLAUDE.md was preserved. Merge anything useful from the scaffold copy.
 - Run `npm audit fix` to resolve the fixable findings (9 moderate, 1 high). The `devalue` HIGH and most MODERATs are dev-tooling transitive deps; low runtime risk but worth patching.

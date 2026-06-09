@@ -22,8 +22,8 @@ ci_cd: deferred
 4. Create a **scoped API token** for local `wrangler` access:
    - My Profile (top-right avatar) → **API Tokens** → **Create Token**
    - Use the **"Edit Cloudflare Workers"** template
-   - Under *Account Resources*: select your account
-   - Under *Zone Resources*: leave as "All zones" (or no zone needed for Workers)
+   - Under _Account Resources_: select your account
+   - Under _Zone Resources_: leave as "All zones" (or no zone needed for Workers)
    - Click **Continue to summary** → **Create Token**
    - Copy the token — it is shown **only once**
 
@@ -69,12 +69,12 @@ npx wrangler whoami
 
 ## Phase 0 — Code fixes
 
-*Agent executes. Three names still read `"10x-astro-starter"` from the starter template. These must match `"obitracker"` before deploying — the `wrangler.jsonc` name becomes the Worker's name in Cloudflare.*
+_Agent executes. Three names still read `"10x-astro-starter"` from the starter template. These must match `"obitracker"` before deploying — the `wrangler.jsonc` name becomes the Worker's name in Cloudflare._
 
-| File | Field | Before | After |
-|---|---|---|---|
-| `wrangler.jsonc` | `name` | `"10x-astro-starter"` | `"obitracker"` |
-| `package.json` | `name` | `"10x-astro-starter"` | `"obitracker"` |
+| File                   | Field        | Before                | After          |
+| ---------------------- | ------------ | --------------------- | -------------- |
+| `wrangler.jsonc`       | `name`       | `"10x-astro-starter"` | `"obitracker"` |
+| `package.json`         | `name`       | `"10x-astro-starter"` | `"obitracker"` |
 | `supabase/config.toml` | `project_id` | `"10x-astro-starter"` | `"obitracker"` |
 
 - [ ] `wrangler.jsonc` name updated
@@ -87,7 +87,7 @@ npx wrangler whoami
 
 ## Phase 1 — Local build verification
 
-*Agent executes.*
+_Agent executes._
 
 ```powershell
 npm run build
@@ -102,7 +102,7 @@ npm run build
 
 ## Phase 2 — Provision Cloudflare Worker secrets
 
-*Human executes. Secrets set here are the **runtime** values on Cloudflare — separate from `.env` which is local dev only.*
+_Human executes. Secrets set here are the **runtime** values on Cloudflare — separate from `.env` which is local dev only._
 
 ```powershell
 # Interactive (prompts for value after running):
@@ -128,7 +128,7 @@ npx wrangler secret list
 
 ## Phase 3 — First deploy
 
-*Agent executes, human verifies.*
+_Agent executes, human verifies._
 
 ```powershell
 npx wrangler deploy
@@ -150,7 +150,7 @@ npx wrangler deploy
 
 ## Phase 4 — Rollback reference
 
-*No action now — reference only.*
+_No action now — reference only._
 
 ```powershell
 # Revert to previous deployment instantly (no rebuild):

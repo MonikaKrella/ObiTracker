@@ -3,7 +3,7 @@ project: ObiTracker
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-05-27  # S-02 unknown resolved: dog switcher → header dropdown
+updated: 2026-05-27 # S-02 unknown resolved: dog switcher → header dropdown
 prd_version: 1
 main_goal: market-feedback
 top_blocker: time
@@ -17,7 +17,7 @@ top_blocker: time
 
 ## Vision recap
 
-Competitive dog obedience handlers need to know what to train *before* they step onto the field — not after reviewing pages of notes. ObiTracker shows a training grid at a glance: custom elements in rows, dates in columns, green/red highlights surfacing the 3 most-trained and 3 least-trained rows within a rolling window the handler configures. The core bet: if one glance replaces a notebook, handlers adopt it immediately and stop reaching for Excel.
+Competitive dog obedience handlers need to know what to train _before_ they step onto the field — not after reviewing pages of notes. ObiTracker shows a training grid at a glance: custom elements in rows, dates in columns, green/red highlights surfacing the 3 most-trained and 3 least-trained rows within a rolling window the handler configures. The core bet: if one glance replaces a notebook, handlers adopt it immediately and stop reaching for Excel.
 
 ## North star
 
@@ -27,22 +27,22 @@ Competitive dog obedience handlers need to know what to train *before* they step
 
 ## At a glance
 
-| ID    | Change ID         | Outcome (user can …)                                                                           | Prerequisites | PRD refs                              | Status   |
-| ----- | ----------------- | ---------------------------------------------------------------------------------------------- | ------------- | ------------------------------------- | -------- |
-| F-01  | db-schema         | (foundation) custom tables live in Supabase with RLS; data layer ready for app writes          | —             | FR-002, FR-003, FR-004, FR-005, FR-006, FR-007 | ready    |
-| S-01  | auth-flow         | sign up and sign in with email + password; protected routes redirect unauthenticated users      | —             | FR-001                                | ready    |
-| S-02  | dog-management    | add a dog and switch between dogs from any authenticated screen                                 | F-01, S-01    | FR-002, FR-003                        | proposed |
-| S-03  | training-elements | add, rename, and remove custom training elements for the selected dog                           | S-02          | FR-004                                | proposed |
-| S-04  | training-grid     | view the colour-coded training grid, tick any visible cell, and see the grid update instantly   | S-03          | FR-005, FR-006, FR-007, US-01         | proposed |
+| ID   | Change ID         | Outcome (user can …)                                                                          | Prerequisites | PRD refs                                       | Status   |
+| ---- | ----------------- | --------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------- | -------- |
+| F-01 | db-schema         | (foundation) custom tables live in Supabase with RLS; data layer ready for app writes         | —             | FR-002, FR-003, FR-004, FR-005, FR-006, FR-007 | ready    |
+| S-01 | auth-flow         | sign up and sign in with email + password; protected routes redirect unauthenticated users    | —             | FR-001                                         | ready    |
+| S-02 | dog-management    | add a dog and switch between dogs from any authenticated screen                               | F-01, S-01    | FR-002, FR-003                                 | proposed |
+| S-03 | training-elements | add, rename, and remove custom training elements for the selected dog                         | S-02          | FR-004                                         | proposed |
+| S-04 | training-grid     | view the colour-coded training grid, tick any visible cell, and see the grid update instantly | S-03          | FR-005, FR-006, FR-007, US-01                  | proposed |
 
 ## Streams
 
 Navigation aid — groups items that share a Prerequisites chain. Canonical ordering still lives in the dependency graph below; this table is the proposed reading order across parallel tracks.
 
-| Stream | Theme            | Chain                               | Note                                                                           |
-| ------ | ---------------- | ----------------------------------- | ------------------------------------------------------------------------------ |
-| A      | Data + core loop | `F-01` → `S-02` → `S-03` → `S-04` | Critical path to the north star; invest in data schema and mobile frontend UX. |
-| B      | Auth             | `S-01`                             | Parallel with F-01; auth tables are in Supabase — no dependency on custom schema. |
+| Stream | Theme            | Chain                             | Note                                                                              |
+| ------ | ---------------- | --------------------------------- | --------------------------------------------------------------------------------- |
+| A      | Data + core loop | `F-01` → `S-02` → `S-03` → `S-04` | Critical path to the north star; invest in data schema and mobile frontend UX.    |
+| B      | Auth             | `S-01`                            | Parallel with F-01; auth tables are in Supabase — no dependency on custom schema. |
 
 ## Baseline
 
@@ -81,7 +81,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Prerequisites:** —
 - **Parallel with:** F-01
 - **Blockers:** —
-- **Unknowns:** — *(resolved 2026-05-27: `signup.astro` exists and `SignUpForm.tsx` POSTs to `/api/auth/signup`; full round-trip confirmed. Note: `confirm-email.astro` exists — Supabase email confirmation is part of the flow; verify post-signup redirect UX during planning.)*
+- **Unknowns:** — _(resolved 2026-05-27: `signup.astro` exists and `SignUpForm.tsx` POSTs to `/api/auth/signup`; full round-trip confirmed. Note: `confirm-email.astro` exists — Supabase email confirmation is part of the flow; verify post-signup redirect UX during planning.)_
 - **Risk:** Auth routes and middleware are already scaffolded; this slice confirms the full round-trip (sign-up form → Supabase → session cookie → protected redirect) works on both phone and laptop. Risk is low, but an unverified end-to-end auth path has caused silent breakage at launch before.
 - **Status:** ready
 
@@ -93,10 +93,10 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Prerequisites:** F-01, S-01
 - **Parallel with:** —
 - **Blockers:** —
-- **Unknowns:** — *(resolved 2026-05-27: dog switcher is a header dropdown on all screen sizes)*
+- **Unknowns:** — _(resolved 2026-05-27: dog switcher is a header dropdown on all screen sizes)_
 - **Risk:** The dog-switcher UX determines the information architecture for every screen that follows; choosing a pattern that doesn't scale to 3+ dogs will require a refactor before launch.
 - **Implementation notes:**
-  - *(F3, db-schema review)* `NewDog` in `src/types.ts` currently omits `account_id` (`Pick<Dog, "name">`) even though `account_id` is `NOT NULL` in the schema. S-02 must resolve this before shipping any dog-insert code: either update the type to `Pick<Dog, "name" | "account_id">` (preferred — gives compile-time safety) or explicitly inject `account_id` from the session in the insert service and add a JSDoc note on `NewDog` explaining the injection pattern. Leaving it as-is produces a NOT NULL violation at runtime with no TypeScript warning.
+  - _(F3, db-schema review)_ `NewDog` in `src/types.ts` currently omits `account_id` (`Pick<Dog, "name">`) even though `account_id` is `NOT NULL` in the schema. S-02 must resolve this before shipping any dog-insert code: either update the type to `Pick<Dog, "name" | "account_id">` (preferred — gives compile-time safety) or explicitly inject `account_id` from the session in the insert service and add a JSDoc note on `NewDog` explaining the injection pattern. Leaving it as-is produces a NOT NULL violation at runtime with no TypeScript warning.
 - **Status:** proposed
 
 ### S-03: Training elements
@@ -107,7 +107,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Prerequisites:** S-02
 - **Parallel with:** —
 - **Blockers:** —
-- **Unknowns:** — *(resolved 2026-05-27: deleting an element hard-deletes all its tick history — no soft delete)*
+- **Unknowns:** — _(resolved 2026-05-27: deleting an element hard-deletes all its tick history — no soft delete)_
 - **Risk:** Deleting an element with training history is irreversible under hard delete; the element management screen may need a confirmation step, while the tick grid deliberately has none (single tap, FR-006).
 - **Status:** proposed
 
@@ -119,10 +119,10 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Prerequisites:** S-03
 - **Parallel with:** —
 - **Blockers:** —
-- **Unknowns:** — *(all resolved 2026-05-27)*
-  - *(resolved)* Empty state when no ticks exist in the visible window: all rows unhighlighted — no green/red shown until at least one tick is recorded.
-  - *(resolved)* Highlight count scope: only ticks within the currently selected window (7, 14, or 30 days) are counted — switching the window immediately recalculates highlights.
-  - *(resolved)* US-01 "30-day grid" wording is a documentation gap; grid is configurable 7/14/30 days per FR-005.
+- **Unknowns:** — _(all resolved 2026-05-27)_
+  - _(resolved)_ Empty state when no ticks exist in the visible window: all rows unhighlighted — no green/red shown until at least one tick is recorded.
+  - _(resolved)_ Highlight count scope: only ticks within the currently selected window (7, 14, or 30 days) are counted — switching the window immediately recalculates highlights.
+  - _(resolved)_ US-01 "30-day grid" wording is a documentation gap; grid is configurable 7/14/30 days per FR-005.
 - **Risk:** The highlight algorithm (top-3/bottom-3 with tie-expansion at rank 1 only) is the product's core differentiator; a subtle bug in the tie-breaking logic produces wrong highlights with no visible error. Requires a pure, unit-testable function and at least one edge-case scenario (all elements tied) exercised before launch.
 - **Status:** proposed
 

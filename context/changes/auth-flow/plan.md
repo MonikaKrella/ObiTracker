@@ -7,6 +7,7 @@ Verify and harden the existing email + password auth scaffold so the complete ro
 ## Current State Analysis
 
 The auth scaffold is ~80% complete. Key pieces already in place:
+
 - `src/lib/supabase.ts` — `createClient()` factory using `@supabase/ssr` with cookie-based sessions; returns `null` when env vars are missing (all callers handle null)
 - `src/middleware.ts` — resolves `context.locals.user` on every request; `PROTECTED_ROUTES = ["/dashboard"]` redirects unauthenticated users to `/auth/signin`
 - `src/pages/api/auth/{signin,signup,signout}.ts` — POST handlers wired to Supabase auth; error redirects via `?error=` query param
@@ -14,6 +15,7 @@ The auth scaffold is ~80% complete. Key pieces already in place:
 - `src/components/auth/{SignInForm,SignUpForm}.tsx` — React islands with client-side validation (email format, 6-char min password, confirm-password match)
 
 **Gaps:**
+
 - `signin.ts:19` redirects to `/` (the welcome page) after successful sign-in — should be `/dashboard`
 - No guard preventing an authenticated user from visiting `/auth/signin` or `/auth/signup`
 - No server-side zod validation on API routes (CLAUDE.md requirement)
@@ -22,6 +24,7 @@ The auth scaffold is ~80% complete. Key pieces already in place:
 ## Desired End State
 
 A handler can complete every auth action without hitting a dead end:
+
 1. Sign up → see "check your email" screen
 2. Click confirmation link in email → session established → land on `/dashboard`
 3. Sign in → land on `/dashboard`
@@ -117,6 +120,7 @@ Add zod validation schemas to the sign-in and sign-up routes, and return a frien
 **Intent:** Reject structurally invalid requests before they reach Supabase, and surface an actionable message for the most common new-user failure (unconfirmed email).
 
 **Contract:**
+
 - Parse the form body with a zod schema: `email` must be a non-empty valid email; `password` must be a non-empty string.
 - On zod parse failure, redirect back to `/auth/signin?error=<message>` (same error-redirect pattern already used for Supabase errors).
 - After `signInWithPassword` returns an error, check whether `error.message` includes `"Email not confirmed"` (case-insensitive). If so, replace the raw Supabase message with: `"Please confirm your email first — check your inbox."` before redirecting.
@@ -128,6 +132,7 @@ Add zod validation schemas to the sign-in and sign-up routes, and return a frien
 **Intent:** Validate input server-side so a bypassed or malformed client request cannot produce an opaque Supabase 422 error.
 
 **Contract:**
+
 - Parse the form body with a zod schema mirroring the client-side rules: `email` must be a valid email; `password` must be at least 6 characters.
 - `confirmPassword` is a client-side UX field only — do not validate it server-side (it's not a security control).
 - On zod failure, redirect to `/auth/signup?error=<message>`.
@@ -160,11 +165,12 @@ Add the missing GET route that Supabase redirects to after a user clicks the con
 
 #### 1. Email confirmation callback route
 
-**File:** `src/pages/api/auth/confirm.ts` *(new file)*
+**File:** `src/pages/api/auth/confirm.ts` _(new file)_
 
 **Intent:** Complete the last leg of the sign-up flow — exchange the Supabase OTP token embedded in the confirmation email for a valid session cookie, then land the user on the app's first authenticated screen.
 
 **Contract:**
+
 - Export a `GET` handler.
 - Read `token_hash` and `type` from `context.url.searchParams`.
 - If either is missing, redirect to `/auth/signin?error=Invalid+confirmation+link`.
@@ -173,13 +179,14 @@ Add the missing GET route that Supabase redirects to after a user clicks the con
 - On success: `context.redirect("/dashboard")`.
 - On error: `context.redirect("/auth/signin?error=" + encodeURIComponent(error.message))`.
 
-#### 2. Supabase dashboard configuration *(manual step — required before production)*
+#### 2. Supabase dashboard configuration _(manual step — required before production)_
 
 **Where:** Supabase dashboard → Authentication → URL Configuration
 
 **Intent:** Tell Supabase which URLs are allowed as confirmation-link redirect targets, and where to send users after confirmation.
 
 **Contract:** Two settings to update:
+
 - **Site URL:** the production domain (e.g. `https://obitracker.example.com`) — used as the default base for confirmation links
 - **Redirect URLs:** add the following entries so Supabase accepts redirects to the callback route:
   - `http://localhost:4321/api/auth/confirm` (local dev)
