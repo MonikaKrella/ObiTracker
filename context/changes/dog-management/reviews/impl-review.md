@@ -5,7 +5,7 @@
 - **Scope**: All phases (1, 2, 3)
 - **Date**: 2026-06-08
 - **Verdict**: NEEDS ATTENTION
-- **Findings**: 0 critical  3 warnings  3 observations
+- **Findings**: 0 critical  3 warnings  3 observations  *(F1 fixed, F3 fixed, F6 fixed — F2 skipped, F4 skipped, F5 skipped — all triaged)*
 
 ## Verdicts
 
@@ -37,7 +37,7 @@
   - Tradeoff: No SSR placeholder — flash of absence instead of disabled button on slow connections.
   - Confidence: MEDIUM — depends on whether SSR placeholder UX matters.
   - Blind spot: Haven't measured JS bundle load time in production.
-- **Decision**: PENDING
+- **Decision**: FIXED — `useLayoutEffect` + DOM swap already in place (no `setState` in effect, compiler rule does not fire); `useMounted` hook added at `src/components/hooks/useMounted.ts` as the canonical pattern for future JSX-level hydration guards
 
 ---
 
@@ -58,7 +58,7 @@
   - Tradeoff: Service role key must live in env vars and never be exposed; more secrets management overhead. RPC is the standard Supabase recommendation for this scenario.
   - Confidence: LOW — service role adds complexity; RPC is better here.
   - Blind spot: Service role key not currently in the codebase.
-- **Decision**: PENDING
+- **Decision**: SKIPPED — RPC implementation is correct and well-secured; scope deviation was a necessary workaround for PostgREST WITH CHECK OPTION behaviour, not negligence
 
 ---
 
@@ -82,7 +82,7 @@
 - **Location**: src/lib/services/dogs.ts
 - **Detail**: PostgREST WITH CHECK OPTION causes any UPDATE that makes a row invisible to the SELECT RLS policy to fail — even without RETURNING. This will recur for any future soft-delete or status-change UPDATE when a column used in the UPDATE is also referenced in the SELECT policy filter.
 - **Fix**: Record as `/10x-lesson`.
-- **Decision**: PENDING
+- **Decision**: SKIPPED — covered by the existing PostgREST lesson captured during this review cycle; no additional action needed
 
 ---
 
