@@ -1,0 +1,47 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { createClient } from "@/lib/supabase";
+import { getDogsList } from "@/lib/services/dogs";
+import { getTrainingElements } from "@/lib/services/training-elements";
+
+// selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
+// if the dog is not found, soft-deleted, or owned by another user.
+// The null guard below is a defensive fallback for TypeScript's benefit.
+const { selectedDog } = Astro.locals;
+if (!selectedDog) {
+  return Astro.redirect("/dashboard");
+}
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const dogs = supabase ? await getDogsList(supabase) : [];
+const elements = supabase ? await getTrainingElements(supabase, selectedDog.id) : [];
+---
+
+<AuthLayout title={`${selectedDog.name} – Training elements`} dogs={dogs}>
+  <div class="space-y-6">
+    <a
+      href={`/dogs/${selectedDog.id}/dashboard`}
+      class="text-sm text-purple-300 transition-colors hover:text-purple-100 hover:underline"
+    >
+      ← Back to {selectedDog.name}'s dashboard
+    </a>
+
+    <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+      Training elements
+    </h1>
+
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+      {
+        elements.length === 0 ? (
+          <p class="text-sm text-blue-100/40">No training elements yet.</p>
+        ) : (
+          <ul class="space-y-2">
+            {elements.map((element) => (
+              <li class="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white">{element.name}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </div>
+</AuthLayout>

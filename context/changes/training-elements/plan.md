@@ -467,37 +467,37 @@ Add the `reorder_training_elements` RPC migration, the corresponding service fun
 
 #### Automated
 
-- [x] 1.1 TypeScript compiles without errors: `npm run build`
-- [x] 1.2 Lint passes: `npm run lint`
+- [x] 1.1 TypeScript compiles without errors: `npm run build` — fdb7b94
+- [x] 1.2 Lint passes: `npm run lint` — fdb7b94
 
 #### Manual
 
-- [x] 1.3 POST `/api/dog/<dogId>/elements` with a valid name creates an element with `sort_position = 0` for the dog's first element
-- [x] 1.4 A second POST creates an element with `sort_position = 1`
-- [x] 1.5 POST with a duplicate name (any case) returns 409 "An element with that name already exists"
-- [x] 1.6 POST with an empty or >100-char name returns 400 with a validation message
-- [x] 1.7 POST with a non-existent or foreign `dogId` returns 404
-- [x] 1.8 PATCH renames an element and returns the updated element
-- [x] 1.9 PATCH renaming an element to its own current name (any case) succeeds — no false 409
-- [x] 1.10 PATCH renaming to a name used by a different element of the same dog returns 409
-- [x] 1.11 DELETE removes the element and cascades its `training_logs` rows
-- [x] 1.12 DELETE for a non-existent or foreign `elementId`/`dogId` returns 404
+- [x] 1.3 POST `/api/dog/<dogId>/elements` with a valid name creates an element with `sort_position = 0` for the dog's first element — fdb7b94
+- [x] 1.4 A second POST creates an element with `sort_position = 1` — fdb7b94
+- [x] 1.5 POST with a duplicate name (any case) returns 409 "An element with that name already exists" — fdb7b94
+- [x] 1.6 POST with an empty or >100-char name returns 400 with a validation message — fdb7b94
+- [x] 1.7 POST with a non-existent or foreign `dogId` returns 404 — fdb7b94
+- [x] 1.8 PATCH renames an element and returns the updated element — fdb7b94
+- [x] 1.9 PATCH renaming an element to its own current name (any case) succeeds — no false 409 — fdb7b94
+- [x] 1.10 PATCH renaming to a name used by a different element of the same dog returns 409 — fdb7b94
+- [x] 1.11 DELETE removes the element and cascades its `training_logs` rows — fdb7b94
+- [x] 1.12 DELETE for a non-existent or foreign `elementId`/`dogId` returns 404 — fdb7b94
 
 ### Phase 2: Page structure
 
 #### Automated
 
-- [ ] 2.1 TypeScript compiles: `npm run build`
-- [ ] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 TypeScript compiles: `npm run build`
+- [x] 2.2 Lint passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.3 Unauthenticated GET `/dogs/<uuid>/elements` redirects to `/auth/signin`
-- [ ] 2.4 GET `/dogs/<id>/elements` for a soft-deleted or foreign dog redirects to `/dashboard`
-- [ ] 2.5 GET `/dogs/<id>/elements` for an owned dog renders the switcher, back link, and element list in saved order
-- [ ] 2.6 GET `/dogs/<id>/elements` for a dog with zero elements shows "No training elements yet."
-- [ ] 2.7 `/dogs/<id>/dashboard` tile shows the correct element count and "Manage elements" link
-- [ ] 2.8 `/dogs/<id>/dashboard` tile shows "No training elements yet." when the dog has zero elements
+- [x] 2.3 Unauthenticated GET `/dogs/<uuid>/elements` redirects to `/auth/signin`
+- [x] 2.4 GET `/dogs/<id>/elements` for a soft-deleted or foreign dog redirects to `/dashboard`
+- [x] 2.5 GET `/dogs/<id>/elements` for an owned dog renders the switcher, back link, and element list in saved order
+- [x] 2.6 GET `/dogs/<id>/elements` for a dog with zero elements shows "No training elements yet."
+- [x] 2.7 `/dogs/<id>/dashboard` tile shows the correct element count and "Manage elements" link
+- [x] 2.8 `/dogs/<id>/dashboard` tile shows "No training elements yet." when the dog has zero elements
 
 ### Phase 3: React islands (CRUD)
 
