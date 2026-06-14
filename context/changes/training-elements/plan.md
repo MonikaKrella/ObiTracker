@@ -503,41 +503,41 @@ Add the `reorder_training_elements` RPC migration, the corresponding service fun
 
 #### Automated
 
-- [x] 3.1 TypeScript compiles: `npm run build`
-- [x] 3.2 Lint passes: `npm run lint`
+- [x] 3.1 TypeScript compiles: `npm run build` — d15aef9
+- [x] 3.2 Lint passes: `npm run lint` — d15aef9
 
 #### Manual
 
-- [x] 3.3 `/dogs/<id>/elements` shows the static list immediately, then becomes interactive after hydration with no layout shift
-- [x] 3.4 "Add element" dialog adds a valid element with no page reload
-- [x] 3.5 Adding a duplicate name (any case) shows a toast error; dialog stays open
-- [x] 3.6 Adding an empty or >100-char name shows a toast validation error
-- [x] 3.7 Rename dialog pre-fills the current name and updates the row in place with no reload
-- [x] 3.8 Renaming to a name used by another element shows a toast error
-- [x] 3.9 Delete dialog names the element and warns about permanent history loss; cancel makes no change
-- [x] 3.10 Confirming delete removes the row with no page reload
-- [x] 3.11 An API error during add/rename/delete shows a toast error and leaves the list unchanged
-- [x] 3.12 A 401 on any action navigates to `/auth/signin`
-- [x] 3.13 Full mobile round-trip: add, rename, delete
-- [x] 3.14 `npm run dev` renders `/dogs/<id>/elements` with no console errors (verify after clearing `node_modules/.vite` — the `radix-ui` 1.4.3→1.5.0 bump from `shadcn add dialog`/`add input` left a stale SSR dep-optimize cache causing "Invalid hook call" / `useState` on `null`)
+- [x] 3.3 `/dogs/<id>/elements` shows the static list immediately, then becomes interactive after hydration with no layout shift — d15aef9
+- [x] 3.4 "Add element" dialog adds a valid element with no page reload — d15aef9
+- [x] 3.5 Adding a duplicate name (any case) shows a toast error; dialog stays open — d15aef9
+- [x] 3.6 Adding an empty or >100-char name shows a toast validation error — d15aef9
+- [x] 3.7 Rename dialog pre-fills the current name and updates the row in place with no reload — d15aef9
+- [x] 3.8 Renaming to a name used by another element shows a toast error — d15aef9
+- [x] 3.9 Delete dialog names the element and warns about permanent history loss; cancel makes no change — d15aef9
+- [x] 3.10 Confirming delete removes the row with no page reload — d15aef9
+- [x] 3.11 An API error during add/rename/delete shows a toast error and leaves the list unchanged — d15aef9
+- [x] 3.12 A 401 on any action navigates to `/auth/signin` — d15aef9
+- [x] 3.13 Full mobile round-trip: add, rename, delete — d15aef9
+- [x] 3.14 `npm run dev` renders `/dogs/<id>/elements` with no console errors (verify after clearing `node_modules/.vite` — the `radix-ui` 1.4.3→1.5.0 bump from `shadcn add dialog`/`add input` left a stale SSR dep-optimize cache causing "Invalid hook call" / `useState` on `null`) — d15aef9
 
 ### Phase 4: Drag-and-drop reorder
 
 #### Automated
 
-- [ ] 4.1 TypeScript compiles: `npm run build`
-- [ ] 4.2 Lint passes: `npm run lint`
-- [ ] 4.3 Migration file exists: `supabase/migrations/20260610000001_reorder_training_elements_fn.sql`
+- [x] 4.1 TypeScript compiles: `npm run build`
+- [x] 4.2 Lint passes: `npm run lint`
+- [x] 4.3 Migration file exists: `supabase/migrations/20260610000001_reorder_training_elements_fn.sql`
 
 #### Manual
 
-- [ ] 4.4 Migration applies cleanly; `reorder_training_elements` is callable and a no-op for a `dog_id` the caller doesn't own
-- [ ] 4.5 Dragging a row by its grip handle reorders the list locally and shows "Save order"
-- [ ] 4.6 Adding or deleting an element without reordering does not show "Save order"
-- [ ] 4.7 Reordering then adding an element still shows "Save order" for the reorder; the new element doesn't add extra dirtiness
-- [ ] 4.8 "Save order" persists the order; reload shows the new order
-- [ ] 4.9 "Save order" shows a loading state during the fetch
-- [ ] 4.10 An API error on save shows a toast error; local order unchanged, retry available
-- [ ] 4.11 Keyboard reordering works (Tab, Space, Arrow keys, Space)
-- [ ] 4.12 Full mobile round-trip: touch drag-reorder; page still scrolls normally elsewhere
-- [ ] 4.13 A single-element list never shows "Save order"
+- [x] 4.4 Migration applies cleanly; `reorder_training_elements` is callable and a no-op for a `dog_id` the caller doesn't own
+- [x] 4.5 Dragging a row by its grip handle reorders the list locally and shows "Save order"
+- [x] 4.6 Adding or deleting an element without reordering does not show "Save order"
+- [x] 4.7 Reordering then adding an element still shows "Save order" for the reorder; the new element doesn't add extra dirtiness
+- [x] 4.8 "Save order" persists the order; reload shows the new order
+- [x] 4.9 "Save order" shows a loading state during the fetch
+- [x] 4.10 An API error on save shows a toast error; local order unchanged, retry available
+- [x] 4.11 Keyboard reordering works (Tab, Space, Arrow keys, Space)
+- [x] 4.12 Full mobile round-trip: touch drag-reorder; page still scrolls normally elsewhere
+- [x] 4.13 A single-element list never shows "Save order"

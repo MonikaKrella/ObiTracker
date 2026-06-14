@@ -120,3 +120,24 @@ export async function deleteTrainingElement(
   if (result.error) throw result.error;
   return (result.count ?? 0) > 0;
 }
+
+/**
+ * Persists a full reordering of a dog's training elements in one atomic
+ * round trip via the `reorder_training_elements` RPC. `orderedIds` is the
+ * complete, zero-based desired order; the RPC sets `sort_position` to each
+ * id's index. A `dogId` the caller doesn't own matches zero rows — a safe
+ * no-op (the RPC is `SECURITY INVOKER`, scoped by the existing
+ * `training_elements_update_authenticated` RLS policy).
+ */
+export async function reorderTrainingElements(
+  supabase: SupabaseClient,
+  dogId: string,
+  orderedIds: string[],
+): Promise<void> {
+  const result = await supabase.rpc("reorder_training_elements", {
+    p_dog_id: dogId,
+    p_element_ids: orderedIds,
+  });
+
+  if (result.error) throw result.error;
+}
