@@ -3,6 +3,7 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
 import { createClient } from "@/lib/supabase";
 import { getDogsList } from "@/lib/services/dogs";
 import { getTrainingElements } from "@/lib/services/training-elements";
+import { TrainingElementsManager } from "@/components/training-elements/TrainingElementsManager";
 
 // selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
 // if the dog is not found, soft-deleted, or owned by another user.
@@ -31,17 +32,7 @@ const elements = supabase ? await getTrainingElements(supabase, selectedDog.id) 
     </h1>
 
     <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-      {
-        elements.length === 0 ? (
-          <p class="text-sm text-blue-100/40">No training elements yet.</p>
-        ) : (
-          <ul class="space-y-2">
-            {elements.map((element) => (
-              <li class="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white">{element.name}</li>
-            ))}
-          </ul>
-        )
-      }
+      <TrainingElementsManager dogId={selectedDog.id} initialElements={elements} client:load />
     </div>
   </div>
 </AuthLayout>
