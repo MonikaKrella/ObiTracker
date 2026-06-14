@@ -525,19 +525,19 @@ Add the `reorder_training_elements` RPC migration, the corresponding service fun
 
 #### Automated
 
-- [x] 4.1 TypeScript compiles: `npm run build`
-- [x] 4.2 Lint passes: `npm run lint`
-- [x] 4.3 Migration file exists: `supabase/migrations/20260610000001_reorder_training_elements_fn.sql`
+- [x] 4.1 TypeScript compiles: `npm run build` — 686e1e2
+- [x] 4.2 Lint passes: `npm run lint` — 686e1e2
+- [x] 4.3 Migration file exists: `supabase/migrations/20260610000001_reorder_training_elements_fn.sql` — 686e1e2
 
 #### Manual
 
-- [x] 4.4 Migration applies cleanly; `reorder_training_elements` is callable and a no-op for a `dog_id` the caller doesn't own
-- [x] 4.5 Dragging a row by its grip handle reorders the list locally and shows "Save order"
-- [x] 4.6 Adding or deleting an element without reordering does not show "Save order"
-- [x] 4.7 Reordering then adding an element still shows "Save order" for the reorder; the new element doesn't add extra dirtiness
-- [x] 4.8 "Save order" persists the order; reload shows the new order
-- [x] 4.9 "Save order" shows a loading state during the fetch
-- [x] 4.10 An API error on save shows a toast error; local order unchanged, retry available
-- [x] 4.11 Keyboard reordering works (Tab, Space, Arrow keys, Space)
-- [x] 4.12 Full mobile round-trip: touch drag-reorder; page still scrolls normally elsewhere
-- [x] 4.13 A single-element list never shows "Save order"
+- [x] 4.4 Migration applies cleanly; `reorder_training_elements` is callable and a no-op for a `dog_id` the caller doesn't own — 686e1e2
+- [x] 4.5 Dragging a row by its grip handle reorders the list locally and shows "Save order" — 686e1e2
+- [x] 4.6 Adding or deleting an element without reordering does not show "Save order" — 686e1e2
+- [x] 4.7 Reordering then adding an element still shows "Save order" for the reorder; the new element doesn't add extra dirtiness — 686e1e2
+- [x] 4.8 "Save order" persists the order; reload shows the new order — 686e1e2
+- [x] 4.9 "Save order" shows a loading state during the fetch — 686e1e2
+- [x] 4.10 An API error on save shows a toast error; local order unchanged, retry available — 686e1e2
+- [x] 4.11 Keyboard reordering works (Tab, Space, Arrow keys, Space) — 686e1e2
+- [x] 4.12 Full mobile round-trip: touch drag-reorder; page still scrolls normally elsewhere — 686e1e2
+- [x] 4.13 A single-element list never shows "Save order" — 686e1e2

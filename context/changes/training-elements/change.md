@@ -1,7 +1,7 @@
 ---
 change_id: training-elements
 title: Training elements
-status: implementing
+status: implemented
 created: 2026-06-09
 updated: 2026-06-14
 archived_at: null
