@@ -188,6 +188,31 @@ describe("computeHighlights", () => {
     expect(Object.fromEntries(result)).toEqual({ A: null });
   });
 
+  it("n=8, one element with 1 tick, the other 7 tied at 0 → green is just the standout, no arbitrary rank-2/3 picks from the 0-tick tie", () => {
+    const elements = makeElements(["A", "B", "C", "D", "E", "F", "G", "H"]);
+    const tickCounts = counts([
+      ["A", 0],
+      ["B", 0],
+      ["C", 0],
+      ["D", 1],
+      ["E", 0],
+      ["F", 0],
+      ["G", 0],
+      ["H", 0],
+    ]);
+    const result = computeHighlights(elements, tickCounts);
+    expect(Object.fromEntries(result)).toEqual({
+      A: null,
+      B: null,
+      C: null,
+      D: "green",
+      E: null,
+      F: null,
+      G: null,
+      H: null,
+    });
+  });
+
   it("n=7 boundary, no rank-1 tie → top-3/bottom-3 sets of size 3 are NOT suppressed", () => {
     const elements = makeElements(["A", "B", "C", "D", "E", "F", "G"]);
     const tickCounts = counts([

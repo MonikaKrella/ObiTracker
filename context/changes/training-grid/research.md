@@ -539,11 +539,14 @@ import type { TrainingElement } from "@/types";
  *
  * TIER 3 — n ≥ 7 (full top-3 / bottom-3 algorithm):
  *   - GREEN: rank elements by tick count DESC. Rank-1 tie: ALL tied elements
- *     get green (tie expansion). Rank 2 and 3: one element each, no tie
- *     expansion.
+ *     get green (tie expansion). Rank 2 and 3: one element each, but ONLY
+ *     when that element's count is unique across ALL elements — if its
+ *     count is shared by any other element (a tie at that rank), the slot
+ *     is skipped rather than arbitrarily picking one of the tied elements.
+ *     (Correction 5, 2026-06-20 — see below.)
  *   - RED: rank elements by tick count ASC. Rank-last tie: ALL tied elements
  *     get red (tie expansion). Ranks 2-from-last and 3-from-last: one
- *     element each, no tie expansion.
+ *     element each, same uniqueness guard as green's rank 2/3.
  *   - SUPPRESSION (post-build, each colour independently): if the resulting
  *     set covers AT LEAST half of all elements (set.size * 2 >= n), suppress
  *     that colour entirely. In practice this only fires when a rank-1 tie
@@ -587,6 +590,13 @@ export function computeHighlights(
   }
 
   // ── TIER 3: n ≥ 7 — full top-3 / bottom-3 with tie expansion + suppression. ──
+  // Frequency of each count value across ALL elements — guards ranks 2 and 3
+  // against arbitrarily picking one element out of a multi-way tie.
+  const countFrequency = new Map<number, number>();
+  for (const count of tickCounts.values()) {
+    countFrequency.set(count, (countFrequency.get(count) ?? 0) + 1);
+  }
+
   const greenSet = new Set<string>();
   {
     const highestCount = byDesc[0][1];
@@ -595,10 +605,10 @@ export function computeHighlights(
     for (const [id, count] of byDesc) {
       if (count === highestCount) { greenSet.add(id); g++; } else break;
     }
-    // Rank 2: one element, no tie expansion.
-    if (g < 3 && g < n) { greenSet.add(byDesc[g][0]); g++; }
-    // Rank 3: one element, no tie expansion.
-    if (g < 3 && g < n) { greenSet.add(byDesc[g][0]); }
+    // Rank 2: one element, only when its count is unique (not tied).
+    if (g < 3 && g < n && countFrequency.get(byDesc[g][1]) === 1) { greenSet.add(byDesc[g][0]); g++; }
+    // Rank 3: one element, same uniqueness guard.
+    if (g < 3 && g < n && countFrequency.get(byDesc[g][1]) === 1) { greenSet.add(byDesc[g][0]); }
 
     // Suppression: green set covers half or more of the elements → clear it.
     if (greenSet.size * 2 >= n) greenSet.clear();
@@ -612,10 +622,10 @@ export function computeHighlights(
     for (const [id, count] of byAsc) {
       if (count === lowestCount) { redSet.add(id); r++; } else break;
     }
-    // Rank 2-from-last: one element, no tie expansion.
-    if (r < 3 && r < n) { redSet.add(byAsc[r][0]); r++; }
-    // Rank 3-from-last: one element, no tie expansion.
-    if (r < 3 && r < n) { redSet.add(byAsc[r][0]); }
+    // Rank 2-from-last: one element, only when its count is unique (not tied).
+    if (r < 3 && r < n && countFrequency.get(byAsc[r][1]) === 1) { redSet.add(byAsc[r][0]); r++; }
+    // Rank 3-from-last: one element, same uniqueness guard.
+    if (r < 3 && r < n && countFrequency.get(byAsc[r][1]) === 1) { redSet.add(byAsc[r][0]); }
 
     // Suppression: red set covers half or more of the elements → clear it.
     if (redSet.size * 2 >= n) redSet.clear();
@@ -871,4 +881,8 @@ This changes real outcomes for n=4–6 with a unique leader/laggard: previously 
 
 **Minimum n for any highlight to appear:** 4 — Tier 2's single-winner rule can fire as low as n=4, but only when the top (or bottom) value is not tied. Tier 3's full top-3/bottom-3 behaviour starts at n=7; at n=7 with no rank-1 tie, top-3 = 3 elements, 3×2 = 6 which is NOT ≥ 7 → not suppressed.
 
-The corrected implementation is in **Section 9** above. The `computeHighlights` function there is the authoritative version for planning and implementation.
+**Correction 5 (2026-06-20, found via manual testing in Phase 3):** Tier 3's rank-2/rank-3 picks for green (and the mirrored rank-2/3-from-last picks for red) were implemented as "take the next array slot after the rank-1 tie group," with no check on whether that slot's value was itself tied with other elements. Bug report: n=8, one element with 1 tick, the other 7 tied at 0 ticks. Rank 1 = the single 1-tick element (unique, correct). Rank 2 and rank 3 then arbitrarily promoted 2 of the 7 zero-tick elements to green — indistinguishable from the other 5 zero-tick elements, but highlighted anyway, purely because of their position in the sorted array. The half-or-more suppression rule didn't catch this because the resulting set (3 elements out of 8) is well under half.
+
+**Fix:** Ranks 2 and 3 (and their red mirrors) now require the candidate's count to be unique across **all** elements (`countFrequency.get(value) === 1`), symmetric with Tier 2's "only highlight when unique" rule. If the value is tied with any other element, that rank is skipped entirely rather than resolving the tie arbitrarily. None of the original 9 trace-table cases exercise this path (the only n≥7 case consumes rank-1 with a 4-way tie, never reaching ranks 2/3), so all are unaffected; a new test case (n=8, one outlier + 7-way zero tie → green: the outlier only) was added to lock in the fix.
+
+The corrected implementation is in **Section 9** above (now reflecting Correction 5). The `computeHighlights` function there is the authoritative version for planning and implementation.

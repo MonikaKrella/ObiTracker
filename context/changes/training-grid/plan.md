@@ -382,32 +382,32 @@ Not applicable — no schema change in this plan.
 
 #### Automated
 
-- [x] 2.1 `npm run lint` passes
-- [x] 2.2 `npm run build` succeeds
+- [x] 2.1 `npm run lint` passes — 47d601d
+- [x] 2.2 `npm run build` succeeds — 47d601d
 
 #### Manual
 
-- [x] 2.3 Two consecutive POSTs toggle ticked → unticked correctly
-- [x] 2.4 POST with a future `trainedOn` returns 400
-- [x] 2.5 POST without a session cookie returns 401
-- [x] 2.6 POST against an unowned/nonexistent `dogId` returns 404
-- [x] 2.7 Direct DB inspection confirms the row appears/disappears exactly once per toggle
+- [x] 2.3 Two consecutive POSTs toggle ticked → unticked correctly — 47d601d
+- [x] 2.4 POST with a future `trainedOn` returns 400 — 47d601d
+- [x] 2.5 POST without a session cookie returns 401 — 47d601d
+- [x] 2.6 POST against an unowned/nonexistent `dogId` returns 404 — 47d601d
+- [x] 2.7 Direct DB inspection confirms the row appears/disappears exactly once per toggle — 47d601d
 
 ### Phase 3: Astro Page Shell & Static Grid
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` passes
-- [ ] 3.2 `npm run build` succeeds
+- [x] 3.1 `npm run lint` passes
+- [x] 3.2 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 3.3 Default SSR render shows a correct 30-day grid with correct highlights
-- [ ] 3.4 SSR always renders the full 30 date columns regardless of any URL — no `?window=` param exists
-- [ ] 3.5 Zero-elements empty state renders correctly
-- [ ] 3.6 Elements-with-zero-ticks renders the full unhighlighted grid
-- [ ] 3.7 Supabase misconfiguration shows the skeleton + error overlay, not a silent empty grid
-- [ ] 3.8 Mobile emulation: horizontal scroll works without breaking sticky header/column
+- [x] 3.3 Default SSR render shows a correct 30-day grid with correct highlights
+- [x] 3.4 SSR always renders the full 30 date columns regardless of any URL — no `?window=` param exists
+- [x] 3.5 Zero-elements empty state renders correctly
+- [x] 3.6 Elements-with-zero-ticks renders the full unhighlighted grid
+- [x] 3.7 Supabase misconfiguration shows the skeleton + error overlay, not a silent empty grid
+- [x] 3.8 Mobile emulation: horizontal scroll works without breaking sticky header/column
 
 ### Phase 4: Interactive React Island
 

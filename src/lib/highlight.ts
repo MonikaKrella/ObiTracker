@@ -21,11 +21,18 @@ import type { TrainingElement } from "@/types";
  *
  * TIER 3 — n ≥ 7 (full top-3 / bottom-3 algorithm):
  *   - GREEN: rank elements by tick count DESC. Rank-1 tie: ALL tied elements
- *     get green (tie expansion). Rank 2 and 3: one element each, no tie
- *     expansion.
+ *     get green (tie expansion). Rank 2 and 3: one element each, but ONLY
+ *     when that element's count is unique across ALL elements — if its
+ *     count is shared by any other element (a tie at that rank), the slot
+ *     is skipped rather than arbitrarily picking one of the tied elements.
+ *     (Corrected 2026-06-20 — see research.md Correction 5: with e.g. 7
+ *     elements tied at 0 ticks and 1 element with a single tick, the
+ *     original "no tie expansion" wording was implemented as "just take the
+ *     next array slot," which arbitrarily promoted 2 of the 7 zero-tick
+ *     elements to green alongside the genuine standout.)
  *   - RED: rank elements by tick count ASC. Rank-last tie: ALL tied elements
  *     get red (tie expansion). Ranks 2-from-last and 3-from-last: one
- *     element each, no tie expansion.
+ *     element each, same uniqueness guard as green's rank 2/3.
  *   - SUPPRESSION (post-build, each colour independently): if the resulting
  *     set covers AT LEAST half of all elements (set.size * 2 >= n), suppress
  *     that colour entirely. In practice this only fires when a rank-1 tie
@@ -67,6 +74,14 @@ export function computeHighlights(
   }
 
   // ── TIER 3: n ≥ 7 — full top-3 / bottom-3 with tie expansion + suppression. ──
+  // Frequency of each count value across ALL elements — used to guard ranks
+  // 2 and 3 against arbitrarily picking one element out of a multi-way tie
+  // (see Correction 5 in the JSDoc above and research.md).
+  const countFrequency = new Map<number, number>();
+  for (const count of tickCounts.values()) {
+    countFrequency.set(count, (countFrequency.get(count) ?? 0) + 1);
+  }
+
   const greenSet = new Set<string>();
   {
     const highestCount = byDesc[0][1];
@@ -78,13 +93,13 @@ export function computeHighlights(
         g++;
       } else break;
     }
-    // Rank 2: one element, no tie expansion.
-    if (g < 3 && g < n) {
+    // Rank 2: one element, only when its count is unique (not tied).
+    if (g < 3 && g < n && countFrequency.get(byDesc[g][1]) === 1) {
       greenSet.add(byDesc[g][0]);
       g++;
     }
-    // Rank 3: one element, no tie expansion.
-    if (g < 3 && g < n) {
+    // Rank 3: one element, same uniqueness guard.
+    if (g < 3 && g < n && countFrequency.get(byDesc[g][1]) === 1) {
       greenSet.add(byDesc[g][0]);
     }
 
@@ -103,13 +118,13 @@ export function computeHighlights(
         r++;
       } else break;
     }
-    // Rank 2-from-last: one element, no tie expansion.
-    if (r < 3 && r < n) {
+    // Rank 2-from-last: one element, only when its count is unique (not tied).
+    if (r < 3 && r < n && countFrequency.get(byAsc[r][1]) === 1) {
       redSet.add(byAsc[r][0]);
       r++;
     }
-    // Rank 3-from-last: one element, no tie expansion.
-    if (r < 3 && r < n) {
+    // Rank 3-from-last: one element, same uniqueness guard.
+    if (r < 3 && r < n && countFrequency.get(byAsc[r][1]) === 1) {
       redSet.add(byAsc[r][0]);
     }
 
