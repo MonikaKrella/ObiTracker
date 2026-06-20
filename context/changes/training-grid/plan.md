@@ -367,31 +367,31 @@ Not applicable — no schema change in this plan.
 
 #### Automated
 
-- [x] 1.1 `npm install` completes cleanly with `vitest` added
-- [x] 1.2 `npm run test` passes — every `highlight.test.ts` case green
-- [x] 1.3 `npm run lint` passes
-- [x] 1.4 `npm run build` succeeds
-- [x] 1.5 CI runs `npm run test` as a workflow step
+- [x] 1.1 `npm install` completes cleanly with `vitest` added — def8601
+- [x] 1.2 `npm run test` passes — every `highlight.test.ts` case green — def8601
+- [x] 1.3 `npm run lint` passes — def8601
+- [x] 1.4 `npm run build` succeeds — def8601
+- [x] 1.5 CI runs `npm run test` as a workflow step — def8601
 
 #### Manual
 
-- [x] 1.6 Manually cross-check 2-3 `computeHighlights` outputs against `research.md`'s trace table
-- [x] 1.7 Manually verify `generateDateRange`/`getTrainingWindow` produce correct UTC date arrays/bounds
+- [x] 1.6 Manually cross-check 2-3 `computeHighlights` outputs against `research.md`'s trace table — def8601
+- [x] 1.7 Manually verify `generateDateRange`/`getTrainingWindow` produce correct UTC date arrays/bounds — def8601
 
 ### Phase 2: Service Layer & Toggle API
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` passes
-- [ ] 2.2 `npm run build` succeeds
+- [x] 2.1 `npm run lint` passes
+- [x] 2.2 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 2.3 Two consecutive POSTs toggle ticked → unticked correctly
-- [ ] 2.4 POST with a future `trainedOn` returns 400
-- [ ] 2.5 POST without a session cookie returns 401
-- [ ] 2.6 POST against an unowned/nonexistent `dogId` returns 404
-- [ ] 2.7 Direct DB inspection confirms the row appears/disappears exactly once per toggle
+- [x] 2.3 Two consecutive POSTs toggle ticked → unticked correctly
+- [x] 2.4 POST with a future `trainedOn` returns 400
+- [x] 2.5 POST without a session cookie returns 401
+- [x] 2.6 POST against an unowned/nonexistent `dogId` returns 404
+- [x] 2.7 Direct DB inspection confirms the row appears/disappears exactly once per toggle
 
 ### Phase 3: Astro Page Shell & Static Grid
 

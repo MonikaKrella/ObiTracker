@@ -122,6 +122,30 @@ export async function deleteTrainingElement(
 }
 
 /**
+ * Checks whether a training element belongs to the given dog. Used as an
+ * app-level ownership guard before writing a `training_logs` row — defense
+ * in depth alongside the RLS `WITH CHECK` clause on `training_logs_insert_authenticated`,
+ * which already requires `training_elements.dog_id = dog_id` but should not
+ * be the only thing standing between a forged/mismatched `elementId` and a
+ * cross-dog log row.
+ */
+export async function elementBelongsToDog(
+  supabase: SupabaseClient,
+  dogId: string,
+  elementId: string,
+): Promise<boolean> {
+  const result = await supabase
+    .from("training_elements")
+    .select("id")
+    .eq("id", elementId)
+    .eq("dog_id", dogId)
+    .maybeSingle();
+
+  if (result.error) throw result.error;
+  return result.data !== null;
+}
+
+/**
  * Persists a full reordering of a dog's training elements in one atomic
  * round trip via the `reorder_training_elements` RPC. `orderedIds` is the
  * complete, zero-based desired order; the RPC sets `sort_position` to each
