@@ -1,0 +1,5 @@
+# Normalize line endings to LF in the repo regardless of the checkout platform's
+# autocrlf setting. Without this, a Windows checkout with core.autocrlf=true
+# materializes CRLF on disk for every text file, which conflicts with Prettier's
+# default LF expectation and floods `npm run lint` with unrelated errors.
+* text=auto eol=lf

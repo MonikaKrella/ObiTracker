@@ -367,16 +367,16 @@ Not applicable — no schema change in this plan.
 
 #### Automated
 
-- [ ] 1.1 `npm install` completes cleanly with `vitest` added
-- [ ] 1.2 `npm run test` passes — every `highlight.test.ts` case green
-- [ ] 1.3 `npm run lint` passes
-- [ ] 1.4 `npm run build` succeeds
-- [ ] 1.5 CI runs `npm run test` as a workflow step
+- [x] 1.1 `npm install` completes cleanly with `vitest` added
+- [x] 1.2 `npm run test` passes — every `highlight.test.ts` case green
+- [x] 1.3 `npm run lint` passes
+- [x] 1.4 `npm run build` succeeds
+- [x] 1.5 CI runs `npm run test` as a workflow step
 
 #### Manual
 
-- [ ] 1.6 Manually cross-check 2-3 `computeHighlights` outputs against `research.md`'s trace table
-- [ ] 1.7 Manually verify `generateDateRange`/`getTrainingWindow` produce correct UTC date arrays/bounds
+- [x] 1.6 Manually cross-check 2-3 `computeHighlights` outputs against `research.md`'s trace table
+- [x] 1.7 Manually verify `generateDateRange`/`getTrainingWindow` produce correct UTC date arrays/bounds
 
 ### Phase 2: Service Layer & Toggle API
 
