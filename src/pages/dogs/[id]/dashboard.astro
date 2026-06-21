@@ -2,6 +2,7 @@
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import { createClient } from "@/lib/supabase";
 import { getDogsList } from "@/lib/services/dogs";
+import { getTrainingElements } from "@/lib/services/training-elements";
 import { DeleteDogModal } from "@/components/dogs/DeleteDogModal";
 
 // selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
@@ -14,6 +15,7 @@ if (!selectedDog) {
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 const dogs = supabase ? await getDogsList(supabase) : [];
+const elements = supabase ? await getTrainingElements(supabase, selectedDog.id) : [];
 ---
 
 <AuthLayout title={selectedDog.name} dogs={dogs}>
@@ -22,10 +24,17 @@ const dogs = supabase ? await getDogsList(supabase) : [];
       {selectedDog.name}
     </h1>
 
-    <!-- Training elements tile — content added in S-03 -->
     <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
       <h2 class="mb-2 text-lg font-semibold text-white">Training elements</h2>
-      <p class="text-sm text-blue-100/40">Coming soon…</p>
+      <p class="mb-4 text-sm text-blue-100/40">
+        {elements.length > 0 ? `${elements.length} training element(s) configured` : "No training elements yet."}
+      </p>
+      <a
+        href={`/dogs/${selectedDog.id}/elements`}
+        class="rounded-lg border border-purple-400/40 bg-purple-500/20 px-4 py-2 text-sm font-medium transition-colors hover:bg-purple-500/30"
+      >
+        Manage elements
+      </a>
     </div>
 
     <!--

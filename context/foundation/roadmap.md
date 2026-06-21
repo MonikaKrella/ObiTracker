@@ -3,7 +3,7 @@ project: ObiTracker
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-05-27 # S-02 unknown resolved: dog switcher → header dropdown
+updated: 2026-06-09 # F-01, S-01, S-02 marked done (all merged to master, impl_reviewed)
 prd_version: 1
 main_goal: market-feedback
 top_blocker: time
@@ -29,9 +29,9 @@ Competitive dog obedience handlers need to know what to train _before_ they step
 
 | ID   | Change ID         | Outcome (user can …)                                                                          | Prerequisites | PRD refs                                       | Status   |
 | ---- | ----------------- | --------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------- | -------- |
-| F-01 | db-schema         | (foundation) custom tables live in Supabase with RLS; data layer ready for app writes         | —             | FR-002, FR-003, FR-004, FR-005, FR-006, FR-007 | ready    |
-| S-01 | auth-flow         | sign up and sign in with email + password; protected routes redirect unauthenticated users    | —             | FR-001                                         | ready    |
-| S-02 | dog-management    | add a dog and switch between dogs from any authenticated screen                               | F-01, S-01    | FR-002, FR-003                                 | proposed |
+| F-01 | db-schema         | (foundation) custom tables live in Supabase with RLS; data layer ready for app writes         | —             | FR-002, FR-003, FR-004, FR-005, FR-006, FR-007 | done     |
+| S-01 | auth-flow         | sign up and sign in with email + password; protected routes redirect unauthenticated users    | —             | FR-001                                         | done     |
+| S-02 | dog-management    | add a dog and switch between dogs from any authenticated screen                               | F-01, S-01    | FR-002, FR-003                                 | done     |
 | S-03 | training-elements | add, rename, and remove custom training elements for the selected dog                         | S-02          | FR-004                                         | proposed |
 | S-04 | training-grid     | view the colour-coded training grid, tick any visible cell, and see the grid update instantly | S-03          | FR-005, FR-006, FR-007, US-01                  | proposed |
 
@@ -69,7 +69,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** RLS policies must be correct from the start — a misconfigured policy that allows cross-account data reads is a trust-destroying bug; write one policy per operation per role (SELECT, INSERT, UPDATE, DELETE) as CLAUDE.md prescribes, not a single catch-all.
-- **Status:** ready
+- **Status:** done
 
 ## Slices
 
@@ -83,7 +83,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** — _(resolved 2026-05-27: `signup.astro` exists and `SignUpForm.tsx` POSTs to `/api/auth/signup`; full round-trip confirmed. Note: `confirm-email.astro` exists — Supabase email confirmation is part of the flow; verify post-signup redirect UX during planning.)_
 - **Risk:** Auth routes and middleware are already scaffolded; this slice confirms the full round-trip (sign-up form → Supabase → session cookie → protected redirect) works on both phone and laptop. Risk is low, but an unverified end-to-end auth path has caused silent breakage at launch before.
-- **Status:** ready
+- **Status:** done
 
 ### S-02: Dog management
 
@@ -97,7 +97,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** The dog-switcher UX determines the information architecture for every screen that follows; choosing a pattern that doesn't scale to 3+ dogs will require a refactor before launch.
 - **Implementation notes:**
   - _(F3, db-schema review)_ `NewDog` in `src/types.ts` currently omits `account_id` (`Pick<Dog, "name">`) even though `account_id` is `NOT NULL` in the schema. S-02 must resolve this before shipping any dog-insert code: either update the type to `Pick<Dog, "name" | "account_id">` (preferred — gives compile-time safety) or explicitly inject `account_id` from the session in the insert service and add a JSDoc note on `NewDog` explaining the injection pattern. Leaving it as-is produces a NOT NULL violation at runtime with no TypeScript warning.
-- **Status:** proposed
+- **Status:** done
 
 ### S-03: Training elements
 
@@ -130,10 +130,10 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 | Roadmap ID | Change ID         | Suggested issue title                                       | Ready for `/10x-plan` | Notes                                         |
 | ---------- | ----------------- | ----------------------------------------------------------- | --------------------- | --------------------------------------------- |
-| F-01       | db-schema         | Set up Supabase schema: dogs, elements, training_logs + RLS | yes                   | Run `/10x-plan db-schema`                     |
-| S-01       | auth-flow         | Complete and verify email auth end-to-end                   | yes                   | Run `/10x-plan auth-flow`                     |
-| S-02       | dog-management    | Add dog + dog switcher                                      | no                    | Needs F-01 and S-01 done first                |
-| S-03       | training-elements | Custom training elements CRUD                               | no                    | Needs S-02 done first                         |
+| F-01       | db-schema         | Set up Supabase schema: dogs, elements, training_logs + RLS | done                  | Merged to master                              |
+| S-01       | auth-flow         | Complete and verify email auth end-to-end                   | done                  | Merged to master                              |
+| S-02       | dog-management    | Add dog + dog switcher                                      | done                  | Merged to master                              |
+| S-03       | training-elements | Custom training elements CRUD                               | yes                   | Run `/10x-plan training-elements`             |
 | S-04       | training-grid     | Training grid with green/red highlights and ticking         | no                    | Needs S-03 done first; this is the north star |
 
 ## Open Roadmap Questions
@@ -151,4 +151,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Done
 
-(Empty on first generation. `/10x-archive` appends an entry here — and flips that item's `Status` to `done` — when a change whose `Change ID` matches the item is archived.)
+| ID   | Change ID         | Outcome                                                                                 | Merged     |
+| ---- | ----------------- | --------------------------------------------------------------------------------------- | ---------- |
+| F-01 | db-schema         | `dogs`, `training_elements`, `training_logs` live in Supabase with RLS                 | 2026-05-27 |
+| S-01 | auth-flow         | Email + password sign-up/sign-in; protected routes redirect unauthenticated users       | 2026-05-27 |
+| S-02 | dog-management    | Add a dog, switch between dogs from header dropdown; selection persists across reloads  | 2026-06-09 |

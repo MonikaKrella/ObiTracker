@@ -23,3 +23,17 @@
 - **Problem**: Supabase grants `SELECT` to the `anon` role on public tables by default. Even with RLS enabled and no anon policies (which blocks rows), the table structure remains visible in the GraphQL schema to anyone using the public anon key — a schema-discoverability leak flagged by Supabase's security linter.
 - **Rule**: After enabling RLS on a new table, immediately add `REVOKE SELECT ON TABLE <table> FROM anon;`. Add the corresponding `GRANT SELECT ON TABLE <table> TO anon;` to the rollback comment.
 - **Applies to**: plan, implement, impl-review
+
+## Every client handler for a mutating action must redirect to /auth/signin on 401
+
+- **Context**: Any React component/island that calls a mutating API route (POST/PATCH/DELETE for create, rename, delete, reorder, etc.)
+- **Problem**: API routes correctly return `401 { error: "Unauthorized" }` when `context.locals.user` is null (expired session). It's easy to spec the "primary" action's dialog (e.g. an Add or Rename dialog) with explicit `401 → window.location.href = "/auth/signin"` handling, then under-specify a sibling action (e.g. a Delete confirmation dialog or a "Save order" button) with only a generic `error → toast.error(...)` branch. The result: an expired session on that one action shows a confusing toast (often literally "Unauthorized") instead of sending the user to sign in, silently breaking any "any action redirects to /auth/signin on 401" success criterion.
+- **Rule**: For every mutating action handler in a feature, check `res.status === 401` first and respond with `window.location.href = "/auth/signin"` — before any toast-based 400/409/500 handling. Apply this uniformly to *all* action handlers (including destructive/confirmation-dialog actions and bulk/reorder actions), not just the first one written. When reviewing a plan, grep every fetch-based handler's contract for a `401 →` bullet and flag any that are missing one.
+- **Applies to**: plan, implement, impl-review
+
+## Explicitly revoke EXECUTE from `anon` on RPC functions meant for `authenticated` only
+
+- **Context**: Any Supabase migration that defines an RPC function intended to be callable only by `authenticated` users (e.g. `soft_delete_dog`, `reorder_training_elements`)
+- **Problem**: `REVOKE EXECUTE ON FUNCTION ... FROM PUBLIC;` only removes the implicit PUBLIC-role grant. Postgres' default privileges (`pg_default_acl`) on the `public` schema separately grant `EXECUTE` to `anon`, `authenticated`, and `service_role` on every new function at creation time — so `anon` retains EXECUTE despite the revoke. Verified on both `soft_delete_dog` and `reorder_training_elements`: `anon_can_exec = true` after the standard `REVOKE ... FROM PUBLIC; GRANT ... TO authenticated;` pair.
+- **Rule**: When an RPC is meant to be `authenticated`-only, add an explicit `REVOKE EXECUTE ON FUNCTION ... FROM anon;` alongside the `FROM PUBLIC` revoke (and from `service_role` too, unless service-role access is intended). Verify with `select has_function_privilege('anon', '<fn>(<args>)', 'EXECUTE')` — it should return `false`. This is defense-in-depth: RLS on the underlying tables usually makes an anon call a safe no-op anyway, but the misleading grant shouldn't be left in place, especially for `SECURITY DEFINER` functions where the EXECUTE grant is the primary boundary.
+- **Applies to**: plan, implement, impl-review
