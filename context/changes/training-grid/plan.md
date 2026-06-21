@@ -427,6 +427,34 @@ The two deviations below were found and applied during Phase 4 manual testing, a
 
 **Impact**: `src/components/ui/button.tsx` only — shared by every `variant="destructive"` button in the app (currently just "Delete dog"), not scoped to the training grid. No change to any grid file.
 
+### In-flight-request race window in `useTrainingGrid.ts` (accepted as risk)
+
+**What changed**: nothing in code — this documents a known, narrow race surfaced by `/10x-impl-review`'s full-plan pass (F1), distinct from the debounce-timer-unmount race already fixed in Phase 4.
+
+**The race**: the pending-toggle map entry for a key (`pendingRef`) is deleted synchronously the instant the debounce timer fires (`useTrainingGrid.ts:57`), before the `await fetch(...)` that follows begins. If the user taps the same cell again while that fetch is still in flight (round-trip > 300ms), the new tap's baseline is computed as `!next` — assuming the in-flight request has already resolved against the prior server state, when it hasn't. A second POST can fire against a cell whose true server state is still being mutated by the first one.
+
+**Why accepted as risk**: the toggle endpoint flips whatever the row currently holds, so it always converges to *some* valid boolean — no data corruption, no wrong final DB state for any single tap's intent. The failure mode is a displayed/optimistic state that can desync from the true DB state until the next reload, and it needs round-trip latency > 300ms *and* a second tap landing in that exact window to trigger — narrow in practice. Closing it fully (tracking "request in flight" per key, not just "timer pending") would be a non-trivial restructuring of this hook's state shape, and there's no test harness for this hook to verify a fix against (only `highlight.ts` has the testing exception in this plan).
+
+**Impact**: `src/components/hooks/useTrainingGrid.ts` only. No code change — documented as an accepted risk for future revisit if real-world latency/usage data shows this matters in practice.
+
+### Undocumented function: `elementBelongsToDog` ownership check
+
+**What changed**: Phase 2's "Changes Required" never named `elementBelongsToDog` (`src/lib/services/training-elements.ts`) as a planned addition, but it exists and is called from `src/pages/api/dog/[id]/logs/index.ts`, enforced before `toggleTrainingLog`, returning 404 on a cross-dog `elementId` before any write happens. Flagged by `/10x-impl-review`'s full-plan pass (F2) as a documentation gap, not a functional issue.
+
+**Why it exists**: app-level defense-in-depth ownership check alongside the RLS `WITH CHECK` clause on `training_logs_insert_authenticated` (the primary boundary, already requires `training_elements.dog_id = dog_id`) — this is the belt-and-suspenders check that rejects a forged/mismatched `elementId` with a clean 404 before it ever reaches the database.
+
+**Impact**: `src/lib/services/training-elements.ts` and `src/pages/api/dog/[id]/logs/index.ts` only — no behavior change, this note just closes the documentation gap retroactively.
+
+### Undocumented new file: `.gitattributes`
+
+**Originally planned**: not addressed by any phase — none of the five phases' "Changes Required" sections name a `.gitattributes` file.
+
+**What changed**: a repo-root `.gitattributes` (`* text=auto eol=lf`) was added to normalize line endings to LF regardless of the checkout platform's `autocrlf` setting. Same shape as the `Layout.astro` viewport-meta and `button.tsx` focus-ring adaptations above — a pre-existing repo-level issue surfaced (and fixed) by this change's work, not a training-grid-specific decision.
+
+**Why**: without it, a Windows checkout with `core.autocrlf=true` materializes CRLF on disk for every text file, which conflicts with Prettier's default LF expectation and floods `npm run lint` with unrelated errors.
+
+**Impact**: `.gitattributes` only — repo-wide, not scoped to the training grid, same as the other infra-fix entries in this section.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
