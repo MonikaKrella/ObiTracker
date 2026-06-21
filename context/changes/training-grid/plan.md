@@ -500,13 +500,13 @@ The two deviations below were found and applied during Phase 4 manual testing, a
 
 #### Automated
 
-- [x] 5.1 `npm run lint` passes
-- [x] 5.2 `npm run build` succeeds
+- [x] 5.1 `npm run lint` passes — 3de58d5
+- [x] 5.2 `npm run build` succeeds — 3de58d5
 
 #### Manual
 
-- [x] 5.3 Dashboard tile links to the grid with an accurate element count
-- [x] 5.4 Keyboard-only navigation reaches and toggles every cell with a visible focus ring
-- [x] 5.5 Screen reader spot-check announces headers and cell state correctly (skipped — accepted as risk)
-- [x] 5.6 Touch target audit on a real phone confirms ≥44×44px tappable cells
-- [x] 5.7 Full regression pass: add/delete/rename element reflects correctly in the grid
+- [x] 5.3 Dashboard tile links to the grid with an accurate element count — 3de58d5
+- [x] 5.4 Keyboard-only navigation reaches and toggles every cell with a visible focus ring — 3de58d5
+- [x] 5.5 Screen reader spot-check announces headers and cell state correctly (skipped — accepted as risk) — 3de58d5
+- [x] 5.6 Touch target audit on a real phone confirms ≥44×44px tappable cells — 3de58d5
+- [x] 5.7 Full regression pass: add/delete/rename element reflects correctly in the grid — 3de58d5
