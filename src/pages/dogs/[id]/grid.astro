@@ -6,6 +6,7 @@ import { getTrainingElements } from "@/lib/services/training-elements";
 import { getTrainingLogs } from "@/lib/services/training-logs";
 import { getTrainingWindow, generateDateRange } from "@/lib/dates";
 import { TrainingGrid } from "@/components/training-grid/TrainingGrid";
+import { WINDOW_COOKIE_NAME, isWindowDays, type WindowDays } from "@/components/training-grid/window-options";
 import type { TrainingElement, TrainingLog } from "@/types";
 
 // selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
@@ -17,10 +18,17 @@ if (!selectedDog) {
 }
 
 // The grid always fetches and computes highlights over the fixed 30-day
-// window, independent of the client-only 7/14/30 display selector added in
-// Phase 4 — see plan.md "Critical Implementation Details".
+// window, independent of the 7/14/30 display selector — see plan.md
+// "Critical Implementation Details".
 const { startDate, endDate } = getTrainingWindow(30);
 const dates = generateDateRange(30, endDate);
+
+// The display selector is persisted as a cookie (not localStorage)
+// specifically so it can be resolved here, server-side, and rendered
+// correctly on the very first paint — no client-only resolution, no
+// post-hydration resize.
+const rawWindow = Number(Astro.cookies.get(WINDOW_COOKIE_NAME)?.value);
+const initialWindow: WindowDays = isWindowDays(rawWindow) ? rawWindow : 30;
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 const serviceUnavailable = !supabase;
@@ -62,6 +70,7 @@ if (supabase) {
     -->
     <div class="mx-[calc(50%-50vw)] px-4 lg:px-8">
       <TrainingGrid
+        client:load
         dogId={selectedDog.id}
         dogName={selectedDog.name}
         elements={elements}
@@ -69,18 +78,8 @@ if (supabase) {
         dates={dates}
         today={endDate}
         serviceUnavailable={serviceUnavailable}
+        initialWindow={initialWindow}
       />
     </div>
   </div>
 </AuthLayout>
-
-<script>
-  // Phase 3 stopgap: scroll the grid to today's column (the rightmost date)
-  // on initial load. The full React island (Phase 4) replaces this with a
-  // `useEffect` tied to a scroll-wrapper ref that also re-runs on window
-  // (7/14/30) switches — remove this script once that lands.
-  const gridScroll = document.getElementById("training-grid-scroll");
-  if (gridScroll) {
-    gridScroll.scrollLeft = gridScroll.scrollWidth;
-  }
-</script>

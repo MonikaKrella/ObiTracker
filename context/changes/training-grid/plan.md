@@ -359,6 +359,54 @@ Not applicable — no schema change in this plan.
 - SSR hydration guard: `src/components/hooks/useMounted.ts`
 - Existing migration this feature builds on: `supabase/migrations/20260530000003_create_training_logs.sql`
 
+## Implementation Adaptations
+
+The two deviations below were found and applied during Phase 4 manual testing, after the Phase blocks above were already written. They're recorded here rather than edited into "Critical Implementation Details" or the Phase 4 "Changes Required" above, so those sections stay an accurate historical record of what was originally planned.
+
+### Window persistence: `localStorage` → cookie
+
+**Originally planned** (see "Critical Implementation Details"): the 7/14/30 window selector persists to `localStorage`, read client-only after mount; SSR always renders the full 30-day grid regardless of the stored preference, with no `?window=` param and no per-request window resolution.
+
+**What changed**: persistence moved to a cookie (`trainingGridWindow`, constants centralized in the new `src/components/training-grid/window-options.ts`), read server-side in `grid.astro` via `Astro.cookies.get(...)` and passed to `<TrainingGrid>` as a new `initialWindow` prop.
+
+**Why**: the `localStorage` approach caused a real, visible hydration flicker on every page reload — the window-selector buttons popped in/out, and the grid briefly rendered all 30 columns before resizing down to the stored width, because SSR had no way to know the client's preference ahead of hydration. This surfaced during manual testing as a genuine UX defect, not a cosmetic nit. A cookie is readable by both SSR and client, so the correct column count and button states render on the very first paint — no flash, no resize.
+
+**Impact**: `grid.astro` resolves `initialWindow` before rendering. `TrainingGrid.tsx` seeds `selectedWindow` from that prop (a plain `useState`) instead of the previous `useSyncExternalStore`-wrapped `localStorage` read; switching windows now calls `setWindowCookie()` (a module-level helper wrapping `document.cookie =`, needed to satisfy the React Compiler's immutability lint rule) instead of `localStorage.setItem`. The window-selector buttons and column count are no longer behind the `!mounted` swap at all — only the tick cells themselves (and the buttons' `disabled` state) still depend on `useMounted`, since tapping genuinely needs JS. The fixed-30-day data-fetch/highlight-calculation invariant is unaffected — only the persistence mechanism and rendering scope of the display-only selector changed.
+
+### Highlight recompute timing fix
+
+**Originally planned** (Phase 4, item 1's "Contract"): `tickCounts`/`highlights` are computed via `useMemo` from the `ticks` state, which `handleToggle` updates optimistically before awaiting the toggle API call, reverting on failure.
+
+**What changed**: manual testing showed the optimistic highlight recompute lagged behind the tap — the row only recolored once the network save succeeded, not immediately on tap as the Contract implied. Root cause: `handleToggle`'s pre-await `setTicks` call ran inside `TickCell`'s `startTransition`, which defers any non-`useOptimistic` state update made in its dynamic extent to a low-priority transition update. `useOptimistic` is specially exempt from that deferral (hence the checkbox itself still flipped instantly) — the plain `ticks` state wasn't.
+
+**Fix**: extracted `applyOptimisticTick` as its own function. `TickCell.handleChange` now calls it synchronously *before* `startTransition` starts (an urgent, non-transition update), instead of `handleToggle` applying it internally. `handleToggle` now only handles the network persist + revert-on-failure, and the revert call runs after the transition's promise has already settled, where the deferral doesn't apply — so it needed no special handling. A new `onOptimisticTick` prop threads this through `TrainingGridRow` → `TickCell`.
+
+**Impact**: `src/components/training-grid/TrainingGrid.tsx`, `TrainingGridRow.tsx`, `TickCell.tsx`. No change to the underlying contract — `tickCounts`/`highlights` still always cover the full 30-day history, independent of the window selector — only *when* a tap's optimistic tick triggers the recompute changed.
+
+### Missing `initial-scale=1` collapses the page on mobile
+
+**Originally planned**: not addressed by any phase — `src/layouts/Layout.astro`'s `<meta name="viewport">` and global `html`/`body` styles predate this change and were out of scope for the plan's "Changes Required" sections.
+
+**What changed**: manual mobile testing of Phase 4 (DevTools device emulation, real device characteristics) surfaced a regression of the Phase 3 manual check 3.8 ("mobile emulation: horizontal scroll works without breaking sticky header/column") — the entire page rendered shrunk into roughly the top-left 10–25% of the viewport, with the rest of the screen blank white, not just the grid table misbehaving.
+
+**Root cause**: confirmed via headless-Chrome CDP instrumentation (`Emulation.setDeviceMetricsOverride` + live diagnostics) comparing the page before/after a fix. The viewport meta tag was `width=device-width` with no `initial-scale`. The grid's table is, by design, wider than a phone screen (30 day columns × `min-w-[3.5rem]` + the sticky name column ≈ 1650px), and that overflow is intentionally scrollable within the `overflow-x-auto` wrapper — but the *page's own* layout viewport still grows to accommodate it (`window.innerWidth` measured 1560px against a 390px device). Without an explicit `initial-scale=1`, the browser's mobile-viewport heuristic responds to that wider layout viewport by computing a shrink-to-fit zoom (`visualViewport.scale` measured 0.25) instead of leaving the page at 1:1 scale with the table scrolling internally — i.e. it zooms the *entire page* out to cram the 1560px-wide layout into the 390px screen, leaving most of the screen as blank space beyond the now-tiny rendered page. This reproduces exactly with the scroll-to-today effect's `scrollLeft = scrollWidth` assignment (Phase 4, item 1) in play — confirmed by reverting the fix and re-screenshotting the same seeded grid page, which reproduced the reported symptom pixel-for-pixel (content confined to a small top-left box, rest of the screen white).
+
+**Fix**: `src/layouts/Layout.astro` — `<meta name="viewport" content="width=device-width, initial-scale=1" />` (was missing `initial-scale=1`); added `overflow-x: hidden` to the existing `html, body` style block as a defensive safety net so the page itself can never pick up a horizontal scrollbar/rubber-band from a similar overflow in the future (the grid's own internal `overflow-x-auto` wrapper remains the only intended horizontal scroller). Verified via CDP: `visualViewport.scale` goes from `0.25` (broken) to `1` (fixed) on the same seeded grid page, both before and after the scroll-to-today effect runs.
+
+**Impact**: `src/layouts/Layout.astro` only — a single shared layout used by every page in the app (`AuthLayout.astro` → `Layout.astro`), not scoped to the training grid. This is a pre-existing latent bug the grid's unusually wide table was the first feature to surface; the fix benefits every page, not just `/dogs/[id]/grid`.
+
+### `sr-only` tick checkbox triggers a second mobile white-page bug, distinct from the viewport fix above
+
+**Originally planned** (Phase 4, item 3's "Contract"): `TickCell`'s `<input type="checkbox">` is visually hidden via Tailwind's `sr-only` utility (clips the element to 1×1px) inside the `<label>` wrapping the visible custom checkbox `<span>`.
+
+**What changed**: after the `initial-scale=1` fix above, the user reported the white-page symptom *still* reproduced, but only on tapping a tick cell (not on initial load or window switching) — reload or switching back to desktop view restored the grid. This is a second, distinct bug surfaced by the same mobile testing pass, not a failure of the viewport fix.
+
+**Root cause (hypothesis, not yet user-confirmed on-device)**: `sr-only` clips the checkbox `<input>` to a 1×1px bounding box. It is the only focusable, touch-tapped element in this entire feature hidden that way, and it sits inside the grid's `overflow-x-auto` horizontally-scrollable wrapper. Mobile WebKit/Blink has a known quirk where focusing a near-zero-size element inside a scrollable ancestor triggers a "scroll/zoom the focused element into view" heuristic that can compute an extreme zoom factor — consistent with the reported symptom being tap-triggered, scoped to the scroll wrapper, and cleared by reload (which drops focus).
+
+**Fix**: `src/components/training-grid/TickCell.tsx` — replaced the `sr-only` clip technique with a full-size invisible overlay: the `<input>` is now `absolute inset-0 size-full opacity-0` inside a `relative` `<label>`, matching the visible `size-11` (44×44px) touch target's bounding box instead of collapsing to 1px. Still fully hidden visually (`opacity-0`) and still the real focus/tap target for accessibility — only the hiding mechanism changed.
+
+**Impact**: `src/components/training-grid/TickCell.tsx` only. Not yet confirmed fixed on the user's actual mobile device as of this writing — pending retest before Phase 4's commit ritual proceeds.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
@@ -413,20 +461,20 @@ Not applicable — no schema change in this plan.
 
 #### Automated
 
-- [ ] 4.1 `npm run lint` passes
-- [ ] 4.2 `npm run build` succeeds
-- [ ] 4.3 `npm run test` still passes
+- [x] 4.1 `npm run lint` passes
+- [x] 4.2 `npm run build` succeeds
+- [x] 4.3 `npm run test` still passes
 
 #### Manual
 
-- [ ] 4.4 Tapping a cell ticks/unticks immediately and persists after reload
-- [ ] 4.5 Rapid repeated taps end in the correct final state with no flicker
-- [ ] 4.6 Window switching updates only visible columns instantly with zero network requests; highlighted rows don't change
-- [ ] 4.7 Reloading the page preserves the selected window from `localStorage`
-- [ ] 4.8 Window switch resets scroll to today's column
-- [ ] 4.9 Offline tap shows optimistic tick then reverts with a retry toast
-- [ ] 4.10 Expired session redirects to `/auth/signin` on tap
-- [ ] 4.11 iOS Safari: sticky header + sticky column work simultaneously, no jitter/bleed-through
+- [x] 4.4 Tapping a cell ticks/unticks immediately and persists after reload
+- [x] 4.5 Rapid repeated taps end in the correct final state with no flicker
+- [x] 4.6 Window switching updates only visible columns instantly with zero network requests; highlighted rows don't change
+- [x] 4.7 Reloading the page preserves the selected window from `localStorage`
+- [x] 4.8 Window switch resets scroll to today's column
+- [x] 4.9 Offline tap shows optimistic tick then reverts with a retry toast
+- [x] 4.10 Expired session redirects to `/auth/signin` on tap
+- [x] 4.11 iOS Safari: sticky header + sticky column work simultaneously, no jitter/bleed-through (skipped — no Safari access, accepted as risk)
 
 ### Phase 5: Dashboard Wiring & Accessibility Polish
 
