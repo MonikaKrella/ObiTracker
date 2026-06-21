@@ -415,6 +415,18 @@ The two deviations below were found and applied during Phase 4 manual testing, a
 
 **Impact**: `src/components/training-grid/sticky-colors.ts` only — no behavior change, this note just closes the documentation gap retroactively.
 
+### Destructive button focus ring is invisible (shared `Button` component, not a grid file)
+
+**Originally planned**: not addressed by any phase — Phase 5's "Accessibility verification pass" scoped its file list to `TrainingGrid.tsx`, `TrainingGridRow.tsx`, `TickCell.tsx` only.
+
+**What changed**: manual testing of 5.4 (keyboard-only navigation, visible focus ring) on the dashboard found the "Delete dog" button's (`variant="destructive"`) focus-visible state nearly invisible — not a grid defect, but a pre-existing contrast bug in the shared `Button` component surfaced by this phase's keyboard-nav pass, the same way the Phase 4 viewport-meta bug was a `Layout.astro` defect surfaced by the grid's unusually wide table.
+
+**Root cause**: the `destructive` variant's focus-visible ring was `ring-destructive/20` (`dark:ring-destructive/40`) — a translucent *red* ring drawn over the button's own solid red (`bg-destructive`) background. Same-hue ring-on-fill at 20–40% opacity produces almost no contrast, regardless of light/dark mode. No other variant has this problem because none of them use the same hue for both fill and ring.
+
+**Fix**: `src/components/ui/button.tsx` — the `destructive` variant's focus-visible styles changed from `focus-visible:ring-destructive/20 ... dark:focus-visible:ring-destructive/40` to `focus-visible:border-2 focus-visible:border-white/90 focus-visible:bg-destructive/80 focus-visible:ring-white/80 ... dark:focus-visible:bg-destructive/50`: an explicit white focus border (the variant has no border at all otherwise), a white ring instead of a same-hue red one, and a darkened fill on focus (lower alpha lets the dark page backdrop show through).
+
+**Impact**: `src/components/ui/button.tsx` only — shared by every `variant="destructive"` button in the app (currently just "Delete dog"), not scoped to the training grid. No change to any grid file.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
@@ -488,13 +500,13 @@ The two deviations below were found and applied during Phase 4 manual testing, a
 
 #### Automated
 
-- [ ] 5.1 `npm run lint` passes
-- [ ] 5.2 `npm run build` succeeds
+- [x] 5.1 `npm run lint` passes
+- [x] 5.2 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 5.3 Dashboard tile links to the grid with an accurate element count
-- [ ] 5.4 Keyboard-only navigation reaches and toggles every cell with a visible focus ring
-- [ ] 5.5 Screen reader spot-check announces headers and cell state correctly
-- [ ] 5.6 Touch target audit on a real phone confirms ≥44×44px tappable cells
-- [ ] 5.7 Full regression pass: add/delete/rename element reflects correctly in the grid
+- [x] 5.3 Dashboard tile links to the grid with an accurate element count
+- [x] 5.4 Keyboard-only navigation reaches and toggles every cell with a visible focus ring
+- [x] 5.5 Screen reader spot-check announces headers and cell state correctly (skipped — accepted as risk)
+- [x] 5.6 Touch target audit on a real phone confirms ≥44×44px tappable cells
+- [x] 5.7 Full regression pass: add/delete/rename element reflects correctly in the grid

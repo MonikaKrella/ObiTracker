@@ -2,6 +2,21 @@ import { useOptimistic, startTransition, useRef } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+const ARIA_MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/**
+ * Formats a "YYYY-MM-DD" string as "Mon D" (e.g. "2026-06-17" -> "Jun 17")
+ * for screen-reader announcements only — pure string slicing, no `Date`
+ * parsing, mirroring `formatHeaderDate`'s approach in `src/lib/dates.ts`.
+ * Distinct from `formatHeaderDate` (which renders "DD.MM" for the visible
+ * column header) because an aria-label reads more naturally with a month
+ * name than with the visible grid's compact numeric format.
+ */
+function formatAriaDate(dateStr: string): string {
+  const [, month, day] = dateStr.split("-");
+  return `${ARIA_MONTH_NAMES[Number(month) - 1]} ${Number(day)}`;
+}
+
 interface Props {
   elementId: string;
   elementName: string;
@@ -68,13 +83,17 @@ export function TickCell({ elementId, elementName, date, checked, isToday, onTog
           type="checkbox"
           checked={optimisticChecked}
           onChange={handleChange}
-          className="absolute inset-0 size-full cursor-pointer opacity-0"
-          aria-label={`${elementName} on ${date}`}
+          className="peer absolute inset-0 size-full cursor-pointer opacity-0"
+          aria-label={`${elementName}, ${formatAriaDate(date)}`}
         />
+        {/* The real input is fully transparent (see comment above), so its native focus
+            outline is invisible too — this `peer-focus-visible` ring on the visible
+            indicator is the cell's only focus affordance for keyboard navigation. */}
         <span
           aria-hidden="true"
           className={cn(
             "flex size-5 items-center justify-center rounded-sm border-2 transition-colors",
+            "peer-focus-visible:ring-2 peer-focus-visible:ring-purple-400 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent",
             optimisticChecked ? "border-emerald-500 bg-emerald-500 text-white" : "border-white/30 bg-transparent",
           )}
         >
