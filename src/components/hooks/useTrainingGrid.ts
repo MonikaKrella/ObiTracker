@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 const DEBOUNCE_MS = 300;
 
@@ -28,6 +28,18 @@ interface PendingToggle {
  */
 export function useTrainingGrid(dogId: string) {
   const pendingRef = useRef(new Map<string, PendingToggle>());
+
+  // If the grid unmounts (e.g. navigating away) within the debounce window,
+  // a stray timer would otherwise still fire and POST after the user has
+  // already left the page.
+  useEffect(() => {
+    const pending = pendingRef.current;
+    return () => {
+      for (const { timer } of pending.values()) {
+        clearTimeout(timer);
+      }
+    };
+  }, []);
 
   const toggleTick = useCallback(
     (elementId: string, date: string, next: boolean): Promise<void> => {

@@ -26,6 +26,11 @@ interface Props {
  */
 export function TickCell({ elementId, elementName, date, checked, isToday, onToggle, onOptimisticTick }: Props) {
   const [optimisticChecked, setOptimisticChecked] = useOptimistic(checked, (_prev: boolean, next: boolean) => next);
+  // Not a real cancellation token — useTrainingGrid's fetch isn't abortable.
+  // Only `.signal.aborted` is read (as a "superseded by a newer tap" flag);
+  // `AbortController` is reused here purely for its built-in superseded-flag
+  // semantics, not to cancel anything in flight (see the class-level comment
+  // above for the full rationale).
   const abortRef = useRef<AbortController | null>(null);
 
   function handleChange() {

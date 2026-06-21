@@ -55,7 +55,11 @@ function applyTick(prev: Map<string, Set<string>>, elementId: string, date: stri
 // `localStorage.setItem(...)` (a method call, not an assignment) was exempt
 // from that same rule in the previous version of this component.
 function setWindowCookie(days: WindowDays) {
-  document.cookie = `${WINDOW_COOKIE_NAME}=${days}; path=/; max-age=${WINDOW_COOKIE_MAX_AGE}; SameSite=Lax`;
+  // `Secure` is conditional on protocol, not unconditional: dev (`npm run dev`)
+  // serves over plain http://localhost, where a `Secure` cookie would silently
+  // fail to round-trip, breaking window persistence in local development.
+  const secure = location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${WINDOW_COOKIE_NAME}=${days}; path=/; max-age=${WINDOW_COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
 }
 
 /**

@@ -407,6 +407,14 @@ The two deviations below were found and applied during Phase 4 manual testing, a
 
 **Impact**: `src/components/training-grid/TickCell.tsx` only. Not yet confirmed fixed on the user's actual mobile device as of this writing — pending retest before Phase 4's commit ritual proceeds.
 
+### Undocumented new file: `sticky-colors.ts`
+
+**What changed**: Phase 4's "Changes Required" never named `src/components/training-grid/sticky-colors.ts` as a new file, but it exists and is imported by both `TrainingGrid.tsx` and `TrainingGridRow.tsx`. Flagged by `/10x-impl-review`'s Phase 4 pass (F4) as a documentation gap, not a functional issue.
+
+**Why it exists**: sticky cells (corner, header row, name column) must render fully opaque — a translucent background would let the date columns scrolling underneath show through (the iOS Safari bleed-through requirement from research.md). `STICKY_BG`/`TODAY_HEADER_BG` centralize the hand-picked opaque color approximations so `TrainingGrid.tsx` and `TrainingGridRow.tsx` don't duplicate them or form a circular import over a single shared constant.
+
+**Impact**: `src/components/training-grid/sticky-colors.ts` only — no behavior change, this note just closes the documentation gap retroactively.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
@@ -461,20 +469,20 @@ The two deviations below were found and applied during Phase 4 manual testing, a
 
 #### Automated
 
-- [x] 4.1 `npm run lint` passes
-- [x] 4.2 `npm run build` succeeds
-- [x] 4.3 `npm run test` still passes
+- [x] 4.1 `npm run lint` passes — 25d0891
+- [x] 4.2 `npm run build` succeeds — 25d0891
+- [x] 4.3 `npm run test` still passes — 25d0891
 
 #### Manual
 
-- [x] 4.4 Tapping a cell ticks/unticks immediately and persists after reload
-- [x] 4.5 Rapid repeated taps end in the correct final state with no flicker
-- [x] 4.6 Window switching updates only visible columns instantly with zero network requests; highlighted rows don't change
-- [x] 4.7 Reloading the page preserves the selected window from `localStorage`
-- [x] 4.8 Window switch resets scroll to today's column
-- [x] 4.9 Offline tap shows optimistic tick then reverts with a retry toast
-- [x] 4.10 Expired session redirects to `/auth/signin` on tap
-- [x] 4.11 iOS Safari: sticky header + sticky column work simultaneously, no jitter/bleed-through (skipped — no Safari access, accepted as risk)
+- [x] 4.4 Tapping a cell ticks/unticks immediately and persists after reload — 25d0891
+- [x] 4.5 Rapid repeated taps end in the correct final state with no flicker — 25d0891
+- [x] 4.6 Window switching updates only visible columns instantly with zero network requests; highlighted rows don't change — 25d0891
+- [x] 4.7 Reloading the page preserves the selected window from a cookie (was `localStorage` in the original plan text; see Implementation Adaptations) — 25d0891
+- [x] 4.8 Window switch resets scroll to today's column — 25d0891
+- [x] 4.9 Offline tap shows optimistic tick then reverts with a retry toast — 25d0891
+- [x] 4.10 Expired session redirects to `/auth/signin` on tap — 25d0891
+- [x] 4.11 iOS Safari: sticky header + sticky column work simultaneously, no jitter/bleed-through (skipped — no Safari access, accepted as risk) — 25d0891
 
 ### Phase 5: Dashboard Wiring & Accessibility Polish
 

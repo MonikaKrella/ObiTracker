@@ -3,7 +3,7 @@ change_id: training-grid
 title: Training grid
 status: implementing
 created: 2026-06-17
-updated: 2026-06-20
+updated: 2026-06-21
 archived_at: null
 ---
 
