@@ -54,10 +54,14 @@ export function computeHighlights(
   const result = new Map<string, "green" | "red" | null>(elements.map((e) => [e.id, null] as const));
 
   const n = elements.length;
-  if (n === 0) return result;
+  if (n === 0) {
+    return result;
+  }
 
   // ── TIER 1: n ≤ 3 — never meaningful, no highlights. ──
-  if (n <= 3) return result;
+  if (n <= 3) {
+    return result;
+  }
 
   const byDesc = [...tickCounts.entries()].sort((a, b) => b[1] - a[1]);
   const byAsc = [...tickCounts.entries()].sort((a, b) => a[1] - b[1]);
@@ -65,11 +69,14 @@ export function computeHighlights(
   // ── TIER 2: 4 ≤ n ≤ 6 — single winner only, no ties, no expansion. ──
   if (n <= 6) {
     const topIsUnique = byDesc[0][1] !== byDesc[1][1];
-    if (topIsUnique) result.set(byDesc[0][0], "green");
+    if (topIsUnique) {
+      result.set(byDesc[0][0], "green");
+    }
 
     const bottomIsUnique = byAsc[0][1] !== byAsc[1][1];
-    if (bottomIsUnique) result.set(byAsc[0][0], "red");
-
+    if (bottomIsUnique) {
+      result.set(byAsc[0][0], "red");
+    }
     return result;
   }
 
@@ -104,7 +111,9 @@ export function computeHighlights(
     }
 
     // Suppression: green set covers half or more of the elements → clear it.
-    if (greenSet.size * 2 >= n) greenSet.clear();
+    if (greenSet.size * 2 >= n) {
+      greenSet.clear();
+    }
   }
 
   const redSet = new Set<string>();
@@ -129,7 +138,9 @@ export function computeHighlights(
     }
 
     // Suppression: red set covers half or more of the elements → clear it.
-    if (redSet.size * 2 >= n) redSet.clear();
+    if (redSet.size * 2 >= n) {
+      redSet.clear();
+    }
   }
 
   // Apply: green takes precedence over red.

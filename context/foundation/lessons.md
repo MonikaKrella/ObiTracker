@@ -37,3 +37,10 @@
 - **Problem**: `REVOKE EXECUTE ON FUNCTION ... FROM PUBLIC;` only removes the implicit PUBLIC-role grant. Postgres' default privileges (`pg_default_acl`) on the `public` schema separately grant `EXECUTE` to `anon`, `authenticated`, and `service_role` on every new function at creation time — so `anon` retains EXECUTE despite the revoke. Verified on both `soft_delete_dog` and `reorder_training_elements`: `anon_can_exec = true` after the standard `REVOKE ... FROM PUBLIC; GRANT ... TO authenticated;` pair.
 - **Rule**: When an RPC is meant to be `authenticated`-only, add an explicit `REVOKE EXECUTE ON FUNCTION ... FROM anon;` alongside the `FROM PUBLIC` revoke (and from `service_role` too, unless service-role access is intended). Verify with `select has_function_privilege('anon', '<fn>(<args>)', 'EXECUTE')` — it should return `false`. This is defense-in-depth: RLS on the underlying tables usually makes an anon call a safe no-op anyway, but the misleading grant shouldn't be left in place, especially for `SECURITY DEFINER` functions where the EXECUTE grant is the primary boundary.
 - **Applies to**: plan, implement, impl-review
+
+## Always use braces for if-statements, with the body on its own line
+
+- **Context**: Any if-statement, in any file (TS/TSX/Astro), across the codebase.
+- **Problem**: Braceless if-statements or bodies written on the same line as the condition (`if (x) doThing();`) are easy to misread, error-prone when a second statement is later added inside the block, and produce noisy diffs.
+- **Rule**: Always wrap if-statement bodies in braces `{ }`, and always place the body on a separate line from the `if (...)` condition — never `if (x) doThing();` on one line, even for single statements.
+- **Applies to**: implement, impl-review

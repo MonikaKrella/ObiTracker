@@ -55,7 +55,8 @@ export async function toggleTrainingLog(
     return "ticked";
   }
 
-  if (insertResult.error.code !== "23505") {
+  const uniqueViolationErrorCode = "23505"; // Postgres unique violation
+  if (insertResult.error.code !== uniqueViolationErrorCode) {
     throw insertResult.error;
   }
 
@@ -66,6 +67,9 @@ export async function toggleTrainingLog(
     .eq("dog_id", dogId)
     .eq("trained_on", trainedOn);
 
-  if (deleteResult.error) throw deleteResult.error;
+  if (deleteResult.error) {
+    throw deleteResult.error;
+  }
+
   return "unticked";
 }
