@@ -37,6 +37,23 @@ const elements = supabase ? await getTrainingElements(supabase, selectedDog.id) 
       </a>
     </div>
 
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+      <h2 class="mb-2 text-lg font-semibold text-white">Training grid</h2>
+      <p class="mb-4 text-sm text-blue-100/40">
+        {
+          elements.length > 0
+            ? `${elements.length} training element(s) tracked`
+            : "Add training elements to start logging."
+        }
+      </p>
+      <a
+        href={`/dogs/${selectedDog.id}/grid`}
+        class="rounded-lg border border-purple-400/40 bg-purple-500/20 px-4 py-2 text-sm font-medium transition-colors hover:bg-purple-500/30"
+      >
+        View training grid
+      </a>
+    </div>
+
     <!--
       Placeholder shown until DeleteDogModal mounts. The island is wrapped in
       a hidden element so it occupies no space until useLayoutEffect swaps them,

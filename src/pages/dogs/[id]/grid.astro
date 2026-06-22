@@ -1,0 +1,85 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { createClient } from "@/lib/supabase";
+import { getDogsList } from "@/lib/services/dogs";
+import { getTrainingElements } from "@/lib/services/training-elements";
+import { getTrainingLogs } from "@/lib/services/training-logs";
+import { getTrainingWindow, generateDateRange } from "@/lib/dates";
+import { TrainingGrid } from "@/components/training-grid/TrainingGrid";
+import { WINDOW_COOKIE_NAME, isWindowDays, type WindowDays } from "@/components/training-grid/window-options";
+import type { TrainingElement, TrainingLog } from "@/types";
+
+// selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
+// if the dog is not found, soft-deleted, or owned by another user.
+// The null guard below is a defensive fallback for TypeScript's benefit.
+const { selectedDog } = Astro.locals;
+if (!selectedDog) {
+  return Astro.redirect("/dashboard");
+}
+
+// The grid always fetches and computes highlights over the fixed 30-day
+// window, independent of the 7/14/30 display selector — see plan.md
+// "Critical Implementation Details".
+const { startDate, endDate } = getTrainingWindow(30);
+const dates = generateDateRange(30, endDate);
+
+// The display selector is persisted as a cookie (not localStorage)
+// specifically so it can be resolved here, server-side, and rendered
+// correctly on the very first paint — no client-only resolution, no
+// post-hydration resize.
+const rawWindow = Number(Astro.cookies.get(WINDOW_COOKIE_NAME)?.value);
+const initialWindow: WindowDays = isWindowDays(rawWindow) ? rawWindow : 30;
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const serviceUnavailable = !supabase;
+const dogs = supabase ? await getDogsList(supabase) : [];
+
+let elements: TrainingElement[] = [];
+let initialTicks: Pick<TrainingLog, "element_id" | "trained_on">[] = [];
+
+if (supabase) {
+  [elements, initialTicks] = await Promise.all([
+    getTrainingElements(supabase, selectedDog.id),
+    getTrainingLogs(supabase, selectedDog.id, startDate, endDate),
+  ]);
+}
+---
+
+<AuthLayout title={`${selectedDog.name} – Training grid`} dogs={dogs}>
+  <div class="space-y-6">
+    <a
+      href={`/dogs/${selectedDog.id}/dashboard`}
+      class="text-sm text-purple-300 transition-colors hover:text-purple-100 hover:underline"
+    >
+      ← Back to {selectedDog.name}'s dashboard
+    </a>
+
+    <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+      Training grid
+    </h1>
+
+    <!--
+      Full-bleed break-out: AuthLayout centers all page content in a
+      `max-w-4xl` column, which is far too narrow for a 30-day grid on
+      desktop. `mx-[calc(50%-50vw)]` cancels that column's centering offset
+      (and its own `px-4` padding) so this wrapper spans the full viewport
+      width, independent of how wide the viewport is — the back-link and
+      heading above stay in the normal centered column. `px-4`/`lg:px-8`
+      re-introduce a matching edge gutter so the grid doesn't touch the
+      browser edge.
+    -->
+    <div class="mx-[calc(50%-50vw)] px-4 lg:px-8">
+      <TrainingGrid
+        client:load
+        dogId={selectedDog.id}
+        dogName={selectedDog.name}
+        elements={elements}
+        initialTicks={initialTicks}
+        dates={dates}
+        today={endDate}
+        serviceUnavailable={serviceUnavailable}
+        initialWindow={initialWindow}
+      />
+    </div>
+  </div>
+</AuthLayout>

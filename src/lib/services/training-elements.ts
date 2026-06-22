@@ -15,7 +15,10 @@ export async function getTrainingElements(supabase: SupabaseClient, dogId: strin
     .order("sort_position", { ascending: true })
     .order("created_at", { ascending: true });
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
+
   return (result.data as TrainingElement[] | null) ?? [];
 }
 
@@ -41,7 +44,10 @@ export async function isElementNameTaken(
 
   const result = await query.maybeSingle();
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
+
   return result.data !== null;
 }
 
@@ -63,7 +69,9 @@ export async function createTrainingElement(
     .limit(1)
     .maybeSingle();
 
-  if (maxResult.error) throw maxResult.error;
+  if (maxResult.error) {
+    throw maxResult.error;
+  }
 
   const nextPosition = Number(maxResult.data?.sort_position ?? -1) + 1;
 
@@ -73,7 +81,10 @@ export async function createTrainingElement(
     .select()
     .single();
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
+
   return result.data as TrainingElement;
 }
 
@@ -96,7 +107,10 @@ export async function renameTrainingElement(
     .select()
     .maybeSingle();
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
+
   return result.data as TrainingElement | null;
 }
 
@@ -117,8 +131,38 @@ export async function deleteTrainingElement(
     .eq("id", elementId)
     .eq("dog_id", dogId);
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
+
   return (result.count ?? 0) > 0;
+}
+
+/**
+ * Checks whether a training element belongs to the given dog. Used as an
+ * app-level ownership guard before writing a `training_logs` row — defense
+ * in depth alongside the RLS `WITH CHECK` clause on `training_logs_insert_authenticated`,
+ * which already requires `training_elements.dog_id = dog_id` but should not
+ * be the only thing standing between a forged/mismatched `elementId` and a
+ * cross-dog log row.
+ */
+export async function elementBelongsToDog(
+  supabase: SupabaseClient,
+  dogId: string,
+  elementId: string,
+): Promise<boolean> {
+  const result = await supabase
+    .from("training_elements")
+    .select("id")
+    .eq("id", elementId)
+    .eq("dog_id", dogId)
+    .maybeSingle();
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return result.data !== null;
 }
 
 /**
@@ -139,5 +183,7 @@ export async function reorderTrainingElements(
     p_element_ids: orderedIds,
   });
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
 }

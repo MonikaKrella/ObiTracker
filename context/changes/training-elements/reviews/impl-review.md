@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: Training Elements Implementation Plan
 
 - **Plan**: context/changes/training-elements/plan.md
@@ -9,14 +10,14 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | PASS |
-| Scope Discipline | PASS |
-| Safety & Quality | PASS |
-| Architecture | PASS |
-| Pattern Consistency | PASS |
-| Success Criteria | PASS |
+| Dimension           | Verdict |
+| ------------------- | ------- |
+| Plan Adherence      | PASS    |
+| Scope Discipline    | PASS    |
+| Safety & Quality    | PASS    |
+| Architecture        | PASS    |
+| Pattern Consistency | PASS    |
+| Success Criteria    | PASS    |
 
 ## Automated checks
 
@@ -45,7 +46,7 @@
 - **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
 - **Dimension**: Scope Discipline
 - **Location**: src/components/ui/alert-dialog.tsx, src/components/ui/button.tsx (commit d15aef9)
-- **Detail**: Phase 3 restyled the shared `AlertDialog` primitives and the `Button` `outline` variant to the dark-glass theme used by the new dialog/input components. Not in the plan's "Changes Required", but verified intentional and consistent: `DeleteDogModal` (uses `AlertDialog`) and `DogSwitcher` (uses `Button variant="outline"` with a hand-rolled `BUTTON_CLASS` override matching the *new* default exactly) both pick this up as a side effect — net effect is more consistency, not a mismatch.
+- **Detail**: Phase 3 restyled the shared `AlertDialog` primitives and the `Button` `outline` variant to the dark-glass theme used by the new dialog/input components. Not in the plan's "Changes Required", but verified intentional and consistent: `DeleteDogModal` (uses `AlertDialog`) and `DogSwitcher` (uses `Button variant="outline"` with a hand-rolled `BUTTON_CLASS` override matching the _new_ default exactly) both pick this up as a side effect — net effect is more consistency, not a mismatch.
 - **Fix**: Optional follow-up — `DogSwitcher`'s now-redundant `BUTTON_CLASS` override could be removed since `variant="outline"` now produces the same classes. Cosmetic, not urgent.
 - **Decision**: ACCEPTED — optional cosmetic follow-up, not actioned now.
 
