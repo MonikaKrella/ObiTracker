@@ -151,8 +151,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Done
 
-| ID   | Change ID         | Outcome                                                                                 | Merged     |
-| ---- | ----------------- | --------------------------------------------------------------------------------------- | ---------- |
-| F-01 | db-schema         | `dogs`, `training_elements`, `training_logs` live in Supabase with RLS                 | 2026-05-27 |
-| S-01 | auth-flow         | Email + password sign-up/sign-in; protected routes redirect unauthenticated users       | 2026-05-27 |
-| S-02 | dog-management    | Add a dog, switch between dogs from header dropdown; selection persists across reloads  | 2026-06-09 |
+| ID   | Change ID      | Outcome                                                                                | Merged     |
+| ---- | -------------- | -------------------------------------------------------------------------------------- | ---------- |
+| F-01 | db-schema      | `dogs`, `training_elements`, `training_logs` live in Supabase with RLS                 | 2026-05-27 |
+| S-01 | auth-flow      | Email + password sign-up/sign-in; protected routes redirect unauthenticated users      | 2026-05-27 |
+| S-02 | dog-management | Add a dog, switch between dogs from header dropdown; selection persists across reloads | 2026-06-09 |

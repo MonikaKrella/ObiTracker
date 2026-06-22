@@ -1,4 +1,5 @@
 <!-- PLAN-REVIEW-REPORT -->
+
 # Plan Review: Training Grid Implementation Plan
 
 - **Plan**: context/changes/training-grid/plan.md
@@ -9,13 +10,13 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| End-State Alignment | FAIL |
-| Lean Execution | PASS |
+| Dimension             | Verdict |
+| --------------------- | ------- |
+| End-State Alignment   | FAIL    |
+| Lean Execution        | PASS    |
 | Architectural Fitness | WARNING |
-| Blind Spots | WARNING |
-| Plan Completeness | PASS |
+| Blind Spots           | WARNING |
+| Plan Completeness     | PASS    |
 
 ## Grounding
 
@@ -29,7 +30,7 @@
 - **Impact**: 🔬 HIGH — architectural stakes; think carefully before deciding
 - **Dimension**: End-State Alignment
 - **Location**: Phase 3 (grid.astro contract) / Phase 4 (useMemo chain)
-- **Detail**: Phase 3's contract calls `getTrainingWindow(windowDays)` and `generateDateRange(windowDays, endDate)` using `windowDays` resolved from the `?window=` URL param — i.e. it only fetches/renders the *requested* window (could be 7 or 14), not always the full 30 days. research.md's architecture (Section 7, Architecture Insight #5) explicitly calls for fetching "30 days max" regardless of the selected default, specifically so client-side window switching never needs a refetch. Phase 4's `useMemo` chain (`allTicks → windowTicks → tickCounts → highlights`) assumes the full 30 days is already present in `allTicks` — but if a handler loads `?window=7` (e.g. a bookmarked or shared link) and then switches the selector to 14 or 30, the other 23 days were never fetched. The grid would silently show incomplete data and wrong highlights for the wider window — not an error, just quietly incorrect. This also surfaces a related gap: neither phase specifies how the *rendered date columns* (not just tick counts/highlights) respond to `selectedWindow`. Manual Verification 4.6 ("zero network requests" on window switch) cannot pass in the switch-up case as currently specified.
+- **Detail**: Phase 3's contract calls `getTrainingWindow(windowDays)` and `generateDateRange(windowDays, endDate)` using `windowDays` resolved from the `?window=` URL param — i.e. it only fetches/renders the _requested_ window (could be 7 or 14), not always the full 30 days. research.md's architecture (Section 7, Architecture Insight #5) explicitly calls for fetching "30 days max" regardless of the selected default, specifically so client-side window switching never needs a refetch. Phase 4's `useMemo` chain (`allTicks → windowTicks → tickCounts → highlights`) assumes the full 30 days is already present in `allTicks` — but if a handler loads `?window=7` (e.g. a bookmarked or shared link) and then switches the selector to 14 or 30, the other 23 days were never fetched. The grid would silently show incomplete data and wrong highlights for the wider window — not an error, just quietly incorrect. This also surfaces a related gap: neither phase specifies how the _rendered date columns_ (not just tick counts/highlights) respond to `selectedWindow`. Manual Verification 4.6 ("zero network requests" on window switch) cannot pass in the switch-up case as currently specified.
 - **Fix A ⭐ Recommended**: Always SSR-fetch the full 30-day window; slice dates client-side
   - Strength: Matches research.md's already-decided architecture exactly; genuinely delivers "zero network requests" in both directions (narrowing and widening).
   - Tradeoff: SSR always runs the larger 30-day query even when the handler's bookmarked link only wants a 7-day view — a marginal cost already accepted in research's "~300 rows, negligible" sizing.

@@ -18,7 +18,7 @@ last_updated_note: "Tightened computeHighlights suppression threshold to >= half
 **Researcher**: Claude Sonnet 4.6  
 **Git Commit**: b8ec710a3d3daafa54b8643899678ebb141443e4  
 **Branch**: training-elements  
-**Repository**: obitracker  
+**Repository**: obitracker
 
 ---
 
@@ -49,11 +49,11 @@ The training grid is the product's north star — one glance must tell the handl
 
 **Decision: `<table>` — not CSS Grid, not flexbox**
 
-| Approach | Sticky column | Alignment | ARIA semantics | Mobile scroll | Verdict |
-|----------|---|---|---|---|---|
-| `<table>` | `sticky left-0` on `<td>` | Native | `role="grid"` for free | `overflow-x-auto` wrapper | ✅ Recommended |
-| CSS Grid | Requires `position: sticky` on each cell + JS-computed column widths | Explicit | Manual ARIA | Same wrapper | ⚠️ Viable but complex |
-| Flexbox | No clean sticky column | Manual alignment | Manual ARIA | Same | ❌ Not recommended |
+| Approach  | Sticky column                                                        | Alignment        | ARIA semantics         | Mobile scroll             | Verdict               |
+| --------- | -------------------------------------------------------------------- | ---------------- | ---------------------- | ------------------------- | --------------------- |
+| `<table>` | `sticky left-0` on `<td>`                                            | Native           | `role="grid"` for free | `overflow-x-auto` wrapper | ✅ Recommended        |
+| CSS Grid  | Requires `position: sticky` on each cell + JS-computed column widths | Explicit         | Manual ARIA            | Same wrapper              | ⚠️ Viable but complex |
+| Flexbox   | No clean sticky column                                               | Manual alignment | Manual ARIA            | Same                      | ❌ Not recommended    |
 
 **Why table:** `position: sticky; left: 0` works directly on `<td>` and `<th>` — critically **not on `<tr>`, `<tbody>`, or `<table>`**. The column count for date headers is known at SSR time (7/14/30 days), so `table-layout: fixed` with explicit `min-w-[...]` per column is appropriate. CSS Grid's `grid-template-columns: repeat(N, ...)` would also work but adds no benefit over table for a regular 2D date-matrix.
 
@@ -64,13 +64,14 @@ The long-standing problem: wrapping with `overflow-x: auto` and `overflow-y: aut
 ```css
 .grid-wrapper {
   overflow-x: auto;
-  overflow-y: clip;   /* horizontal scroll only — sticky top tracks the document */
+  overflow-y: clip; /* horizontal scroll only — sticky top tracks the document */
 }
 ```
 
 `overflow-y: clip` prevents a vertical scroller from being created; sticky headers walk up to the document anchor. The sticky first column (`left: 0`) still sticks to the wrapper's horizontal scroll. Two independent sticky anchors, zero JS.
 
 **iOS Safari critical requirements:**
+
 - `transform: translateZ(0)` on sticky cells — forces GPU compositing, eliminates jitter on fast iOS scroll
 - `touch-action: manipulation` on tap targets — eliminates the 300ms iOS double-tap delay
 - Explicit `background-color` on all sticky cells — transparent stickies show scroll-through bleed
@@ -79,12 +80,12 @@ The long-standing problem: wrapping with `overflow-x: auto` and `overflow-y: aut
 
 **Z-index stacking for sticky header + column:**
 
-| Element | Classes | z-index |
-|---------|---------|---------|
-| Header corner (top-left, both sticky) | `sticky left-0 top-0 z-30` | 30 |
-| Header row (date columns, sticky top) | `sticky top-0 z-20` | 20 |
-| Name column (element rows, sticky left) | `sticky left-0 z-20` | 20 |
-| Normal data cells | — | auto |
+| Element                                 | Classes                    | z-index |
+| --------------------------------------- | -------------------------- | ------- |
+| Header corner (top-left, both sticky)   | `sticky left-0 top-0 z-30` | 30      |
+| Header row (date columns, sticky top)   | `sticky top-0 z-20`        | 20      |
+| Name column (element rows, sticky left) | `sticky left-0 z-20`       | 20      |
+| Normal data cells                       | —                          | auto    |
 
 **Row highlighting pattern follows `ElementRow.tsx:29-31`:**
 
@@ -108,8 +109,8 @@ The existing page wrapper (`src/layouts/AuthLayout.astro:17-18`) uses `max-w-4xl
 **Recommended grid container (two-axis scroll):**
 
 ```html
-<div class="overflow-x-auto border border-white/10 rounded-2xl bg-white/5 [overflow-y:clip]">
-  <table class="w-full border-collapse table-fixed text-sm">
+<div class="overflow-x-auto [overflow-y:clip] rounded-2xl border border-white/10 bg-white/5">
+  <table class="w-full table-fixed border-collapse text-sm">
     <!-- ... -->
   </table>
 </div>
@@ -119,11 +120,11 @@ The grid scrolls **horizontally within this container** and **vertically with th
 
 **Column widths:**
 
-| Column | Min width | Rationale |
-|--------|-----------|-----------|
-| Name (sticky) | `min-w-[150px]` or `min-w-[9rem]` | Room for typical element names |
-| Day column | `min-w-[2.75rem]` (44px) | WCAG 2.5.5 touch target minimum |
-| Today's column | Same but with distinct border | Visual anchor |
+| Column         | Min width                         | Rationale                       |
+| -------------- | --------------------------------- | ------------------------------- |
+| Name (sticky)  | `min-w-[150px]` or `min-w-[9rem]` | Room for typical element names  |
+| Day column     | `min-w-[2.75rem]` (44px)          | WCAG 2.5.5 touch target minimum |
+| Today's column | Same but with distinct border     | Visual anchor                   |
 
 On a 375px phone in landscape (667px), 14 columns × 44px + 150px label = 766px — horizontal scroll engaged. On desktop (1440px), 30 columns × 44px + 150px = 1470px — also scrolls slightly inside `max-w-4xl`.
 
@@ -139,11 +140,13 @@ This is the most accessible and most robust approach (recommended by Adrian Rose
 
 ```tsx
 <td role="gridcell" className="p-0">
-  <label className={cn(
-    "flex items-center justify-center min-w-[2.75rem] min-h-[2.75rem]",
-    "cursor-pointer select-none touch-action-manipulation",
-    "-webkit-tap-highlight-color-transparent"
-  )}>
+  <label
+    className={cn(
+      "flex min-h-[2.75rem] min-w-[2.75rem] items-center justify-center",
+      "touch-action-manipulation cursor-pointer select-none",
+      "-webkit-tap-highlight-color-transparent",
+    )}
+  >
     <input
       type="checkbox"
       checked={optimisticChecked}
@@ -151,12 +154,13 @@ This is the most accessible and most robust approach (recommended by Adrian Rose
       className="sr-only"
       aria-label={`${elementName} on ${date}`}
     />
-    <span aria-hidden="true" className={cn(
-      "w-5 h-5 rounded-sm border-2 flex items-center justify-center transition-colors",
-      optimisticChecked
-        ? "bg-emerald-500 border-emerald-500"
-        : "border-white/30 bg-transparent"
-    )}>
+    <span
+      aria-hidden="true"
+      className={cn(
+        "flex h-5 w-5 items-center justify-center rounded-sm border-2 transition-colors",
+        optimisticChecked ? "border-emerald-500 bg-emerald-500" : "border-white/30 bg-transparent",
+      )}
+    >
       {optimisticChecked && <CheckIcon className="size-3 text-white" />}
     </span>
   </label>
@@ -164,14 +168,16 @@ This is the most accessible and most robust approach (recommended by Adrian Rose
 ```
 
 **Why this over `role="checkbox"` + `aria-checked`:**
+
 - Native `<input type="checkbox">` gives correct announcements on all screen readers without managing `aria-checked` manually
 - `<label>` wrapper makes the entire cell the tap target (no `e.stopPropagation()` needed)
 - Compatible with `useOptimistic` via the `checked` prop and `onChange` handler
 - Keyboard: Tab to the checkbox, Space to toggle — zero custom keyboard handling
 
 **Table-level ARIA:**
+
 ```html
-<table role="grid" aria-label="Training log for {dogName}">
+<table role="grid" aria-label="Training log for {dogName}"></table>
 ```
 
 `role="grid"` on `<table>` signals to assistive tech that the table contains interactive widgets. Combined with `<th scope="col">` for date headers and `<th scope="row">` for element names (as `role="rowheader"`), screen readers announce each cell as "Heelwork, Jun 17, unchecked."
@@ -191,16 +197,13 @@ import { useOptimistic, startTransition, useRef } from "react";
 interface Props {
   elementId: string;
   elementName: string;
-  date: string;            // "YYYY-MM-DD"
-  checked: boolean;        // from parent state
+  date: string; // "YYYY-MM-DD"
+  checked: boolean; // from parent state
   onToggle: (elementId: string, date: string, next: boolean) => Promise<void>;
 }
 
 export function TickCell({ elementId, elementName, date, checked, onToggle }: Props) {
-  const [optimisticChecked, setOptimisticChecked] = useOptimistic(
-    checked,
-    (_prev, next: boolean) => next,
-  );
+  const [optimisticChecked, setOptimisticChecked] = useOptimistic(checked, (_prev, next: boolean) => next);
 
   const abortRef = useRef<AbortController | null>(null);
 
@@ -211,9 +214,9 @@ export function TickCell({ elementId, elementName, date, checked, onToggle }: Pr
     abortRef.current = new AbortController();
 
     startTransition(async () => {
-      setOptimisticChecked(next);  // immediate visual flip
+      setOptimisticChecked(next); // immediate visual flip
       try {
-        await onToggle(elementId, date, next);  // debounced in parent
+        await onToggle(elementId, date, next); // debounced in parent
       } catch (e) {
         if (e instanceof DOMException && e.name === "AbortError") return; // superseded tap
         // useOptimistic auto-reverts here — parent prop unchanged = revert
@@ -224,7 +227,7 @@ export function TickCell({ elementId, elementName, date, checked, onToggle }: Pr
 
   return (
     <td role="gridcell" className="p-0">
-      <label className="flex items-center justify-center min-w-[2.75rem] min-h-[2.75rem] cursor-pointer select-none touch-action-manipulation">
+      <label className="touch-action-manipulation flex min-h-[2.75rem] min-w-[2.75rem] cursor-pointer items-center justify-center select-none">
         <input
           type="checkbox"
           checked={optimisticChecked}
@@ -232,10 +235,13 @@ export function TickCell({ elementId, elementName, date, checked, onToggle }: Pr
           className="sr-only"
           aria-label={`${elementName} on ${date}`}
         />
-        <span aria-hidden="true" className={cn(
-          "w-5 h-5 rounded-sm border-2 flex items-center justify-center transition-colors",
-          optimisticChecked ? "bg-emerald-500 border-emerald-500" : "border-white/30 bg-transparent"
-        )}>
+        <span
+          aria-hidden="true"
+          className={cn(
+            "flex h-5 w-5 items-center justify-center rounded-sm border-2 transition-colors",
+            optimisticChecked ? "border-emerald-500 bg-emerald-500" : "border-white/30 bg-transparent",
+          )}
+        >
           {optimisticChecked && <CheckIcon className="size-3 text-white" />}
         </span>
       </label>
@@ -275,10 +281,10 @@ async function handleToggleAPI(elementId: string, date: string, next: boolean) {
 // Props passed from Astro SSR page to the island
 interface TrainingGridProps {
   dogId: string;
-  elements: TrainingElement[];                          // ordered list
+  elements: TrainingElement[]; // ordered list
   initialTicks: Array<{ element_id: string; trained_on: string }>; // from getTrainingLogs()
-  today: string;                                        // "YYYY-MM-DD" — set server-side
-  defaultWindowDays?: 7 | 14 | 30;                      // defaults to 30
+  today: string; // "YYYY-MM-DD" — set server-side
+  defaultWindowDays?: 7 | 14 | 30; // defaults to 30
 }
 
 // Internal state (inside the island, not exposed)
@@ -294,7 +300,7 @@ interface TrainingGridInternalState {
 }
 ```
 
-**`allTicks` vs. window-scoped ticks:** Load ALL tick history upfront (or at least 30 days — the maximum window). This enables instant client-side window switching without a new API call. At ~10 elements × 30 days, `allTicks` is ~300 rows maximum — negligible JSON size. 
+**`allTicks` vs. window-scoped ticks:** Load ALL tick history upfront (or at least 30 days — the maximum window). This enables instant client-side window switching without a new API call. At ~10 elements × 30 days, `allTicks` is ~300 rows maximum — negligible JSON size.
 
 **`highlights` is derived state.** Never store it redundantly — recompute from `allTicks` + `windowDays` + `today` on every relevant change using `useMemo`.
 
@@ -311,7 +317,7 @@ const windowTicks = useMemo(() => {
   const start = new Date(today);
   start.setDate(start.getDate() - (selectedWindow - 1));
   const startISO = start.toISOString().slice(0, 10);
-  return allTicks.filter(t => t.trained_on >= startISO && t.trained_on <= today);
+  return allTicks.filter((t) => t.trained_on >= startISO && t.trained_on <= today);
 }, [allTicks, selectedWindow, today]);
 
 // Build tick counts per element
@@ -354,8 +360,8 @@ import type { TrainingLog } from "@/types";
 export async function getTrainingLogs(
   supabase: SupabaseClient,
   dogId: string,
-  startDate: string,  // "YYYY-MM-DD"
-  endDate: string,    // "YYYY-MM-DD"
+  startDate: string, // "YYYY-MM-DD"
+  endDate: string, // "YYYY-MM-DD"
 ): Promise<Pick<TrainingLog, "element_id" | "trained_on">[]> {
   const { data, error } = await supabase
     .from("training_logs")
@@ -496,14 +502,14 @@ export const POST: APIRoute = async (context) => {
     return Response.json({ success: true, state: "unticked" });
   } catch (err) {
     const message =
-      err instanceof Error ? err.message :
-      (err as { message?: string }).message ?? "An unexpected error occurred";
+      err instanceof Error ? err.message : ((err as { message?: string }).message ?? "An unexpected error occurred");
     return Response.json({ error: message }, { status: 500 });
   }
 };
 ```
 
 **Why a single toggle endpoint over separate POST/DELETE:**
+
 - **Idempotent:** Two rapid taps → first INSERT succeeds, second INSERT fails UNIQUE → DELETE. Final state: unticked. Correct.
 - **Optimistic UI compatible:** Server returns `state: "ticked" | "unticked"`, which the island uses to confirm or correct its optimistic state. No re-fetch of the grid needed.
 - **Race-condition safe:** The UNIQUE constraint serializes concurrent writes at the DB level. No app-level locking needed.
@@ -565,9 +571,7 @@ export function computeHighlights(
   elements: TrainingElement[],
   tickCounts: Map<string, number>,
 ): Map<string, "green" | "red" | null> {
-  const result = new Map<string, "green" | "red" | null>(
-    elements.map(e => [e.id, null] as const),
-  );
+  const result = new Map<string, "green" | "red" | null>(elements.map((e) => [e.id, null] as const));
 
   const n = elements.length;
   if (n === 0) return result;
@@ -603,12 +607,20 @@ export function computeHighlights(
     let g = 0;
     // Rank 1: all tied elements get green.
     for (const [id, count] of byDesc) {
-      if (count === highestCount) { greenSet.add(id); g++; } else break;
+      if (count === highestCount) {
+        greenSet.add(id);
+        g++;
+      } else break;
     }
     // Rank 2: one element, only when its count is unique (not tied).
-    if (g < 3 && g < n && countFrequency.get(byDesc[g][1]) === 1) { greenSet.add(byDesc[g][0]); g++; }
+    if (g < 3 && g < n && countFrequency.get(byDesc[g][1]) === 1) {
+      greenSet.add(byDesc[g][0]);
+      g++;
+    }
     // Rank 3: one element, same uniqueness guard.
-    if (g < 3 && g < n && countFrequency.get(byDesc[g][1]) === 1) { greenSet.add(byDesc[g][0]); }
+    if (g < 3 && g < n && countFrequency.get(byDesc[g][1]) === 1) {
+      greenSet.add(byDesc[g][0]);
+    }
 
     // Suppression: green set covers half or more of the elements → clear it.
     if (greenSet.size * 2 >= n) greenSet.clear();
@@ -620,19 +632,27 @@ export function computeHighlights(
     let r = 0;
     // Rank-last: all tied elements get red.
     for (const [id, count] of byAsc) {
-      if (count === lowestCount) { redSet.add(id); r++; } else break;
+      if (count === lowestCount) {
+        redSet.add(id);
+        r++;
+      } else break;
     }
     // Rank 2-from-last: one element, only when its count is unique (not tied).
-    if (r < 3 && r < n && countFrequency.get(byAsc[r][1]) === 1) { redSet.add(byAsc[r][0]); r++; }
+    if (r < 3 && r < n && countFrequency.get(byAsc[r][1]) === 1) {
+      redSet.add(byAsc[r][0]);
+      r++;
+    }
     // Rank 3-from-last: one element, same uniqueness guard.
-    if (r < 3 && r < n && countFrequency.get(byAsc[r][1]) === 1) { redSet.add(byAsc[r][0]); }
+    if (r < 3 && r < n && countFrequency.get(byAsc[r][1]) === 1) {
+      redSet.add(byAsc[r][0]);
+    }
 
     // Suppression: red set covers half or more of the elements → clear it.
     if (redSet.size * 2 >= n) redSet.clear();
   }
 
   // Apply: green takes precedence over red.
-  for (const id of redSet)   result.set(id, "red");
+  for (const id of redSet) result.set(id, "red");
   for (const id of greenSet) result.set(id, "green"); // overwrites red if overlap
 
   return result;
@@ -641,17 +661,17 @@ export function computeHighlights(
 
 **Edge case traces — now driven by tier (n ≤ 3 / 4–6 / ≥ 7), not suppression alone:**
 
-| n | Elements / Counts | Tier | Result |
-|---|---|---|---|
-| 8 | A=5,B=5,C=5,D=5,E=3,F=2,G=1,H=0 | 3 — full algorithm | Green: — (tie set {A,B,C,D}=4, 4×2=8≥8 → suppressed) · Red: H,G,F |
-| 6 | A=5,B=4,C=3,D=2,E=1,F=0 | 2 — single winner | Green: A (unique top) · Red: F (unique bottom) |
-| 6 | A=5,B=5,C=5,D=1,E=1,F=0 | 2 — single winner | Green: — (3-way tie at top) · Red: F (unique bottom) |
-| 5 | A=5,B=5,C=3,D=1,E=0 | 2 — single winner | Green: — (tie at top) · Red: E (unique bottom) |
-| 4 | A=5,B=5,C=1,D=1 | 2 — single winner | Green: — (tie at top) · Red: — (tie at bottom) |
-| 3 | A=3,B=2,C=1 | 1 — n ≤ 3 | Green: — · Red: — (tier suppresses everything) |
-| 5 | A=3,B=3,C=3,D=3,E=0 | 2 — single winner | Green: — (4-way tie at top) · Red: E (unique bottom) |
-| 6 | all=0 | 2 — single winner | Green: — (tie at top) · Red: — (tie at bottom) |
-| 1 | A=5 | 1 — n ≤ 3 | Green: — · Red: — |
+| n   | Elements / Counts               | Tier               | Result                                                            |
+| --- | ------------------------------- | ------------------ | ----------------------------------------------------------------- |
+| 8   | A=5,B=5,C=5,D=5,E=3,F=2,G=1,H=0 | 3 — full algorithm | Green: — (tie set {A,B,C,D}=4, 4×2=8≥8 → suppressed) · Red: H,G,F |
+| 6   | A=5,B=4,C=3,D=2,E=1,F=0         | 2 — single winner  | Green: A (unique top) · Red: F (unique bottom)                    |
+| 6   | A=5,B=5,C=5,D=1,E=1,F=0         | 2 — single winner  | Green: — (3-way tie at top) · Red: F (unique bottom)              |
+| 5   | A=5,B=5,C=3,D=1,E=0             | 2 — single winner  | Green: — (tie at top) · Red: E (unique bottom)                    |
+| 4   | A=5,B=5,C=1,D=1                 | 2 — single winner  | Green: — (tie at top) · Red: — (tie at bottom)                    |
+| 3   | A=3,B=2,C=1                     | 1 — n ≤ 3          | Green: — · Red: — (tier suppresses everything)                    |
+| 5   | A=3,B=3,C=3,D=3,E=0             | 2 — single winner  | Green: — (4-way tie at top) · Red: E (unique bottom)              |
+| 6   | all=0                           | 2 — single winner  | Green: — (tie at top) · Red: — (tie at bottom)                    |
+| 1   | A=5                             | 1 — n ≤ 3          | Green: — · Red: —                                                 |
 
 **Practical implication:** the algorithm now has three tiers, driven entirely by `n` (the dog's training-element count):
 
@@ -668,7 +688,7 @@ Elements with no ticks in the window are not returned by the DB query. They must
 ```typescript
 // In the island, before calling computeHighlights:
 const tickCounts = useMemo(() => {
-  const map = new Map(elements.map(e => [e.id, 0] as const)); // default 0 for all
+  const map = new Map(elements.map((e) => [e.id, 0] as const)); // default 0 for all
   for (const tick of windowTicks) {
     map.set(tick.element_id, (map.get(tick.element_id) ?? 0) + 1);
   }
@@ -786,6 +806,7 @@ _All original open questions resolved 2026-06-17. See follow-up section below._
 **Decision:** `/dogs/[id]/grid` is the training grid page. The dog dashboard tile gets a "View training grid" link to that route.
 
 **Architecture impact:**
+
 - New file: `src/pages/dogs/[id]/grid.astro` — mirrors the pattern of `elements.astro`; protected automatically by `PROTECTED_ROUTES` + `DOG_ID_REGEX` in `src/middleware.ts` with no changes needed.
 - `src/pages/dogs/[id]/dashboard.astro` gets a new tile: element count summary + "View training grid" link (similar to the existing "Manage elements" tile). No page replacement.
 - Component folder: `src/components/training-grid/` (not colocated with `dashboard`).
@@ -835,10 +856,12 @@ return (
 **"Today" column visual marker:** The rightmost column (today) gets a distinct border or background so the handler can orient themselves even before reading the header date label:
 
 ```tsx
-<th className={cn(
-  "sticky top-0 z-20 px-2 py-2 text-center text-xs font-semibold text-white/80 min-w-[2.75rem] border-l border-white/10",
-  date === today && "border-l-2 border-l-purple-400 text-white"
-)}>
+<th
+  className={cn(
+    "sticky top-0 z-20 min-w-[2.75rem] border-l border-white/10 px-2 py-2 text-center text-xs font-semibold text-white/80",
+    date === today && "border-l-2 border-l-purple-400 text-white",
+  )}
+>
   {formatDateShort(date)}
 </th>
 ```
@@ -846,6 +869,7 @@ return (
 ### Q3 resolved: Both empty states are correct
 
 **Confirmed:**
+
 - **Zero elements:** "No training elements yet" message with a link to the elements management page (`/dogs/[id]/elements`). No grid rendered.
 - **Elements exist, zero ticks in window:** Full grid is rendered with all rows unhighlighted (no green, no red). No special empty state for this case — the grid structure itself communicates "nothing trained yet."
 
@@ -864,6 +888,7 @@ return (
 **Correction 3 (2026-06-18):** Suppression threshold tightened from strict `>` to `>=`. A set that covers exactly half of all elements (not just more than half) is now also suppressed — the highlight is only meaningful when it singles out a true minority, and "exactly half" doesn't qualify.
 
 **Correction 4 (2026-06-18):** Replaced the single global algorithm with three tiers driven by `n`:
+
 - **n ≤ 3** → no highlights at all. Previously these cases happened to end up suppressed by the half-or-more rule anyway (size-3 always ≥ half at n≤3); this makes that an explicit policy rather than an algorithmic side effect.
 - **4 ≤ n ≤ 6** → single-winner only: highlight the rank-1 green and/or rank-1 red individually, and only when each is a unique, non-tied value. No tie expansion, no rank-2/3, no suppression check.
 - **n ≥ 7** → unchanged: the full top-3/bottom-3 algorithm with rank-1 tie expansion and half-or-more suppression (Correction 3).
@@ -873,6 +898,7 @@ This changes real outcomes for n=4–6 with a unique leader/laggard: previously 
 **Correct rule (Tier 3, n ≥ 7):** Build the full set first (rank-1 tie expansion + ranks 2 and 3), then check: if the resulting set covers **half or more** of all elements (`set.size * 2 >= n`), suppress it entirely. This is a post-build check, not a pre-build gate.
 
 **Rule, formally (Tier 3):**
+
 - Build `greenSet` normally.
 - If `greenSet.size * 2 >= n`: clear `greenSet` (suppress).
 - Build `redSet` normally.

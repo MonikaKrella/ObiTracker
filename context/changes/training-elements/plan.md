@@ -128,7 +128,7 @@ Add the training-elements service (list, duplicate-check, create, rename, delete
 - POST with a `dogId` that doesn't exist or belongs to another user returns 404
 - PATCH `/api/dog/<dogId>/elements/<elementId>` with `{"name":"New name"}` updates the row and returns the updated element
 - PATCH renaming an element to its own current name (same or different case) succeeds — no false 409
-- PATCH renaming to a name already used by a *different* element of the same dog returns 409
+- PATCH renaming to a name already used by a _different_ element of the same dog returns 409
 - DELETE `/api/dog/<dogId>/elements/<elementId>` removes the row; a direct query confirms its `training_logs` rows are also gone (FK cascade)
 - DELETE for a non-existent or foreign `elementId`/`dogId` returns 404
 

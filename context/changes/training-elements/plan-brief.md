@@ -20,17 +20,17 @@ S-03 / FR-004: a handler can add, rename, and remove custom training elements fo
 
 ## Key Decisions Made
 
-| Decision | Choice | Why |
-| --- | --- | --- |
-| Page location | New dedicated page `/dogs/[id]/elements` | Keeps the dashboard tile small; element management is its own task |
-| Add UX | Button → dialog with name field | User preference; consistent dialog pattern for add/rename |
-| Rename UX | Per-row edit icon → dialog pre-filled with current name | Mirrors Add dialog; avoids inline-edit complexity |
-| Reordering | In scope now (drag-and-drop via `@dnd-kit`) | User chose to do it now rather than defer to a later slice |
-| Reorder persistence | Explicit "Save order" button (not auto-save on drop) | User preference; avoids surprise writes on accidental drags |
-| Duplicate names | Case-insensitive app-level check (`isElementNameTaken`, mirrors `isDogNameTaken` but also escapes `\`) | Matches existing dog-name pattern; fixes a known escaping gap (impl-review F5) |
-| Delete confirmation | Dialog explicitly warns training history will be permanently deleted | Per `roadmap-suggestions.md` — the one deliberate exception to "no confirmation dialogs" (grid ticks have none) |
-| Reorder RPC security | `SECURITY INVOKER` (default), unlike `soft_delete_dog`'s `SECURITY DEFINER` | `sort_position` isn't referenced by any SELECT RLS policy, so the existing UPDATE policy protects it directly — no WITH CHECK OPTION conflict |
-| `sort_position` on create | `MAX(sort_position) + 1`, never the column default `0` | Per roadmap-suggestions risk — avoids non-deterministic ordering |
+| Decision                  | Choice                                                                                                 | Why                                                                                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page location             | New dedicated page `/dogs/[id]/elements`                                                               | Keeps the dashboard tile small; element management is its own task                                                                            |
+| Add UX                    | Button → dialog with name field                                                                        | User preference; consistent dialog pattern for add/rename                                                                                     |
+| Rename UX                 | Per-row edit icon → dialog pre-filled with current name                                                | Mirrors Add dialog; avoids inline-edit complexity                                                                                             |
+| Reordering                | In scope now (drag-and-drop via `@dnd-kit`)                                                            | User chose to do it now rather than defer to a later slice                                                                                    |
+| Reorder persistence       | Explicit "Save order" button (not auto-save on drop)                                                   | User preference; avoids surprise writes on accidental drags                                                                                   |
+| Duplicate names           | Case-insensitive app-level check (`isElementNameTaken`, mirrors `isDogNameTaken` but also escapes `\`) | Matches existing dog-name pattern; fixes a known escaping gap (impl-review F5)                                                                |
+| Delete confirmation       | Dialog explicitly warns training history will be permanently deleted                                   | Per `roadmap-suggestions.md` — the one deliberate exception to "no confirmation dialogs" (grid ticks have none)                               |
+| Reorder RPC security      | `SECURITY INVOKER` (default), unlike `soft_delete_dog`'s `SECURITY DEFINER`                            | `sort_position` isn't referenced by any SELECT RLS policy, so the existing UPDATE policy protects it directly — no WITH CHECK OPTION conflict |
+| `sort_position` on create | `MAX(sort_position) + 1`, never the column default `0`                                                 | Per roadmap-suggestions risk — avoids non-deterministic ordering                                                                              |
 
 ## Scope
 
@@ -51,12 +51,12 @@ Phases 1-3 ship a complete CRUD experience that doesn't depend on Phase 4; Phase
 
 ## Phases at a Glance
 
-| Phase | Delivers | New deps/migrations |
-| --- | --- | --- |
-| 1. Data layer (CRUD) | Service functions + create/rename/delete API routes | — |
-| 2. Page structure | `/dogs/[id]/elements` static page + dashboard tile | — |
-| 3. React islands (CRUD) | Fully interactive add/rename/delete, no reload | shadcn `dialog`, `input` |
-| 4. Drag-and-drop reorder | Drag handle + "Save order", persists new order | `@dnd-kit/*`, `20260610000001_reorder_training_elements_fn.sql` |
+| Phase                    | Delivers                                            | New deps/migrations                                             |
+| ------------------------ | --------------------------------------------------- | --------------------------------------------------------------- |
+| 1. Data layer (CRUD)     | Service functions + create/rename/delete API routes | —                                                               |
+| 2. Page structure        | `/dogs/[id]/elements` static page + dashboard tile  | —                                                               |
+| 3. React islands (CRUD)  | Fully interactive add/rename/delete, no reload      | shadcn `dialog`, `input`                                        |
+| 4. Drag-and-drop reorder | Drag handle + "Save order", persists new order      | `@dnd-kit/*`, `20260610000001_reorder_training_elements_fn.sql` |
 
 ## Open Risks & Assumptions
 

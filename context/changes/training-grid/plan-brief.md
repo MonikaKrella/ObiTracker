@@ -17,18 +17,18 @@ The handler opens the grid, sees correct green/red highlights immediately, taps 
 
 ## Key Decisions Made
 
-| Decision | Choice | Why (1 sentence) | Source |
-| --- | --- | --- | --- |
-| Grid markup | `<table>` with `position: sticky` + `overflow-y: clip` | Native sticky-column support, free ARIA grid semantics, zero-JS two-axis sticky | Research |
-| Tick interaction | `useOptimistic` + debounced/aborted fetch | Field-use latency can't block the UI; React 19's auto-revert removes manual rollback complexity | Research |
-| Highlight algorithm | 3-tier `computeHighlights` (n≤3 none / 4-6 single-winner / n≥7 full top-3/bottom-3) | Fully traced against 9 edge cases already in research; copied verbatim | Research |
-| Toggle API | Single `POST .../logs` endpoint, INSERT-then-DELETE-on-conflict | UNIQUE constraint serializes concurrent toggles; idempotent under rapid taps | Research |
-| Window selector UI | Segmented button group (not dropdown/native select) | Single tap, fastest for field use, no new dependency | Plan |
-| Window persistence | URL query param (`?window=`), default 30 | Shareable/bookmarkable, survives reload, no client storage | Plan |
-| Testing | Minimal Vitest suite, scoped to `computeHighlights` only | This algorithm is the entire product's value prop; an exception to "no test suite" is worth it here specifically | Plan |
-| Supabase misconfigured | Skeleton + "Something went wrong, please try later" overlay | Distinct from the empty-elements state, unlike the silent-empty-array precedent elsewhere | Plan |
-| Toggle date guard | Reject `trainedOn` > server's UTC "today" (400) | Timezone-neutral by construction — blocks only dates the rendered grid could never produce | Plan |
-| Insert-error handling | Check Postgres code `23505` before falling to DELETE | Fixes a bug in the research draft: any other insert error would silently become a no-op "untick" | Plan |
+| Decision               | Choice                                                                              | Why (1 sentence)                                                                                                 | Source   |
+| ---------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------- |
+| Grid markup            | `<table>` with `position: sticky` + `overflow-y: clip`                              | Native sticky-column support, free ARIA grid semantics, zero-JS two-axis sticky                                  | Research |
+| Tick interaction       | `useOptimistic` + debounced/aborted fetch                                           | Field-use latency can't block the UI; React 19's auto-revert removes manual rollback complexity                  | Research |
+| Highlight algorithm    | 3-tier `computeHighlights` (n≤3 none / 4-6 single-winner / n≥7 full top-3/bottom-3) | Fully traced against 9 edge cases already in research; copied verbatim                                           | Research |
+| Toggle API             | Single `POST .../logs` endpoint, INSERT-then-DELETE-on-conflict                     | UNIQUE constraint serializes concurrent toggles; idempotent under rapid taps                                     | Research |
+| Window selector UI     | Segmented button group (not dropdown/native select)                                 | Single tap, fastest for field use, no new dependency                                                             | Plan     |
+| Window persistence     | URL query param (`?window=`), default 30                                            | Shareable/bookmarkable, survives reload, no client storage                                                       | Plan     |
+| Testing                | Minimal Vitest suite, scoped to `computeHighlights` only                            | This algorithm is the entire product's value prop; an exception to "no test suite" is worth it here specifically | Plan     |
+| Supabase misconfigured | Skeleton + "Something went wrong, please try later" overlay                         | Distinct from the empty-elements state, unlike the silent-empty-array precedent elsewhere                        | Plan     |
+| Toggle date guard      | Reject `trainedOn` > server's UTC "today" (400)                                     | Timezone-neutral by construction — blocks only dates the rendered grid could never produce                       | Plan     |
+| Insert-error handling  | Check Postgres code `23505` before falling to DELETE                                | Fixes a bug in the research draft: any other insert error would silently become a no-op "untick"                 | Plan     |
 
 ## Scope
 
@@ -42,13 +42,13 @@ SSR fetches all 30 days of tick history once (`Promise.all` of elements + logs);
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-| --- | --- | --- |
-| 1. Pure Functions & Test Infrastructure | `computeHighlights`, date helpers, scoped Vitest suite | Vitest/Astro alias misconfiguration (mitigated — no alias needed, see plan) |
-| 2. Service Layer & Toggle API | `getTrainingLogs`, `toggleTrainingLog`, `POST .../logs` route | Insert-error mishandling silently corrupting tick state if the `23505` check is skipped |
-| 3. Astro Page Shell & Static Grid | Working read-only `/dogs/[id]/grid` page | Sticky CSS (`overflow-y: clip`) browser quirks, especially iOS Safari |
-| 4. Interactive React Island | Optimistic ticking, window selector, scroll-to-today | Stale scroll position or URL/state desync on window switch |
-| 5. Dashboard Wiring & Accessibility Polish | Dashboard tile, ARIA/keyboard/touch-target verification | Touch target regressions only visible on a real device, not DevTools |
+| Phase                                      | What it delivers                                              | Key risk                                                                                |
+| ------------------------------------------ | ------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| 1. Pure Functions & Test Infrastructure    | `computeHighlights`, date helpers, scoped Vitest suite        | Vitest/Astro alias misconfiguration (mitigated — no alias needed, see plan)             |
+| 2. Service Layer & Toggle API              | `getTrainingLogs`, `toggleTrainingLog`, `POST .../logs` route | Insert-error mishandling silently corrupting tick state if the `23505` check is skipped |
+| 3. Astro Page Shell & Static Grid          | Working read-only `/dogs/[id]/grid` page                      | Sticky CSS (`overflow-y: clip`) browser quirks, especially iOS Safari                   |
+| 4. Interactive React Island                | Optimistic ticking, window selector, scroll-to-today          | Stale scroll position or URL/state desync on window switch                              |
+| 5. Dashboard Wiring & Accessibility Polish | Dashboard tile, ARIA/keyboard/touch-target verification       | Touch target regressions only visible on a real device, not DevTools                    |
 
 **Prerequisites:** S-03 (training-elements) is `impl_reviewed` and merged — confirmed in `change.md`.
 **Estimated effort:** ~5 phases, roughly one focused after-hours session each.

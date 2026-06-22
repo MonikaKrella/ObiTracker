@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: Training Grid
 
 - **Plan**: context/changes/training-grid/plan.md
@@ -9,14 +10,14 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | PASS |
-| Scope Discipline | WARNING |
-| Safety & Quality | WARNING |
-| Architecture | PASS |
-| Pattern Consistency | PASS |
-| Success Criteria | PASS |
+| Dimension           | Verdict |
+| ------------------- | ------- |
+| Plan Adherence      | PASS    |
+| Scope Discipline    | WARNING |
+| Safety & Quality    | WARNING |
+| Architecture        | PASS    |
+| Pattern Consistency | PASS    |
+| Success Criteria    | PASS    |
 
 ## Findings
 
@@ -26,9 +27,9 @@
 - **Impact**: 🔎 MEDIUM — real tradeoff; pause to reason through it
 - **Dimension**: Safety & Quality
 - **Location**: src/components/hooks/useTrainingGrid.ts:57
-- **Detail**: The pending-toggle map entry for a key is deleted synchronously the instant the debounce timer fires (line 57), before the `await fetch(...)` that follows begins. If the user taps the same cell again while that fetch is still in flight (slow network, round-trip > 300ms), the new tap's baseline is computed as `!next` — it assumes the in-flight request has already resolved against the prior server state, when it hasn't. A second POST can fire against a cell whose true server state is still being mutated by the first request. No data corruption (the endpoint just flips whatever the row currently holds, so it converges to *some* valid boolean) but the displayed/optimistic state can desync from the true DB state until the next reload, for users on poor connectivity who tap quickly. The Phase-4 review already added unmount-timer cleanup for the debounce-window race; this is a distinct, narrower race in the in-flight-request window that wasn't covered by that fix.
+- **Detail**: The pending-toggle map entry for a key is deleted synchronously the instant the debounce timer fires (line 57), before the `await fetch(...)` that follows begins. If the user taps the same cell again while that fetch is still in flight (slow network, round-trip > 300ms), the new tap's baseline is computed as `!next` — it assumes the in-flight request has already resolved against the prior server state, when it hasn't. A second POST can fire against a cell whose true server state is still being mutated by the first request. No data corruption (the endpoint just flips whatever the row currently holds, so it converges to _some_ valid boolean) but the displayed/optimistic state can desync from the true DB state until the next reload, for users on poor connectivity who tap quickly. The Phase-4 review already added unmount-timer cleanup for the debounce-window race; this is a distinct, narrower race in the in-flight-request window that wasn't covered by that fix.
 - **Fix A ⭐ Recommended**: Accept as risk, document why
-  - Strength: Needs round-trip latency > 300ms *and* a second tap landing in that exact window — narrow in practice, and the failure mode is "stale display until reload," not data loss or a wrong final DB state for any single tap's intent.
+  - Strength: Needs round-trip latency > 300ms _and_ a second tap landing in that exact window — narrow in practice, and the failure mode is "stale display until reload," not data loss or a wrong final DB state for any single tap's intent.
   - Tradeoff: A real (if rare) UI/DB desync can linger until reload.
   - Confidence: MED — no production latency data for this app to size the actual exposure.
   - Blind spot: Haven't measured real-world round-trip times for the toggle endpoint under load.
