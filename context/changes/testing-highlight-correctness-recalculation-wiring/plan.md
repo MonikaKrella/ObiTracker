@@ -281,24 +281,24 @@ Not in scope for this phase. The integration layer (tick persistence, deletion c
 
 #### Automated
 
-- [x] 1.1 `npm run test` passes (all 18 highlight cases green)
-- [x] 1.2 `npm run lint` passes
-- [x] 1.3 `npm run build` succeeds
+- [x] 1.1 `npm run test` passes (all 18 highlight cases green) — cc05cd5
+- [x] 1.2 `npm run lint` passes — cc05cd5
+- [x] 1.3 `npm run build` succeeds — cc05cd5
 
 #### Manual
 
-- [x] 1.4 Confirm 12 original `it(...)` descriptions are unchanged
+- [x] 1.4 Confirm 12 original `it(...)` descriptions are unchanged — cc05cd5
 
 ### Phase 2: Date Utility Tests
 
 #### Automated
 
-- [ ] 2.1 `npm run test` passes (all prior + 11 date cases green)
-- [ ] 2.2 `npm run lint` passes
+- [x] 2.1 `npm run test` passes (all prior + 11 date cases green)
+- [x] 2.2 `npm run lint` passes
 
 #### Manual
 
-- [ ] 2.3 Confirm no value import uses `@/` alias in `dates.test.ts`
+- [x] 2.3 Confirm no value import uses `@/` alias in `dates.test.ts`
 
 ### Phase 3: Extract Training-Grid Helpers and Wiring Tests
 
