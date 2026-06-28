@@ -304,12 +304,12 @@ Not in scope for this phase. The integration layer (tick persistence, deletion c
 
 #### Automated
 
-- [x] 3.1 `npm run test` passes (all prior + helper + invariant cases green)
-- [x] 3.2 `npm run lint` passes (react-compiler rule passes on updated useMemo)
-- [x] 3.3 `npm run build` succeeds
+- [x] 3.1 `npm run test` passes (all prior + helper + invariant cases green) — 6431a4b
+- [x] 3.2 `npm run lint` passes (react-compiler rule passes on updated useMemo) — 6431a4b
+- [x] 3.3 `npm run build` succeeds — 6431a4b
 
 #### Manual
 
-- [x] 3.4 Tick and untick elements in `npm run dev`; highlight updates immediately
-- [x] 3.5 Switch 7d/14d/30d windows; highlight colours are unchanged
-- [x] 3.6 Confirm no `@/` value import in `training-grid-helpers.ts`
+- [x] 3.4 Tick and untick elements in `npm run dev`; highlight updates immediately — 6431a4b
+- [x] 3.5 Switch 7d/14d/30d windows; highlight colours are unchanged — 6431a4b
+- [x] 3.6 Confirm no `@/` value import in `training-grid-helpers.ts` — 6431a4b
