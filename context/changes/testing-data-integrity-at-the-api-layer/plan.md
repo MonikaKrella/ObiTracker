@@ -302,11 +302,11 @@ Each integration test makes ~4–8 Supabase HTTP calls (create user, seed, toggl
 
 #### Automated
 
-- [x] 2.1 `npm run test` reports 40 passing tests (37 + 3 new)
-- [x] 2.2 `npx tsc --noEmit` passes
+- [x] 2.1 `npm run test` reports 40 passing tests (37 + 3 new) — db0d3c0
+- [x] 2.2 `npx tsc --noEmit` passes — db0d3c0
 
 #### Manual
 
-- [x] 2.3 All three integration tests pass with local Supabase running (`npx supabase start`)
-- [x] 2.4 No orphan rows remain after the test run (verified via supabase studio or psql)
-- [x] 2.5 Second consecutive test run passes (confirms teardown idempotency)
+- [x] 2.3 All three integration tests pass with local Supabase running (`npx supabase start`) — db0d3c0
+- [x] 2.4 No orphan rows remain after the test run (verified via supabase studio or psql) — db0d3c0
+- [x] 2.5 Second consecutive test run passes (confirms teardown idempotency) — db0d3c0
