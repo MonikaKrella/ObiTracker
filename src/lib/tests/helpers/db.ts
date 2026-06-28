@@ -1,12 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { PostgrestSingleResponse, SupabaseClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 const ANON_KEY = process.env.SUPABASE_KEY ?? "";
 
 /** Service-role client: bypasses RLS. Use for seeding and count-verification. */
-export function createAdminClient(): SupabaseClient {
+export function createAdminClient() {
   return createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
@@ -64,18 +64,26 @@ export async function createTestUser(admin: SupabaseClient): Promise<{
 
 /** Inserts a dog row (service-role, bypasses RLS). */
 export async function seedDog(admin: SupabaseClient, accountId: string, name = "Test Dog"): Promise<{ dogId: string }> {
-  const { data, error } = await admin.from("dogs").insert({ account_id: accountId, name }).select("id").single();
-  if (error) {
-    throw error;
+  const result: PostgrestSingleResponse<{ id: string }> = await admin
+    .from("dogs")
+    .insert({ account_id: accountId, name })
+    .select("id")
+    .single();
+  if (result.error) {
+    throw result.error;
   }
-  return { dogId: data.id };
+  return { dogId: result.data.id };
 }
 
 /** Inserts a training element row (service-role, bypasses RLS). */
 export async function seedElement(admin: SupabaseClient, dogId: string, name: string): Promise<{ elementId: string }> {
-  const { data, error } = await admin.from("training_elements").insert({ dog_id: dogId, name }).select("id").single();
-  if (error) {
-    throw error;
+  const result: PostgrestSingleResponse<{ id: string }> = await admin
+    .from("training_elements")
+    .insert({ dog_id: dogId, name })
+    .select("id")
+    .single();
+  if (result.error) {
+    throw result.error;
   }
-  return { elementId: data.id };
+  return { elementId: result.data.id };
 }

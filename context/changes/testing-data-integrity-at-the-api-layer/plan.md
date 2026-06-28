@@ -290,23 +290,23 @@ Each integration test makes ~4–8 Supabase HTTP calls (create user, seed, toggl
 
 #### Automated
 
-- [x] 1.1 `npm run test` still reports 37 passing after helper file is added
-- [x] 1.2 `npx tsc --noEmit` passes with no errors on the new helper file
+- [x] 1.1 `npm run test` still reports 37 passing after helper file is added — 31f1459
+- [x] 1.2 `npx tsc --noEmit` passes with no errors on the new helper file — 31f1459
 
 #### Manual
 
-- [x] 1.3 `npx supabase status` output matches the key added to `.env`
-- [x] 1.4 `SUPABASE_SERVICE_ROLE_KEY` placeholder exists in `.env.example`
+- [x] 1.3 `npx supabase status` output matches the key added to `.env` — 31f1459
+- [x] 1.4 `SUPABASE_SERVICE_ROLE_KEY` placeholder exists in `.env.example` — 31f1459
 
 ### Phase 2: Integration Tests
 
 #### Automated
 
-- [ ] 2.1 `npm run test` reports 40 passing tests (37 + 3 new)
-- [ ] 2.2 `npx tsc --noEmit` passes
+- [x] 2.1 `npm run test` reports 40 passing tests (37 + 3 new)
+- [x] 2.2 `npx tsc --noEmit` passes
 
 #### Manual
 
-- [ ] 2.3 All three integration tests pass with local Supabase running (`npx supabase start`)
-- [ ] 2.4 No orphan rows remain after the test run (verified via supabase studio or psql)
-- [ ] 2.5 Second consecutive test run passes (confirms teardown idempotency)
+- [x] 2.3 All three integration tests pass with local Supabase running (`npx supabase start`)
+- [x] 2.4 No orphan rows remain after the test run (verified via supabase studio or psql)
+- [x] 2.5 Second consecutive test run passes (confirms teardown idempotency)
