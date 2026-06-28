@@ -72,7 +72,7 @@ Create `src/lib/tests/`, relocate the existing test file there (updating its imp
 
 **Intent**: Cover the five Tier 3 edge cases (G1–G5) identified in the research coverage gap table, plus one Tier 2 happy-path case omitted from the original test file.
 
-**Contract**: Append six new `it(...)` blocks inside the existing `describe("computeHighlights", ...)` block, each with hard-coded expected output derived independently from FR-007 and the tier rules (never from calling `computeHighlights` to generate the expectation — see test-plan oracle discipline):
+**Contract**: Append five new `it(...)` blocks inside the existing `describe("computeHighlights", ...)` block, each with hard-coded expected output derived independently from FR-007 and the tier rules (never from calling `computeHighlights` to generate the expectation — see test-plan oracle discipline):
 
 - **G1** `n=7, A=B=5 (rank-1 2-way tie), C=4, D=3, E=2, F=1, G=0` — greenSet expands to {A,B} then fills rank-2 (C, unique) → 3 green; red fills normally → A=green, B=green, C=green, D=null, E=red, F=red, G=red. Verifies rank-1 tie expansion in non-suppressed Tier 3.
 - **G2** `n=7, A=7, B=6, C=5, D=4, E=3, F=1, G=1 (rank-last 2-way tie)` — redSet expands to {F,G} then fills rank-2-from-last (E, unique) → 3 red; green fills normally → A=green, B=green, C=green, D=null, E=red, F=red, G=red. Verifies red-side rank-last tie expansion.

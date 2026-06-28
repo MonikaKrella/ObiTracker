@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-06-22
+> Last updated: 2026-06-28
 
 ## 1. Strategy
 
@@ -70,7 +70,7 @@ orchestrator updates Status as artifacts appear on disk.
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|---|---|---|---|---|---|
 | 1 | Mobile field-use regression guard | Prove the grid renders and works at real mobile viewports, and survives a future desktop-targeted CSS change | #1 | e2e (Playwright, new) — deterministic viewport/width checks | change opened | `context/changes/testing-mobile-field-use-regression-guard/` |
-| 2 | Highlight correctness & recalculation wiring | Prove the green/red rule is correct across element counts/ties, and tick-toggle triggers correct recalculation | #2, #5 | unit (extend `highlight.test.ts`) + integration | change opened | `context/changes/testing-highlight-correctness-recalculation-wiring/` |
+| 2 | Highlight correctness & recalculation wiring | Prove the green/red rule is correct across element counts/ties, and tick-toggle triggers correct recalculation | #2, #5 | unit (extend `highlight.test.ts`) + integration | complete | `context/changes/testing-highlight-correctness-recalculation-wiring/` |
 | 3 | Data integrity at the API layer | Prove ticks persist correctly under rapid taps, and element deletion doesn't leak across elements/dogs | #3, #6 | integration (vitest, no browser) | not started | — |
 | 4 | Cross-account authorization gate | Prove every dog-scoped API route denies cross-account access, not just unauthenticated access | #4 | integration, two seeded accounts | not started | — |
 
@@ -83,7 +83,7 @@ The classic test base for this project. AI-native tools (if any) carry a
 
 | Layer | Tool | Version | Notes |
 |---|---|---|---|
-| unit + integration | Vitest | 4.1.9 | configured; 1 test file today (`src/lib/highlight.test.ts`) — sparse profile, clusters in `src/lib/` only |
+| unit + integration | Vitest | 4.1.9 | configured; 3 test files in `src/lib/tests/` — `highlight.test.ts` (18 cases), `dates.test.ts` (11 cases), `training-grid.test.ts` (8 cases); 37 passing |
 | API mocking | none yet | n/a | Phase 3/4 integration tests should hit a real test Supabase project or local Supabase, not mock the DB layer — research to confirm the approach |
 | e2e | none yet — see Phase 1 | n/a | Playwright bootstrapped in Phase 1, scoped to mobile-viewport grid checks, not a general e2e suite |
 | accessibility | none yet | n/a | not in scope — no risk row in §2 maps to it |
@@ -115,9 +115,11 @@ the relevant rollout phase ships; before that, the sub-section reads
 
 ### 6.1 Adding a unit test
 
-- **Location**: colocated next to the module under test in `src/lib/`.
-- **Naming**: `<module>.test.ts`.
-- **Reference test**: `src/lib/highlight.test.ts`.
+- **Location**: `src/lib/tests/<module>.test.ts`. Test files live in the `tests/` subdirectory of `src/lib/` — not colocated directly in `src/lib/`. Vitest's default glob (`**/*.test.ts`) picks them up automatically.
+- **Naming**: `<module>.test.ts` matching the module under test.
+- **Imports**: use relative imports from the tests directory — e.g. `import { fn } from "../module"`. Never use `@/` value imports in test files: the vitest config runs `environment: "node"` with no path-alias resolution, so `@/` runtime imports will fail. `import type` from `@/types` is safe (esbuild-stripped).
+- **Reference tests**: `src/lib/tests/highlight.test.ts` (pure-function algorithm tests), `src/lib/tests/dates.test.ts` (boundary/consistency tests), `src/lib/tests/training-grid.test.ts` (helper + design-invariant tests).
+- **Extracting private helpers**: if a function under test is private/unexported, extract it to a new `src/lib/<name>-helpers.ts` module (see `src/lib/training-grid-helpers.ts`) and import it back into the component. Do not export from the original file while keeping the definition there — move the definition entirely to avoid drift.
 - **Run locally**: `npm run test`.
 
 ### 6.2 Adding an integration test
@@ -134,7 +136,22 @@ the relevant rollout phase ships; before that, the sub-section reads
 
 ### 6.5 Per-rollout-phase notes
 
-(Filled in by `/10x-implement` as each phase's final sub-phase lands.)
+#### Phase 2 — Highlight correctness & recalculation wiring (shipped 2026-06-28)
+
+Change: `context/changes/testing-highlight-correctness-recalculation-wiring/`
+
+**What was built:**
+
+- `src/lib/tests/highlight.test.ts` — extended from 12 → 18 cases covering all Tier 1/2/3 boundary and tie configurations, including the reported 8-element incident (Correction-5 guard) and five new Tier 3 edge cases (rank-1 tie expansion, rank-last tie expansion, rank-2/3 uniqueness guard, all-equal suppression, Tier 2 unique-winner happy-path)
+- `src/lib/tests/dates.test.ts` — 11 cases for `getTrainingWindow`, `generateDateRange`, and `isFutureUtcDate`; covers 7/14/30-day windows, month-turn boundary arithmetic, and cross-function consistency (`generateDateRange` and `getTrainingWindow` agree on the window's oldest date)
+- `src/lib/training-grid-helpers.ts` — pure-function extraction of `applyTick`, `buildTicksByElement`, and `buildTickCounts` from `TrainingGrid.tsx`; no behaviour change
+- `src/lib/tests/training-grid.test.ts` — 8 cases for the three helpers plus a design-invariant test that asserts `buildTickCounts` uses `dateSet.size` (all 30-day ticks) not a display-window-filtered count, documenting the intentional window-agnostic highlight design
+
+**Key design decisions:**
+
+- `vitest.config.ts` stays `environment: "node"` — no JSDOM/RTL; pure-function layer only. All `@/` imports in tested modules and test files must be `import type` (esbuild-stripped before vitest sees them).
+- Highlight ranking is window-agnostic by design: `tickCounts` is always computed over 30-day data regardless of the 7/14/30-day display window. The invariant test documents this explicitly.
+- Private helpers extracted to `src/lib/training-grid-helpers.ts` and imported back into `TrainingGrid.tsx` — move-not-duplicate to prevent drift.
 
 ## 7. What We Deliberately Don't Test
 
@@ -147,7 +164,7 @@ contributors should respect these unless the underlying assumption changes.
 ## 8. Freshness Ledger
 
 - Strategy (§1–§5) last reviewed: 2026-06-22
-- Stack versions last verified: 2026-06-22
+- Stack versions last verified: 2026-06-28 (Vitest 4.1.9, 37 passing tests)
 - AI-native tool references last verified: 2026-06-22
 
 Refresh (`/10x-test-plan --refresh`) when:
