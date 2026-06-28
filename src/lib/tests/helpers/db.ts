@@ -5,6 +5,15 @@ const SUPABASE_URL = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 const ANON_KEY = process.env.SUPABASE_KEY ?? "";
 
+if (!SERVICE_ROLE_KEY) {
+  throw new Error(
+    "SUPABASE_SERVICE_ROLE_KEY is required for integration tests — run npx supabase status to get the value",
+  );
+}
+if (!ANON_KEY) {
+  throw new Error("SUPABASE_KEY is required for integration tests");
+}
+
 /** Service-role client: bypasses RLS. Use for seeding and count-verification. */
 export function createAdminClient() {
   return createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
@@ -36,30 +45,39 @@ export async function createTestUser(admin: SupabaseClient): Promise<{
 
   const userId = createData.user.id;
 
-  const anonClient = createClient(SUPABASE_URL, ANON_KEY, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  try {
+    const anonClient = createClient(SUPABASE_URL, ANON_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
 
-  const { data: signInData, error: signInError } = await anonClient.auth.signInWithPassword({ email, password });
-  if (signInError) {
-    throw signInError;
-  }
-
-  const accessToken = signInData.session.access_token;
-
-  const authClient = createClient(SUPABASE_URL, ANON_KEY, {
-    auth: { autoRefreshToken: false, persistSession: false },
-    global: { headers: { Authorization: `Bearer ${accessToken}` } },
-  });
-
-  const cleanup = async (): Promise<void> => {
-    const { error } = await admin.auth.admin.deleteUser(userId);
-    if (error) {
-      throw error;
+    const { data: signInData, error: signInError } = await anonClient.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      throw signInError;
     }
-  };
+    if (!signInData.session) {
+      throw new Error("signInWithPassword returned no session — check email_confirm: true is set");
+    }
 
-  return { userId, authClient, cleanup };
+    const accessToken = signInData.session.access_token;
+
+    const authClient = createClient(SUPABASE_URL, ANON_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+      global: { headers: { Authorization: `Bearer ${accessToken}` } },
+    });
+
+    const cleanup = async (): Promise<void> => {
+      const { error } = await admin.auth.admin.deleteUser(userId);
+      if (error) {
+        throw error;
+      }
+    };
+
+    return { userId, authClient, cleanup };
+  } catch (err) {
+    // createUser succeeded but a later step failed — delete the orphaned user before re-throwing.
+    await admin.auth.admin.deleteUser(userId);
+    throw err;
+  }
 }
 
 /** Inserts a dog row (service-role, bypasses RLS). */

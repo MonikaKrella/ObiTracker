@@ -53,16 +53,19 @@ describe("data integrity", () => {
       expect(countAfterUntick).toBe(0);
     });
 
-    it("Risk #3: concurrent duplicate toggles never produce two log rows for the same cell", async () => {
+    // Covers Risk #3 (test-plan.md §3)
+    it("concurrent duplicate toggles never produce two log rows for the same cell", async () => {
       const { elementId } = await seedElement(admin, dogId, "Down");
       const trainedOn = "2026-01-16";
 
-      const results = await Promise.all([
+      const results = await Promise.allSettled([
         toggleTrainingLog(authClient, dogId, elementId, userId, trainedOn),
         toggleTrainingLog(authClient, dogId, elementId, userId, trainedOn),
       ]);
 
-      expect([...results].sort()).toEqual(["ticked", "unticked"]);
+      expect(results.every((r) => r.status === "fulfilled")).toBe(true);
+      const values = results.map((r) => (r as PromiseFulfilledResult<string>).value);
+      expect([...values].sort()).toEqual(["ticked", "unticked"]);
 
       const { count, error } = await admin
         .from("training_logs")
@@ -72,7 +75,7 @@ describe("data integrity", () => {
       if (error) {
         throw error;
       }
-      expect(count).not.toBe(2);
+      expect(count).toBeLessThanOrEqual(1);
     });
   });
 

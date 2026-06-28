@@ -71,7 +71,7 @@ orchestrator updates Status as artifacts appear on disk.
 |---|---|---|---|---|---|---|
 | 1 | Mobile field-use regression guard | Prove the grid renders and works at real mobile viewports, and survives a future desktop-targeted CSS change | #1 | e2e (Playwright, new) — deterministic viewport/width checks | change opened | `context/changes/testing-mobile-field-use-regression-guard/` |
 | 2 | Highlight correctness & recalculation wiring | Prove the green/red rule is correct across element counts/ties, and tick-toggle triggers correct recalculation | #2, #5 | unit (extend `highlight.test.ts`) + integration | complete | `context/changes/testing-highlight-correctness-recalculation-wiring/` |
-| 3 | Data integrity at the API layer | Prove ticks persist correctly under rapid taps, and element deletion doesn't leak across elements/dogs | #3, #6 | integration (vitest, no browser) | not started | — |
+| 3 | Data integrity at the API layer | Prove ticks persist correctly under rapid taps, and element deletion doesn't leak across elements/dogs | #3, #6 | integration (vitest, no browser) | complete | `context/changes/testing-data-integrity-at-the-api-layer/` |
 | 4 | Cross-account authorization gate | Prove every dog-scoped API route denies cross-account access, not just unauthenticated access | #4 | integration, two seeded accounts | not started | — |
 
 **Status vocabulary** (fixed — parser literals): `not started` → `change opened` → `researched` → `planned` → `implementing` → `complete`.
@@ -83,7 +83,7 @@ The classic test base for this project. AI-native tools (if any) carry a
 
 | Layer | Tool | Version | Notes |
 |---|---|---|---|
-| unit + integration | Vitest | 4.1.9 | configured; 3 test files in `src/lib/tests/` — `highlight.test.ts` (18 cases), `dates.test.ts` (11 cases), `training-grid.test.ts` (8 cases); 37 passing |
+| unit + integration | Vitest | 4.1.9 | configured; 4 test files in `src/lib/tests/` — `highlight.test.ts` (18 cases), `dates.test.ts` (11 cases), `training-grid.test.ts` (8 cases), `data-integrity.test.ts` (3 cases); 40 passing |
 | API mocking | none yet | n/a | Phase 3/4 integration tests should hit a real test Supabase project or local Supabase, not mock the DB layer — research to confirm the approach |
 | e2e | none yet — see Phase 1 | n/a | Playwright bootstrapped in Phase 1, scoped to mobile-viewport grid checks, not a general e2e suite |
 | accessibility | none yet | n/a | not in scope — no risk row in §2 maps to it |
@@ -124,7 +124,13 @@ the relevant rollout phase ships; before that, the sub-section reads
 
 ### 6.2 Adding an integration test
 
-- TBD — see §3 Phase 3 for the data-integrity-at-API-layer pattern (tick-toggle persistence, deletion-cascade scope).
+- **Location**: `src/lib/tests/<name>.test.ts` — same directory as unit tests; Vitest picks them up automatically.
+- **Shared helpers**: `src/lib/tests/helpers/db.ts` exports `createAdminClient`, `createTestUser`, `seedDog`, `seedElement`. Import from there instead of duplicating setup logic.
+- **Two-client pattern**: `createAdminClient()` (service-role) for seeding and count-verification; `createTestUser(admin).authClient` (user-scoped JWT) for service-function calls that must pass RLS.
+- **Per-test teardown**: `createTestUser` returns a `cleanup()` that deletes the test user from `auth.users`, cascading through `dogs → training_elements → training_logs`. Call it in `afterEach`. Do not run `supabase db reset` between tests.
+- **Env requirements**: local Supabase must be running (`npx supabase start`); `.env` must contain `SUPABASE_URL`, `SUPABASE_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` (see `.env.example`). `vitest.config.ts` loads all `.env` vars via `loadEnv` with an empty prefix.
+- **Count-verification pattern**: `.select("*", { count: "exact", head: true }).eq(...)` — use `count` from the result, not row data.
+- **Reference test**: `src/lib/tests/data-integrity.test.ts` (tick-toggle persistence, deletion-cascade scope).
 
 ### 6.3 Adding an e2e test
 
@@ -135,6 +141,23 @@ the relevant rollout phase ships; before that, the sub-section reads
 - TBD — see §3 Phase 3 (data integrity) and Phase 4 (cross-account authorization) for the integration-test pattern against dog-scoped routes.
 
 ### 6.5 Per-rollout-phase notes
+
+#### Phase 3 — Data integrity at the API layer (shipped 2026-06-28)
+
+Change: `context/changes/testing-data-integrity-at-the-api-layer/`
+
+**What was built:**
+
+- `src/lib/tests/helpers/db.ts` — shared integration-test helper: `createAdminClient` (service-role, bypasses RLS), `createTestUser` (two-client pattern: admin creates user, anon client signs in for JWT), `seedDog`, `seedElement`. Includes orphan-guard (try/catch deletes user if post-create steps fail), session null-check, and explicit env-var throws.
+- `src/lib/tests/data-integrity.test.ts` — 3 integration tests calling service functions directly against local Supabase (no HTTP, no Astro dev server): happy-path sequential toggle (Risk #3 baseline), concurrent duplicate-toggle via `Promise.allSettled` (Risk #3), and element-deletion cascade isolation (Risk #6).
+- `vitest.config.ts` — extended with `loadEnv(mode, process.cwd(), "")` so `SUPABASE_URL`, `SUPABASE_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are available via `process.env` in integration tests.
+
+**Key design decisions:**
+
+- Service layer, not HTTP layer — tests call `toggleTrainingLog` and `deleteTrainingElement` directly; the Astro routing layer is not involved. The DB-integrity risks live in the service + DB path.
+- `Promise.allSettled` (not `Promise.all`) for the concurrent-toggle test — makes service-thrown errors surface as readable assertion failures rather than unhandled rejections.
+- Per-test teardown via `userCleanup()` — deleting the test user from `auth.users` cascades through `dogs → training_elements → training_logs`; no `supabase db reset` between tests.
+- Local Supabase required; CI integration deferred (needs a GitHub Actions Supabase setup out of scope for this phase).
 
 #### Phase 2 — Highlight correctness & recalculation wiring (shipped 2026-06-28)
 
@@ -164,7 +187,7 @@ contributors should respect these unless the underlying assumption changes.
 ## 8. Freshness Ledger
 
 - Strategy (§1–§5) last reviewed: 2026-06-22
-- Stack versions last verified: 2026-06-28 (Vitest 4.1.9, 37 passing tests)
+- Stack versions last verified: 2026-06-28 (Vitest 4.1.9, 40 passing tests)
 - AI-native tool references last verified: 2026-06-22
 
 Refresh (`/10x-test-plan --refresh`) when:
