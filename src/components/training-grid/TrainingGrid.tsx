@@ -11,6 +11,7 @@ import {
 } from "@/components/training-grid/window-options";
 import { computeHighlights } from "@/lib/highlight";
 import { formatHeaderDate } from "@/lib/dates";
+import { applyTick, buildTicksByElement, buildTickCounts } from "@/lib/training-grid-helpers";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import type { TrainingElement, TrainingLog } from "@/types";
@@ -24,29 +25,6 @@ interface Props {
   today: string;
   serviceUnavailable: boolean;
   initialWindow: WindowDays;
-}
-
-function buildTicksByElement(
-  elements: TrainingElement[],
-  initialTicks: Pick<TrainingLog, "element_id" | "trained_on">[],
-): Map<string, Set<string>> {
-  const map = new Map<string, Set<string>>(elements.map((e) => [e.id, new Set<string>()]));
-  for (const tick of initialTicks) {
-    map.get(tick.element_id)?.add(tick.trained_on);
-  }
-  return map;
-}
-
-function applyTick(prev: Map<string, Set<string>>, elementId: string, date: string, checked: boolean) {
-  const next = new Map(prev);
-  const set = new Set(next.get(elementId) ?? []);
-  if (checked) {
-    set.add(date);
-  } else {
-    set.delete(date);
-  }
-  next.set(elementId, set);
-  return next;
 }
 
 // A plain function call (not an inline `document.cookie = ...` assignment
@@ -106,15 +84,7 @@ export function TrainingGrid({
     }
   }, [selectedWindow]);
 
-  const tickCounts = useMemo(() => {
-    const counts = new Map<string, number>(elements.map((e) => [e.id, 0]));
-    for (const [elementId, dateSet] of ticks) {
-      if (counts.has(elementId)) {
-        counts.set(elementId, dateSet.size);
-      }
-    }
-    return counts;
-  }, [elements, ticks]);
+  const tickCounts = useMemo(() => buildTickCounts(elements, ticks), [elements, ticks]);
 
   const highlights = useMemo(() => computeHighlights(elements, tickCounts), [elements, tickCounts]);
 

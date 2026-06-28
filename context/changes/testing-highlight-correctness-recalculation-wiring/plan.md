@@ -293,23 +293,23 @@ Not in scope for this phase. The integration layer (tick persistence, deletion c
 
 #### Automated
 
-- [x] 2.1 `npm run test` passes (all prior + 11 date cases green)
-- [x] 2.2 `npm run lint` passes
+- [x] 2.1 `npm run test` passes (all prior + 11 date cases green) — a129648
+- [x] 2.2 `npm run lint` passes — a129648
 
 #### Manual
 
-- [x] 2.3 Confirm no value import uses `@/` alias in `dates.test.ts`
+- [x] 2.3 Confirm no value import uses `@/` alias in `dates.test.ts` — a129648
 
 ### Phase 3: Extract Training-Grid Helpers and Wiring Tests
 
 #### Automated
 
-- [ ] 3.1 `npm run test` passes (all prior + helper + invariant cases green)
-- [ ] 3.2 `npm run lint` passes (react-compiler rule passes on updated useMemo)
-- [ ] 3.3 `npm run build` succeeds
+- [x] 3.1 `npm run test` passes (all prior + helper + invariant cases green)
+- [x] 3.2 `npm run lint` passes (react-compiler rule passes on updated useMemo)
+- [x] 3.3 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 3.4 Tick and untick elements in `npm run dev`; highlight updates immediately
-- [ ] 3.5 Switch 7d/14d/30d windows; highlight colours are unchanged
-- [ ] 3.6 Confirm no `@/` value import in `training-grid-helpers.ts`
+- [x] 3.4 Tick and untick elements in `npm run dev`; highlight updates immediately
+- [x] 3.5 Switch 7d/14d/30d windows; highlight colours are unchanged
+- [x] 3.6 Confirm no `@/` value import in `training-grid-helpers.ts`
