@@ -18,8 +18,8 @@ describe("cross-account authorization (Risk #4)", () => {
   let authClientB: SupabaseClient;
   let dogAId: string;
   let elementAId: string;
-  let cleanupA: () => Promise<void>;
-  let cleanupB: () => Promise<void>;
+  let cleanupA: () => Promise<void> = () => Promise.resolve();
+  let cleanupB: () => Promise<void> = () => Promise.resolve();
 
   beforeEach(async () => {
     admin = createAdminClient();
