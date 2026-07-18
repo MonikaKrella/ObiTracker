@@ -22,8 +22,16 @@ export function createAdminClient() {
 }
 
 /**
- * Creates a test user via the admin API, signs them in via a fresh anon client
- * to get a real user JWT, and returns an authClient authenticated as that user.
+ * Creates a test user via the admin API, signs them in to get a real user JWT,
+ * and returns an authClient authenticated as that user.
+ *
+ * Why a custom fetch instead of relying on the client's session management:
+ * @supabase/supabase-js@2.99.x with persistSession:false falls back to
+ * `Authorization: Bearer <ANON_KEY>` on every PostgREST request when
+ * getSession() returns null — even immediately after signInWithPassword.
+ * Injecting the token in the fetch layer bypasses that interceptor entirely
+ * and mirrors exactly what curl does in the passing diagnostic.
+ *
  * cleanup() deletes the user from auth.users (cascades dogs → elements → logs).
  */
 export async function createTestUser(admin: SupabaseClient): Promise<{
@@ -46,14 +54,27 @@ export async function createTestUser(admin: SupabaseClient): Promise<{
   const userId = createData.user.id;
 
   try {
-    const authClient = createClient(SUPABASE_URL, ANON_KEY, {
+    const tempClient = createClient(SUPABASE_URL, ANON_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const { error: signInError } = await authClient.auth.signInWithPassword({ email, password });
+    const { data: signInData, error: signInError } = await tempClient.auth.signInWithPassword({ email, password });
     if (signInError) {
       throw signInError;
     }
+
+    const accessToken = signInData.session.access_token;
+
+    const authClient = createClient(SUPABASE_URL, ANON_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+      global: {
+        fetch: (url: RequestInfo | URL, options?: RequestInit) => {
+          const headers = new Headers(options?.headers);
+          headers.set("Authorization", `Bearer ${accessToken}`);
+          return fetch(url, { ...options, headers });
+        },
+      },
+    });
 
     const cleanup = async (): Promise<void> => {
       const { error } = await admin.auth.admin.deleteUser(userId);

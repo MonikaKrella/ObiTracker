@@ -29,36 +29,6 @@ jobs:
           echo "SUPABASE_URL=http://127.0.0.1:54321" >> $GITHUB_ENV
           echo "SUPABASE_KEY=$(echo "$STATUS" | jq -r '.ANON_KEY')" >> $GITHUB_ENV
           echo "SUPABASE_SERVICE_ROLE_KEY=$(echo "$STATUS" | jq -r '.SERVICE_ROLE_KEY')" >> $GITHUB_ENV
-      - name: Verify PostgREST JWT auth
-        env:
-          SUPABASE_URL: http://127.0.0.1:54321
-          SUPABASE_KEY: ${{ env.SUPABASE_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
-        run: |
-          echo "--- create temp user ---"
-          curl -s -X POST "$SUPABASE_URL/auth/v1/admin/users" \
-            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "Content-Type: application/json" \
-            -d '{"email":"ci-jwt@test.com","password":"Test123!","email_confirm":true}' \
-            | jq '{email:.email, error:.message}'
-
-          echo "--- sign in ---"
-          TOKEN_RESP=$(curl -s -X POST "$SUPABASE_URL/auth/v1/token?grant_type=password" \
-            -H "apikey: $SUPABASE_KEY" \
-            -H "Content-Type: application/json" \
-            -d '{"email":"ci-jwt@test.com","password":"Test123!"}')
-          JWT=$(echo "$TOKEN_RESP" | jq -r '.access_token // empty')
-          echo "JWT obtained (first 30): ${JWT:0:30}..."
-          echo "JWT claims: $(echo "$JWT" | cut -d. -f2 | base64 -d 2>/dev/null | jq .)"
-
-          echo "--- PostgREST /dogs WITHOUT auth ---"
-          curl -s "$SUPABASE_URL/rest/v1/dogs" -H "apikey: $SUPABASE_KEY"
-
-          echo "--- PostgREST /dogs WITH JWT ---"
-          curl -s "$SUPABASE_URL/rest/v1/dogs" \
-            -H "apikey: $SUPABASE_KEY" \
-            -H "Authorization: Bearer $JWT"
       - run: npm run test
       - run: npm run build
         env:
