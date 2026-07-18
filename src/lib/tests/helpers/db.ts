@@ -25,12 +25,10 @@ export function createAdminClient() {
  * Creates a test user via the admin API, signs them in to get a real user JWT,
  * and returns an authClient authenticated as that user.
  *
- * Why `accessToken` option instead of relying on the client's session management:
- * @supabase/supabase-js@2.99.x with persistSession:false falls back to
- * `Authorization: Bearer <ANON_KEY>` on every PostgREST request when
- * getSession() returns null — even immediately after signInWithPassword on a
- * separate client instance. The `accessToken` option bypasses GoTrue entirely:
- * SupabaseClient._getAccessToken() returns our lambda's value directly, so
+ * Session flow: sign in directly on authClient with persistSession defaulting
+ * to true. In Node.js (no localStorage), GoTrueClient uses an in-memory store,
+ * so the session is available to getSession() immediately after signInWithPassword.
+ * SupabaseClient._getAccessToken() then returns session.access_token, and
  * fetchWithAuth sets `Authorization: Bearer <userJwt>` on every PostgREST call.
  *
  * cleanup() deletes the user from auth.users (cascades dogs → elements → logs).
@@ -55,20 +53,24 @@ export async function createTestUser(admin: SupabaseClient): Promise<{
   const userId = createData.user.id;
 
   try {
-    const tempClient = createClient(SUPABASE_URL, ANON_KEY, {
-      auth: { autoRefreshToken: false, persistSession: false },
+    const authClient = createClient(SUPABASE_URL, ANON_KEY, {
+      auth: { autoRefreshToken: false },
     });
 
-    const { data: signInData, error: signInError } = await tempClient.auth.signInWithPassword({ email, password });
+    const { error: signInError } = await authClient.auth.signInWithPassword({ email, password });
     if (signInError) {
       throw signInError;
     }
 
-    const accessToken = signInData.session.access_token;
-
-    const authClient = createClient(SUPABASE_URL, ANON_KEY, {
-      accessToken: () => Promise.resolve(accessToken),
-    });
+    // Verify the session is actually in memory before returning — a null here
+    // means GoTrueClient's in-memory storage is broken, which would silently
+    // fall back to ANON_KEY on every PostgREST request.
+    const { data: sessionCheck } = await authClient.auth.getSession();
+    if (!sessionCheck.session) {
+      throw new Error(
+        "signInWithPassword succeeded but getSession() returned null — in-memory session storage not working",
+      );
+    }
 
     const cleanup = async (): Promise<void> => {
       const { error } = await admin.auth.admin.deleteUser(userId);
