@@ -67,7 +67,7 @@ export async function createTestUser(admin: SupabaseClient): Promise<{
     const accessToken = signInData.session.access_token;
 
     const authClient = createClient(SUPABASE_URL, ANON_KEY, {
-      accessToken: async () => accessToken,
+      accessToken: () => Promise.resolve(accessToken),
     });
 
     const cleanup = async (): Promise<void> => {
