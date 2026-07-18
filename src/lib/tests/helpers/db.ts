@@ -54,9 +54,6 @@ export async function createTestUser(admin: SupabaseClient): Promise<{
     if (signInError) {
       throw signInError;
     }
-    if (!signInData.session) {
-      throw new Error("signInWithPassword returned no session — check email_confirm: true is set");
-    }
 
     const accessToken = signInData.session.access_token;
 

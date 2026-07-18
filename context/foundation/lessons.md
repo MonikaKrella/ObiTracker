@@ -44,3 +44,10 @@
 - **Problem**: Braceless if-statements or bodies written on the same line as the condition (`if (x) doThing();`) are easy to misread, error-prone when a second statement is later added inside the block, and produce noisy diffs.
 - **Rule**: Always wrap if-statement bodies in braces `{ }`, and always place the body on a separate line from the `if (...)` condition — never `if (x) doThing();` on one line, even for single statements.
 - **Applies to**: implement, impl-review
+
+## Always register authenticated page routes in PROTECTED_ROUTES
+
+- **Context**: Any new Astro page route for authenticated users (`src/pages/`)
+- **Problem**: Without a central list, each new page has to self-guard instead of relying on the middleware's common redirect — easy to forget, and the omission is silent (the route just becomes publicly accessible).
+- **Rule**: Always add new Astro page routes that require a logged-in user to `PROTECTED_ROUTES` in `src/middleware.ts`. The middleware's centralized redirect to `/auth/signin` only fires for paths explicitly listed there.
+- **Applies to**: plan, implement, impl-review

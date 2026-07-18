@@ -61,6 +61,15 @@ const reactConfig = tseslint.config({
 
 const astroConfig = tseslint.config({
   files: ["**/*.astro"],
+  languageOptions: {
+    // astro-eslint-parser does not support projectService; override with project: true
+    // so the warning from the base config is silenced for .astro files.
+    parserOptions: {
+      projectService: false,
+      project: true,
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
   rules: {
     "astro/no-set-html-directive": "error",
     "astro/no-unused-css-selector": "warn",
