@@ -46,21 +46,14 @@ export async function createTestUser(admin: SupabaseClient): Promise<{
   const userId = createData.user.id;
 
   try {
-    const anonClient = createClient(SUPABASE_URL, ANON_KEY, {
+    const authClient = createClient(SUPABASE_URL, ANON_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const { data: signInData, error: signInError } = await anonClient.auth.signInWithPassword({ email, password });
+    const { error: signInError } = await authClient.auth.signInWithPassword({ email, password });
     if (signInError) {
       throw signInError;
     }
-
-    const accessToken = signInData.session.access_token;
-
-    const authClient = createClient(SUPABASE_URL, ANON_KEY, {
-      auth: { autoRefreshToken: false, persistSession: false },
-      global: { headers: { Authorization: `Bearer ${accessToken}` } },
-    });
 
     const cleanup = async (): Promise<void> => {
       const { error } = await admin.auth.admin.deleteUser(userId);
