@@ -6,7 +6,7 @@
 >
 > Refresh: re-run `/10x-test-plan --refresh` when stale (see §8).
 >
-> Last updated: 2026-06-28
+> Last updated: 2026-07-18
 
 ## 1. Strategy
 
@@ -72,7 +72,7 @@ orchestrator updates Status as artifacts appear on disk.
 | 1   | Mobile field-use regression guard            | Prove the grid renders and works at real mobile viewports, and survives a future desktop-targeted CSS change   | #1            | e2e (Playwright, new) — deterministic viewport/width checks | change opened | `context/changes/testing-mobile-field-use-regression-guard/`          |
 | 2   | Highlight correctness & recalculation wiring | Prove the green/red rule is correct across element counts/ties, and tick-toggle triggers correct recalculation | #2, #5        | unit (extend `highlight.test.ts`) + integration             | complete      | `context/changes/testing-highlight-correctness-recalculation-wiring/` |
 | 3   | Data integrity at the API layer              | Prove ticks persist correctly under rapid taps, and element deletion doesn't leak across elements/dogs         | #3, #6        | integration (vitest, no browser)                            | complete      | `context/changes/testing-data-integrity-at-the-api-layer/`            |
-| 4   | Cross-account authorization gate             | Prove every dog-scoped API route denies cross-account access, not just unauthenticated access                  | #4            | integration, two seeded accounts                            | researched    | `context/changes/testing-cross-account-authorization-gate/`           |
+| 4   | Cross-account authorization gate             | Prove every dog-scoped API route denies cross-account access, not just unauthenticated access                  | #4            | integration, two seeded accounts                            | complete      | `context/changes/testing-cross-account-authorization-gate/`           |
 
 **Status vocabulary** (fixed — parser literals): `not started` → `change opened` → `researched` → `planned` → `implementing` → `complete`.
 
@@ -81,13 +81,13 @@ orchestrator updates Status as artifacts appear on disk.
 The classic test base for this project. AI-native tools (if any) carry a
 `checked:` date so future readers can see which lines need re-verification.
 
-| Layer                | Tool                       | Version | Notes                                                                                                                                                                                        |
-| -------------------- | -------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| unit + integration   | Vitest                     | 4.1.9   | configured; 4 test files in `src/lib/tests/` — `highlight.test.ts` (18 cases), `dates.test.ts` (11 cases), `training-grid.test.ts` (8 cases), `data-integrity.test.ts` (3 cases); 40 passing |
-| API mocking          | none yet                   | n/a     | Phase 3/4 integration tests should hit a real test Supabase project or local Supabase, not mock the DB layer — research to confirm the approach                                              |
-| e2e                  | none yet — see Phase 1     | n/a     | Playwright bootstrapped in Phase 1, scoped to mobile-viewport grid checks, not a general e2e suite                                                                                           |
-| accessibility        | none yet                   | n/a     | not in scope — no risk row in §2 maps to it                                                                                                                                                  |
-| (optional) AI-native | none — checked: 2026-06-22 | n/a     | not used; Risk #1's failure mode is answered more cheaply by a deterministic viewport/width assertion than a vision-model layer                                                              |
+| Layer                | Tool                       | Version | Notes                                                                                                                                                                                                                                         |
+| -------------------- | -------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| unit + integration   | Vitest                     | 4.1.9   | configured; 5 test files in `src/lib/tests/` — `highlight.test.ts` (18 cases), `dates.test.ts` (11 cases), `training-grid.test.ts` (8 cases), `data-integrity.test.ts` (3 cases), `cross-account-authorization.test.ts` (9 cases); 49 passing |
+| API mocking          | none — by design           | n/a     | Phases 3 and 4 confirmed: integration tests hit local Supabase directly (no mock layer). Mocking the DB would hide the RLS and upsert behaviors that are exactly what the tests verify.                                                       |
+| e2e                  | none yet — see Phase 1     | n/a     | Playwright bootstrapped in Phase 1, scoped to mobile-viewport grid checks, not a general e2e suite                                                                                                                                            |
+| accessibility        | none yet                   | n/a     | not in scope — no risk row in §2 maps to it                                                                                                                                                                                                   |
+| (optional) AI-native | none — checked: 2026-06-22 | n/a     | not used; Risk #1's failure mode is answered more cheaply by a deterministic viewport/width assertion than a vision-model layer                                                                                                               |
 
 **Stack grounding tools (current session):**
 
@@ -160,6 +160,23 @@ Change: `context/changes/testing-data-integrity-at-the-api-layer/`
 - Per-test teardown via `userCleanup()` — deleting the test user from `auth.users` cascades through `dogs → training_elements → training_logs`; no `supabase db reset` between tests.
 - Local Supabase required; CI integration deferred (needs a GitHub Actions Supabase setup out of scope for this phase).
 
+#### Phase 4 — Cross-account authorization gate (shipped 2026-07-18)
+
+Change: `context/changes/testing-cross-account-authorization-gate/`
+
+**What was built:**
+
+- `src/lib/tests/cross-account-authorization.test.ts` — 9 integration tests across three nested `describe` blocks (`dogs`, `training elements`, `training logs`). Two-account lifecycle: userA ("victim") and userB ("attacker") created in `beforeEach`, both cleaned up in `afterEach`. All service calls use `authClientB` targeting userA's resources (`dogAId`, `elementAId`).
+
+**Key design decisions:**
+
+- Service layer, not HTTP layer — same rationale as Phase 3; spinning up the Astro dev server is not required. The DB-level ownership enforcement is what the test plan requires to validate.
+- Both accounts in `beforeEach` / `afterEach` — the two-account lifecycle mirrors the Phase 3 single-account pattern; `cleanupA()` and `cleanupB()` each cascade their user's full data tree.
+- `sort_position` inline seeding for the reorder test — `seedElement` doesn't expose `sort_position` and the column defaults to `0`. The reorder test inserts two elements directly via the admin client with explicit `sort_position: 1` and `sort_position: 2`, then asserts those values are unchanged after the cross-account reorder call.
+- `rejects.toBeDefined()` for throw scenarios — `createTrainingElement` and `toggleTrainingLog` throw a `PostgrestError` on RLS WITH CHECK failure. Tests use `await expect(promise).rejects.toBeDefined()` rather than asserting a specific Postgres error code, keeping the assertion stable across Supabase SDK versions.
+- `toggleTrainingLog` `accountId` must be `userBId` — passing `userBId` as `accountId` simulates the real attack path: DELETE returns 0 rows (RLS blocks; log.account_id = A ≠ B), then INSERT with `account_id = B` fails the dogs-ownership EXISTS check. Using `userAId` would not trigger this path.
+- No code-specific error assertions — cross-account denials surface as null/false/[]/throw depending on the service function; tests assert the appropriate sentinel without coupling to internal error codes.
+
 #### Phase 2 — Highlight correctness & recalculation wiring (shipped 2026-06-28)
 
 Change: `context/changes/testing-highlight-correctness-recalculation-wiring/`
@@ -188,7 +205,7 @@ contributors should respect these unless the underlying assumption changes.
 ## 8. Freshness Ledger
 
 - Strategy (§1–§5) last reviewed: 2026-06-22
-- Stack versions last verified: 2026-06-28 (Vitest 4.1.9, 40 passing tests)
+- Stack versions last verified: 2026-07-18 (Vitest 4.1.9, 49 passing tests)
 - AI-native tool references last verified: 2026-06-22
 
 Refresh (`/10x-test-plan --refresh`) when:

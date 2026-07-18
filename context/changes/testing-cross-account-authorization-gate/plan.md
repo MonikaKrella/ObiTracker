@@ -155,20 +155,20 @@ Update `test-plan.md` to mark Phase 4 complete and record key decisions, and upd
 
 #### Automated
 
-- [x] 1.1 All 49 tests pass: `npm run test`
-- [x] 1.2 No lint errors: `npm run lint`
+- [x] 1.1 All 49 tests pass: `npm run test` — a7a8f52
+- [x] 1.2 No lint errors: `npm run lint` — a7a8f52
 
 #### Manual
 
-- [ ] 1.3 Local Supabase confirmed running before test run
-- [ ] 1.4 9 new tests visible in output, grouped under the correct describe hierarchy
-- [ ] 1.5 Sanity-falsify check: one assertion deliberately broken, test fails, then reverted
+- [x] 1.3 Local Supabase confirmed running before test run — a7a8f52
+- [x] 1.4 9 new tests visible in output, grouped under the correct describe hierarchy — a7a8f52
+- [x] 1.5 Sanity-falsify check: one assertion deliberately broken, test fails, then reverted — a7a8f52
 
 ### Phase 2: Documentation Update
 
 #### Automated
 
-- [ ] 2.1 No lint errors on updated markdown: `npm run lint`
+- [x] 2.1 No lint errors on updated markdown: `npm run lint`
 
 #### Manual
 
