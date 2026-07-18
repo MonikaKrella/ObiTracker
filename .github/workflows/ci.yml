@@ -29,6 +29,59 @@ jobs:
           echo "SUPABASE_URL=http://127.0.0.1:54321" >> $GITHUB_ENV
           echo "SUPABASE_KEY=$(echo "$STATUS" | jq -r '.ANON_KEY')" >> $GITHUB_ENV
           echo "SUPABASE_SERVICE_ROLE_KEY=$(echo "$STATUS" | jq -r '.SERVICE_ROLE_KEY')" >> $GITHUB_ENV
+      - name: Diagnose auth + grants
+        run: |
+          node - <<'EOF'
+          const { createClient } = require('@supabase/supabase-js');
+          const url   = process.env.SUPABASE_URL;
+          const anon  = process.env.SUPABASE_KEY;
+          const svc   = process.env.SUPABASE_SERVICE_ROLE_KEY;
+          console.log('URL:', url);
+          console.log('ANON_KEY prefix:', anon?.slice(0,20), 'len:', anon?.length);
+          console.log('SVC_KEY  prefix:', svc?.slice(0,20),  'len:', svc?.length);
+
+          (async () => {
+            const admin = createClient(url, svc, { auth: { autoRefreshToken: false } });
+            const email = `diag-${Date.now()}@example.com`;
+            const pass  = 'Diag12345!';
+
+            const { data: u, error: ce } = await admin.auth.admin.createUser(
+              { email, password: pass, email_confirm: true });
+            if (ce) { console.error('createUser failed:', ce.message); process.exit(1); }
+            console.log('Created user:', u.user.id);
+
+            const authClient = createClient(url, anon, { auth: { autoRefreshToken: false } });
+            const { data: sd, error: se } = await authClient.auth.signInWithPassword({ email, password: pass });
+            if (se) { console.error('signIn failed:', se.message); process.exit(1); }
+            console.log('signIn ok, token prefix:', sd.session.access_token.slice(0,20));
+
+            const { data: gs } = await authClient.auth.getSession();
+            console.log('getSession after signIn:', gs.session ? 'HAS SESSION' : 'NULL SESSION');
+
+            // Raw fetch to PostgREST
+            const jwt = sd.session.access_token;
+            const res = await fetch(`${url}/rest/v1/dogs?select=id&limit=1`, {
+              headers: { apikey: anon, Authorization: `Bearer ${jwt}`, Accept: 'application/json' }
+            });
+            console.log('raw fetch status:', res.status, await res.text());
+
+            // Grants check via admin client
+            const { data: grants, error: ge } = await admin
+              .from('dogs').select('id').limit(1);
+            console.log('admin dogs query:', ge ? 'ERROR:'+ge.message : 'ok rows='+JSON.stringify(grants));
+
+            // authClient PostgREST query
+            const { data: ad, error: ae } = await authClient.from('dogs').select('id').limit(1);
+            console.log('authClient dogs query:', ae ? 'ERROR:'+ae.message : 'ok rows='+JSON.stringify(ad));
+
+            await admin.auth.admin.deleteUser(u.user.id);
+            console.log('cleanup done');
+          })().catch(e => { console.error('FATAL:', e); process.exit(1); });
+          EOF
+        env:
+          SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ env.SUPABASE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
       - run: npm run test
       - run: npm run build
         env:
