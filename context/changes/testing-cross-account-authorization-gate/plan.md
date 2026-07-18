@@ -168,10 +168,10 @@ Update `test-plan.md` to mark Phase 4 complete and record key decisions, and upd
 
 #### Automated
 
-- [x] 2.1 No lint errors on updated markdown: `npm run lint`
+- [x] 2.1 No lint errors on updated markdown: `npm run lint` — 98fdd65
 
 #### Manual
 
-- [ ] 2.2 §3 Phase 4 status reads `complete`
-- [ ] 2.3 §4 test count updated to 49 passing
-- [ ] 2.4 §6.5 Phase 4 section present with key decisions recorded
+- [x] 2.2 §3 Phase 4 status reads `complete` — 98fdd65
+- [x] 2.3 §4 test count updated to 49 passing — 98fdd65
+- [x] 2.4 §6.5 Phase 4 section present with key decisions recorded — 98fdd65
