@@ -15,9 +15,20 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
       - run: npm ci
       - run: npx astro sync
       - run: npm run lint
+      - name: Start Supabase local
+        run: supabase start
+      - name: Export local Supabase credentials
+        run: |
+          STATUS=$(supabase status -o json 2>/dev/null)
+          echo "SUPABASE_URL=http://127.0.0.1:54321" >> $GITHUB_ENV
+          echo "SUPABASE_KEY=$(echo "$STATUS" | jq -r '.ANON_KEY')" >> $GITHUB_ENV
+          echo "SUPABASE_SERVICE_ROLE_KEY=$(echo "$STATUS" | jq -r '.SERVICE_ROLE_KEY')" >> $GITHUB_ENV
       - run: npm run test
       - run: npm run build
         env:

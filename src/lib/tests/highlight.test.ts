@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeHighlights } from "./highlight";
+import { computeHighlights } from "../highlight";
 import type { TrainingElement } from "@/types";
 
 /** Builds a minimal TrainingElement for test purposes — only `id` matters to computeHighlights. */
@@ -233,6 +233,117 @@ describe("computeHighlights", () => {
       E: "red",
       F: "red",
       G: "red",
+    });
+  });
+
+  it("n=7, A=B=5 (rank-1 2-way tie), C=4, D=3, E=2, F=1, G=0 → rank-1 tie expansion: green={A,B} + unique rank-2 C → 3 green; red fills normally: E,F,G", () => {
+    const elements = makeElements(["A", "B", "C", "D", "E", "F", "G"]);
+    const tickCounts = counts([
+      ["A", 5],
+      ["B", 5],
+      ["C", 4],
+      ["D", 3],
+      ["E", 2],
+      ["F", 1],
+      ["G", 0],
+    ]);
+    const result = computeHighlights(elements, tickCounts);
+    expect(Object.fromEntries(result)).toEqual({
+      A: "green",
+      B: "green",
+      C: "green",
+      D: null,
+      E: "red",
+      F: "red",
+      G: "red",
+    });
+  });
+
+  it("n=7, A=7,B=6,C=5,D=4,E=3,F=1,G=1 (rank-last 2-way tie) → red rank-last expansion: red={F,G} + unique rank-2-from-last E → 3 red; green fills normally: A,B,C", () => {
+    const elements = makeElements(["A", "B", "C", "D", "E", "F", "G"]);
+    const tickCounts = counts([
+      ["A", 7],
+      ["B", 6],
+      ["C", 5],
+      ["D", 4],
+      ["E", 3],
+      ["F", 1],
+      ["G", 1],
+    ]);
+    const result = computeHighlights(elements, tickCounts);
+    expect(Object.fromEntries(result)).toEqual({
+      A: "green",
+      B: "green",
+      C: "green",
+      D: null,
+      E: "red",
+      F: "red",
+      G: "red",
+    });
+  });
+
+  it("n=7, A=7, B=C=5 (tied at rank-2, freq=2), D=4, E=3, F=2, G=1 → Correction-5 guard: rank-2/3 slots skipped (non-unique count), green={A} only; red fills normally: E,F,G", () => {
+    const elements = makeElements(["A", "B", "C", "D", "E", "F", "G"]);
+    const tickCounts = counts([
+      ["A", 7],
+      ["B", 5],
+      ["C", 5],
+      ["D", 4],
+      ["E", 3],
+      ["F", 2],
+      ["G", 1],
+    ]);
+    const result = computeHighlights(elements, tickCounts);
+    expect(Object.fromEntries(result)).toEqual({
+      A: "green",
+      B: null,
+      C: null,
+      D: null,
+      E: "red",
+      F: "red",
+      G: "red",
+    });
+  });
+
+  it("n=8, all zeros → Tier 3 all-equal: rank-1 tie size 8 ≥ half → green suppressed; rank-last tie size 8 ≥ half → red suppressed → all null", () => {
+    const elements = makeElements(["A", "B", "C", "D", "E", "F", "G", "H"]);
+    const tickCounts = counts([
+      ["A", 0],
+      ["B", 0],
+      ["C", 0],
+      ["D", 0],
+      ["E", 0],
+      ["F", 0],
+      ["G", 0],
+      ["H", 0],
+    ]);
+    const result = computeHighlights(elements, tickCounts);
+    expect(Object.fromEntries(result)).toEqual({
+      A: null,
+      B: null,
+      C: null,
+      D: null,
+      E: null,
+      F: null,
+      G: null,
+      H: null,
+    });
+  });
+
+  it("n=4, A=5,B=4,C=3,D=2 (all unique) → Tier 2 happy-path: green=A (unique top), red=D (unique bottom)", () => {
+    const elements = makeElements(["A", "B", "C", "D"]);
+    const tickCounts = counts([
+      ["A", 5],
+      ["B", 4],
+      ["C", 3],
+      ["D", 2],
+    ]);
+    const result = computeHighlights(elements, tickCounts);
+    expect(Object.fromEntries(result)).toEqual({
+      A: "green",
+      B: null,
+      C: null,
+      D: "red",
     });
   });
 });
