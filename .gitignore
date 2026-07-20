@@ -30,3 +30,6 @@ pnpm-debug.log*
 # agents and skills
 .agents/
 .claude/
+
+# auth test setup
+auth.json
