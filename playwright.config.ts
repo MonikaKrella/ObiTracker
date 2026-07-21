@@ -10,6 +10,9 @@ export default defineConfig({
     url: "http://localhost:4321",
     reuseExistingServer: !process.env.CI,
   },
+  use: {
+    baseURL: "http://localhost:4321",
+  },
   projects: [
     {
       name: "mobile-chrome",

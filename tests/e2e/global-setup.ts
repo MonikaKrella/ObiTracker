@@ -21,6 +21,7 @@ export default async function globalSetup(): Promise<void> {
   const requestContext = await request.newContext({ baseURL: BASE_URL });
   const response = await requestContext.post("/api/auth/signin", {
     form: { email, password },
+    headers: { origin: BASE_URL },
     maxRedirects: 0,
   });
   if (response.status() !== 302) {

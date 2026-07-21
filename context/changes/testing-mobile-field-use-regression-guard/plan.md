@@ -219,10 +219,10 @@ N/A — no data migration; purely additive test infrastructure.
 
 #### Automated
 
-- [x] 1.1 `npm run lint` passes on all new/changed files
-- [x] 1.2 `npm ci && npx playwright install --with-deps chromium` completes without error
-- [x] 1.3 `npx playwright test --list` runs without a config-loading error
-- [x] 1.4 `.playwright-cli/**` no longer tracked and covered by `.gitignore`
+- [x] 1.1 `npm run lint` passes on all new/changed files — 2703bd1
+- [x] 1.2 `npm ci && npx playwright install --with-deps chromium` completes without error — 2703bd1
+- [x] 1.3 `npx playwright test --list` runs without a config-loading error — 2703bd1
+- [x] 1.4 `.playwright-cli/**` no longer tracked and covered by `.gitignore` — 2703bd1
 
 #### Manual
 
