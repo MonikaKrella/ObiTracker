@@ -35,6 +35,8 @@ export function createAdminClient() {
  */
 export async function createTestUser(admin: SupabaseClient): Promise<{
   userId: string;
+  email: string;
+  password: string;
   authClient: SupabaseClient;
   cleanup: () => Promise<void>;
 }> {
@@ -79,7 +81,7 @@ export async function createTestUser(admin: SupabaseClient): Promise<{
       }
     };
 
-    return { userId, authClient, cleanup };
+    return { userId, email, password, authClient, cleanup };
   } catch (err) {
     // createUser succeeded but a later step failed — delete the orphaned user before re-throwing.
     await admin.auth.admin.deleteUser(userId);

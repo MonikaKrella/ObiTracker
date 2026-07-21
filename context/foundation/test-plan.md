@@ -85,7 +85,7 @@ The classic test base for this project. AI-native tools (if any) carry a
 | -------------------- | -------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | unit + integration   | Vitest                     | 4.1.9   | configured; 5 test files in `src/lib/tests/` — `highlight.test.ts` (18 cases), `dates.test.ts` (11 cases), `training-grid.test.ts` (8 cases), `data-integrity.test.ts` (3 cases), `cross-account-authorization.test.ts` (9 cases); 49 passing |
 | API mocking          | none — by design           | n/a     | Phases 3 and 4 confirmed: integration tests hit local Supabase directly (no mock layer). Mocking the DB would hide the RLS and upsert behaviors that are exactly what the tests verify.                                                       |
-| e2e                  | none yet — see Phase 1     | n/a     | Playwright bootstrapped in Phase 1, scoped to mobile-viewport grid checks, not a general e2e suite                                                                                                                                            |
+| e2e                  | Playwright                 | 1.61.1  | Bootstrapped in Phase 1 (`playwright.config.ts`, `tests/e2e/global-setup.ts`/`global-teardown.ts`, advisory `e2e` CI job); scoped to the one mobile-viewport grid spec added in Phase 2, not a general e2e suite                              |
 | accessibility        | none yet                   | n/a     | not in scope — no risk row in §2 maps to it                                                                                                                                                                                                   |
 | (optional) AI-native | none — checked: 2026-06-22 | n/a     | not used; Risk #1's failure mode is answered more cheaply by a deterministic viewport/width assertion than a vision-model layer                                                                                                               |
 
@@ -102,11 +102,11 @@ The full set of gates that must pass before a change reaches production.
 "Required for §3 Phase <N>" means the gate is enforced once that rollout
 phase lands; before that, the gate is `planned`.
 
-| Gate                   | Where      | Required?                 | Catches                                                        |
-| ---------------------- | ---------- | ------------------------- | -------------------------------------------------------------- |
-| lint + typecheck       | local + CI | required                  | syntactic / type drift                                         |
-| unit + integration     | local + CI | required after §3 Phase 2 | highlight, data-integrity, and authorization logic regressions |
-| e2e on mobile viewport | CI on PR   | required after §3 Phase 1 | mobile grid rendering/layout regressions                       |
+| Gate                   | Where      | Required?                                                                                                                                                | Catches                                                        |
+| ---------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| lint + typecheck       | local + CI | required                                                                                                                                                 | syntactic / type drift                                         |
+| unit + integration     | local + CI | required after §3 Phase 2                                                                                                                                | highlight, data-integrity, and authorization logic regressions |
+| e2e on mobile viewport | CI on PR   | advisory (not yet required) — Phase 1 lands the `e2e` job as non-blocking; promoting it to a required status check is a manual GitHub-settings follow-up | mobile grid rendering/layout regressions                       |
 
 ## 6. Cookbook Patterns
 

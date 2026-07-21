@@ -33,3 +33,9 @@ pnpm-debug.log*
 
 # auth test setup
 auth.json
+
+# playwright
+playwright-report/
+test-results/
+playwright/.auth/
+.playwright-cli/
