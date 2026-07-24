@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { createAdminClient } from "../../src/lib/tests/helpers/db";
+import { createAdminClient } from "../helpers/db";
 
 const SEED_PATH = path.join("playwright", ".auth", "seed.json");
 

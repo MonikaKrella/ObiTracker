@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeHighlights } from "../highlight";
+import { computeHighlights } from "../../src/lib/highlight";
 import type { TrainingElement } from "@/types";
 
 /** Builds a minimal TrainingElement for test purposes — only `id` matters to computeHighlights. */

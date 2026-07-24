@@ -81,13 +81,13 @@ orchestrator updates Status as artifacts appear on disk.
 The classic test base for this project. AI-native tools (if any) carry a
 `checked:` date so future readers can see which lines need re-verification.
 
-| Layer                | Tool                       | Version | Notes                                                                                                                                                                                                                                         |
-| -------------------- | -------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| unit + integration   | Vitest                     | 4.1.9   | configured; 5 test files in `src/lib/tests/` — `highlight.test.ts` (18 cases), `dates.test.ts` (11 cases), `training-grid.test.ts` (8 cases), `data-integrity.test.ts` (3 cases), `cross-account-authorization.test.ts` (9 cases); 49 passing |
-| API mocking          | none — by design           | n/a     | Phases 3 and 4 confirmed: integration tests hit local Supabase directly (no mock layer). Mocking the DB would hide the RLS and upsert behaviors that are exactly what the tests verify.                                                       |
-| e2e                  | Playwright                 | 1.61.1  | Bootstrapped in Phase 1 (`playwright.config.ts`, `tests/e2e/global-setup.ts`/`global-teardown.ts`, advisory `e2e` CI job); scoped to the one mobile-viewport grid spec added in Phase 2, not a general e2e suite                              |
-| accessibility        | none yet                   | n/a     | not in scope — no risk row in §2 maps to it                                                                                                                                                                                                   |
-| (optional) AI-native | none — checked: 2026-06-22 | n/a     | not used; Risk #1's failure mode is answered more cheaply by a deterministic viewport/width assertion than a vision-model layer                                                                                                               |
+| Layer                | Tool                       | Version | Notes                                                                                                                                                                                                                                      |
+| -------------------- | -------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| unit + integration   | Vitest                     | 4.1.9   | configured; 5 test files in `tests/unit/` — `highlight.test.ts` (18 cases), `dates.test.ts` (11 cases), `training-grid.test.ts` (8 cases), `data-integrity.test.ts` (3 cases), `cross-account-authorization.test.ts` (9 cases); 49 passing |
+| API mocking          | none — by design           | n/a     | Phases 3 and 4 confirmed: integration tests hit local Supabase directly (no mock layer). Mocking the DB would hide the RLS and upsert behaviors that are exactly what the tests verify.                                                    |
+| e2e                  | Playwright                 | 1.61.1  | Bootstrapped in Phase 1 (`playwright.config.ts`, `tests/e2e/global-setup.ts`/`global-teardown.ts`, advisory `e2e` CI job); scoped to the one mobile-viewport grid spec added in Phase 2, not a general e2e suite                           |
+| accessibility        | none yet                   | n/a     | not in scope — no risk row in §2 maps to it                                                                                                                                                                                                |
+| (optional) AI-native | none — checked: 2026-06-22 | n/a     | not used; Risk #1's failure mode is answered more cheaply by a deterministic viewport/width assertion than a vision-model layer                                                                                                            |
 
 **Stack grounding tools (current session):**
 
@@ -116,22 +116,22 @@ the relevant rollout phase ships; before that, the sub-section reads
 
 ### 6.1 Adding a unit test
 
-- **Location**: `src/lib/tests/<module>.test.ts`. Test files live in the `tests/` subdirectory of `src/lib/` — not colocated directly in `src/lib/`. Vitest's default glob (`**/*.test.ts`) picks them up automatically.
+- **Location**: `tests/unit/<module>.test.ts`. Test files live in the project-level `tests/unit/` directory, not colocated in `src/lib/`. `vitest.config.ts` scopes `test.include` to `tests/unit/**/*.test.ts` (not Vitest's default glob — that also matches `tests/e2e/*.spec.ts`, which fails hard under Vitest).
 - **Naming**: `<module>.test.ts` matching the module under test.
-- **Imports**: use relative imports from the tests directory — e.g. `import { fn } from "../module"`. Never use `@/` value imports in test files: the vitest config runs `environment: "node"` with no path-alias resolution, so `@/` runtime imports will fail. `import type` from `@/types` is safe (esbuild-stripped).
-- **Reference tests**: `src/lib/tests/highlight.test.ts` (pure-function algorithm tests), `src/lib/tests/dates.test.ts` (boundary/consistency tests), `src/lib/tests/training-grid.test.ts` (helper + design-invariant tests).
+- **Imports**: use relative imports from `tests/unit/` — e.g. `import { fn } from "../../src/lib/module"`. Never use `@/` value imports in test files: the vitest config runs `environment: "node"` with no path-alias resolution, so `@/` runtime imports will fail. `import type` from `@/types` is safe (esbuild-stripped).
+- **Reference tests**: `tests/unit/highlight.test.ts` (pure-function algorithm tests), `tests/unit/dates.test.ts` (boundary/consistency tests), `tests/unit/training-grid.test.ts` (helper + design-invariant tests).
 - **Extracting private helpers**: if a function under test is private/unexported, extract it to a new `src/lib/<name>-helpers.ts` module (see `src/lib/training-grid-helpers.ts`) and import it back into the component. Do not export from the original file while keeping the definition there — move the definition entirely to avoid drift.
 - **Run locally**: `npm run test`.
 
 ### 6.2 Adding an integration test
 
-- **Location**: `src/lib/tests/<name>.test.ts` — same directory as unit tests; Vitest picks them up automatically.
-- **Shared helpers**: `src/lib/tests/helpers/db.ts` exports `createAdminClient`, `createTestUser`, `seedDog`, `seedElement`. Import from there instead of duplicating setup logic.
+- **Location**: `tests/unit/<name>.test.ts` — same directory as unit tests; Vitest picks them up automatically.
+- **Shared helpers**: `tests/helpers/db.ts` exports `createAdminClient`, `createTestUser`, `seedDog`, `seedElement`. Import from there instead of duplicating setup logic (also reused by `tests/e2e/global-setup.ts`/`global-teardown.ts`).
 - **Two-client pattern**: `createAdminClient()` (service-role) for seeding and count-verification; `createTestUser(admin).authClient` (user-scoped JWT) for service-function calls that must pass RLS.
 - **Per-test teardown**: `createTestUser` returns a `cleanup()` that deletes the test user from `auth.users`, cascading through `dogs → training_elements → training_logs`. Call it in `afterEach`. Do not run `supabase db reset` between tests.
 - **Env requirements**: local Supabase must be running (`npx supabase start`); `.env` must contain `SUPABASE_URL`, `SUPABASE_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` (see `.env.example`). `vitest.config.ts` loads all `.env` vars via `loadEnv` with an empty prefix.
 - **Count-verification pattern**: `.select("*", { count: "exact", head: true }).eq(...)` — use `count` from the result, not row data.
-- **Reference test**: `src/lib/tests/data-integrity.test.ts` (tick-toggle persistence, deletion-cascade scope).
+- **Reference test**: `tests/unit/data-integrity.test.ts` (tick-toggle persistence, deletion-cascade scope).
 
 ### 6.3 Adding an e2e test
 

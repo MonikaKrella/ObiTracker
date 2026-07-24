@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getDogById, softDeleteDog } from "../services/dogs";
+import { getDogById, softDeleteDog } from "../../src/lib/services/dogs";
 import {
   getTrainingElements,
   createTrainingElement,
   renameTrainingElement,
   deleteTrainingElement,
   reorderTrainingElements,
-} from "../services/training-elements";
-import { getTrainingLogs, toggleTrainingLog } from "../services/training-logs";
-import { createAdminClient, createTestUser, seedDog, seedElement } from "./helpers/db";
+} from "../../src/lib/services/training-elements";
+import { getTrainingLogs, toggleTrainingLog } from "../../src/lib/services/training-logs";
+import { createAdminClient, createTestUser, seedDog, seedElement } from "../helpers/db";
 
 describe("cross-account authorization (Risk #4)", () => {
   let admin: SupabaseClient;

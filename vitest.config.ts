@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
       // (`test() did not expect to be called here`). Scope to this project's
       // actual unit/integration location instead of adding an exclude that'd
       // need updating every time a new top-level test dir appears.
-      include: ["src/**/*.test.ts"],
+      include: ["tests/unit/**/*.test.ts"],
     },
   };
 });

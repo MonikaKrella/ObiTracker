@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyTick, buildTicksByElement, buildTickCounts } from "../training-grid-helpers";
+import { applyTick, buildTicksByElement, buildTickCounts } from "../../src/lib/training-grid-helpers";
 import type { TrainingElement } from "@/types";
 
 /** Builds a minimal TrainingElement for test purposes — only `id` matters to these helpers. */

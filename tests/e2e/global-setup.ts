@@ -2,7 +2,7 @@ import "dotenv/config";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { request } from "@playwright/test";
-import { createAdminClient, createTestUser, seedDog, seedElement } from "../../src/lib/tests/helpers/db";
+import { createAdminClient, createTestUser, seedDog, seedElement } from "../helpers/db";
 
 const AUTH_DIR = path.join("playwright", ".auth");
 const STORAGE_STATE_PATH = path.join(AUTH_DIR, "user.json");
