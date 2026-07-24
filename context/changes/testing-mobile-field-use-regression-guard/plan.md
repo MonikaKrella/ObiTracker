@@ -236,11 +236,11 @@ N/A — no data migration; purely additive test infrastructure.
 - [x] 2.1 `npx playwright test tests/e2e/mobile-grid.spec.ts` passes locally — 2e2bb5b
 - [x] 2.2 Deliberate-break check: spec fails when the regression is reproduced, passes again after revert (see Deviations below — broke the CSS overflow wrapper, not `initial-scale`, and corrected assertion 2's target element in the process) — 2e2bb5b
 - [x] 2.3 `npm run lint` passes on the new spec files — 2e2bb5b
-- [ ] 2.4 `e2e` CI job passes on the PR
+- [x] 2.4 `e2e` CI job passes on the PR — 0bf173d
 
 #### Manual
 
-- [ ] 2.5 Real-device or non-Chromium spot-check of full-width render + no-zoom-on-tap
+- [x] 2.5 Real-device or non-Chromium spot-check of full-width render + no-zoom-on-tap
 - [x] 2.6 Generated spec reviewed against the five anti-patterns (hallucinated assertion, brittle selector, shared state, wait-for-time, no cleanup) — none found in `seed.spec.ts` or `mobile-grid.spec.ts`
 
 ### Deviations from the plan (Phase 2)
