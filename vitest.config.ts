@@ -16,6 +16,12 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: "node",
       env,
+      // Default include (`**/*.{test,spec}.ts`) also matches
+      // tests/e2e/*.spec.ts — Playwright specs, which fail hard under Vitest
+      // (`test() did not expect to be called here`). Scope to this project's
+      // actual unit/integration location instead of adding an exclude that'd
+      // need updating every time a new top-level test dir appears.
+      include: ["src/**/*.test.ts"],
     },
   };
 });

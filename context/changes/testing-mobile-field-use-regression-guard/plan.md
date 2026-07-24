@@ -233,9 +233,9 @@ N/A — no data migration; purely additive test infrastructure.
 
 #### Automated
 
-- [x] 2.1 `npx playwright test tests/e2e/mobile-grid.spec.ts` passes locally
-- [x] 2.2 Deliberate-break check: spec fails when the regression is reproduced, passes again after revert (see Deviations below — broke the CSS overflow wrapper, not `initial-scale`, and corrected assertion 2's target element in the process)
-- [x] 2.3 `npm run lint` passes on the new spec files
+- [x] 2.1 `npx playwright test tests/e2e/mobile-grid.spec.ts` passes locally — 2e2bb5b
+- [x] 2.2 Deliberate-break check: spec fails when the regression is reproduced, passes again after revert (see Deviations below — broke the CSS overflow wrapper, not `initial-scale`, and corrected assertion 2's target element in the process) — 2e2bb5b
+- [x] 2.3 `npm run lint` passes on the new spec files — 2e2bb5b
 - [ ] 2.4 `e2e` CI job passes on the PR
 
 #### Manual
@@ -247,3 +247,4 @@ N/A — no data migration; purely additive test infrastructure.
 
 - **Deliberate-break target.** The plan's Success Criteria named reverting `initial-scale=1` in `Layout.astro:17` as the deliberate break. Tried it first — the mobile-grid spec stayed green, because Playwright's Chromium device emulation (`devices["Pixel 5"]`) doesn't reproduce the mobile-browser shrink-to-fit zoom heuristic the meta tag guards against on a real device; `visualViewport.scale` stayed `1` regardless of the meta tag in this environment. Switched the break to the actual CSS mechanism Risk #1 describes: temporarily stripped `max-w-full overflow-x-auto` from the grid's scroll wrapper (`TrainingGrid.tsx` line 146) so the 30-day table overflows its container un-scrolled — this is a faithful reproduction of "a desktop-targeted CSS change silently collapses the mobile grid." Reverted immediately after confirming red→green; never committed.
 - **Assertion 2's target element.** The plan specified `document.documentElement.scrollWidth` vs `clientWidth`. Empirically, `Layout.astro`'s `overflow-x: hidden` is set on both `html` and `body` — and Chromium clamps `documentElement.scrollWidth` to its own `clientWidth` once `html` itself has `overflow-x: hidden`, so the literal assertion never caught the deliberate break (stayed passing even mid-regression). `document.body.scrollWidth` still reports the true unclamped content extent, so the spec asserts on that instead. Confirmed this correctly fails on the break and passes after the revert.
+- **CI failure: Vitest picked up the new Playwright specs.** `npm run test` (Vitest, required job) failed on the pushed commit — `vitest.config.ts` had no `test.include`, so its default glob (`**/*.{test,spec}.ts`) also matched `tests/e2e/*.spec.ts`, and Playwright's `test()` isn't callable outside the Playwright runner (`Playwright Test did not expect test() to be called here`). Not caught locally during Phase 2 because `npm run test` was never re-run after the new spec files were added — only `npx playwright test` and `eslint` were. Fixed by scoping `vitest.config.ts`'s `test.include` to `src/**/*.test.ts`, matching this project's actual unit/integration test location (`context/foundation/test-plan.md` §6.1). Verified locally: `npm run test` now runs exactly the 5 pre-existing suites (49 passing), no e2e specs picked up.
