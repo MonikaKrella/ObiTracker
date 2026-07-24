@@ -40,16 +40,19 @@ test("training grid renders at full mobile width and stays usable after a tap", 
   // trigger the tap-triggered zoom quirk the full-size hitbox fix guards against.
   const todayCell = page.getByRole("grid").getByRole("checkbox").last();
   const wasChecked = await todayCell.isChecked();
-  await todayCell.click();
-  await expect(todayCell).toBeChecked({ checked: !wasChecked });
+  try {
+    await todayCell.click();
+    await expect(todayCell).toBeChecked({ checked: !wasChecked });
 
-  const scaleAfterTap = await page.evaluate(() => window.visualViewport?.scale);
-  expect(scaleAfterTap).toBeGreaterThan(1 - SCALE_TOLERANCE);
-  expect(scaleAfterTap).toBeLessThan(1 + SCALE_TOLERANCE);
-
-  // Cleanup: restore the cell's original state — no per-test DB teardown
-  // exists for this seeded element (see plan.md's Critical Implementation
-  // Details), so the test must leave the row exactly as it found it.
-  await todayCell.click();
-  await expect(todayCell).toBeChecked({ checked: wasChecked });
+    const scaleAfterTap = await page.evaluate(() => window.visualViewport?.scale);
+    expect(scaleAfterTap).toBeGreaterThan(1 - SCALE_TOLERANCE);
+    expect(scaleAfterTap).toBeLessThan(1 + SCALE_TOLERANCE);
+  } finally {
+    // Cleanup: restore the cell's original state even if an assertion above
+    // failed — no per-test DB teardown exists for this seeded element (see
+    // plan.md's Critical Implementation Details), so the test must leave the
+    // row exactly as it found it regardless of outcome.
+    await todayCell.click();
+    await expect(todayCell).toBeChecked({ checked: wasChecked });
+  }
 });

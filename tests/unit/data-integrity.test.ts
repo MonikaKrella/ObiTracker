@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { deleteTrainingElement } from "../services/training-elements";
-import { toggleTrainingLog } from "../services/training-logs";
-import { createAdminClient, createTestUser, seedDog, seedElement } from "./helpers/db";
+import { deleteTrainingElement } from "../../src/lib/services/training-elements";
+import { toggleTrainingLog } from "../../src/lib/services/training-logs";
+import { createAdminClient, createTestUser, seedDog, seedElement } from "../helpers/db";
 
 describe("data integrity", () => {
   let admin: SupabaseClient;

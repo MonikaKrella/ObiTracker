@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateDateRange, getTrainingWindow, isFutureUtcDate } from "../dates";
+import { generateDateRange, getTrainingWindow, isFutureUtcDate } from "../../src/lib/dates";
 
 describe("getTrainingWindow", () => {
   it("windowDays=7, today=2026-06-25 → startDate=2026-06-19, endDate=2026-06-25", () => {
