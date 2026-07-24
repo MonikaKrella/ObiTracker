@@ -1,7 +1,7 @@
 ---
 change_id: testing-mobile-field-use-regression-guard
 title: Testing mobile field use regression guard
-status: implemented
+status: impl_reviewed
 created: 2026-06-22
 updated: 2026-07-24
 archived_at: null
