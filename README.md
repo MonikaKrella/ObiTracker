@@ -1,8 +1,6 @@
-# 10x Astro Starter
+# ObiTracker
 
-![](./public/template.png)
-
-A modern, opinionated starter template for building fast, accessible web applications.
+A mobile-friendly web app for faster and more effective dog obedience training planning.
 
 ## Tech Stack
 
