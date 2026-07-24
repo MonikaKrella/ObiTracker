@@ -226,19 +226,24 @@ N/A — no data migration; purely additive test infrastructure.
 
 #### Manual
 
-- [ ] 1.5 New `e2e` CI job runs successfully on the PR (0 tests found, pipeline plumbing validated)
-- [ ] 1.6 `e2e` job confirmed not a required status check (advisory)
+- [x] 1.5 New `e2e` CI job runs successfully on the PR (0 tests found, pipeline plumbing validated)
+- [x] 1.6 `e2e` job confirmed not a required status check (advisory)
 
 ### Phase 2: Mobile field-use regression-guard test
 
 #### Automated
 
-- [ ] 2.1 `npx playwright test tests/e2e/mobile-grid.spec.ts` passes locally
-- [ ] 2.2 Deliberate-break check: spec fails when `initial-scale=1` is reverted, passes again after revert
-- [ ] 2.3 `npm run lint` passes on the new spec files
+- [x] 2.1 `npx playwright test tests/e2e/mobile-grid.spec.ts` passes locally
+- [x] 2.2 Deliberate-break check: spec fails when the regression is reproduced, passes again after revert (see Deviations below — broke the CSS overflow wrapper, not `initial-scale`, and corrected assertion 2's target element in the process)
+- [x] 2.3 `npm run lint` passes on the new spec files
 - [ ] 2.4 `e2e` CI job passes on the PR
 
 #### Manual
 
 - [ ] 2.5 Real-device or non-Chromium spot-check of full-width render + no-zoom-on-tap
-- [ ] 2.6 Generated spec reviewed against the seed-test-pattern's four qualities
+- [x] 2.6 Generated spec reviewed against the five anti-patterns (hallucinated assertion, brittle selector, shared state, wait-for-time, no cleanup) — none found in `seed.spec.ts` or `mobile-grid.spec.ts`
+
+### Deviations from the plan (Phase 2)
+
+- **Deliberate-break target.** The plan's Success Criteria named reverting `initial-scale=1` in `Layout.astro:17` as the deliberate break. Tried it first — the mobile-grid spec stayed green, because Playwright's Chromium device emulation (`devices["Pixel 5"]`) doesn't reproduce the mobile-browser shrink-to-fit zoom heuristic the meta tag guards against on a real device; `visualViewport.scale` stayed `1` regardless of the meta tag in this environment. Switched the break to the actual CSS mechanism Risk #1 describes: temporarily stripped `max-w-full overflow-x-auto` from the grid's scroll wrapper (`TrainingGrid.tsx` line 146) so the 30-day table overflows its container un-scrolled — this is a faithful reproduction of "a desktop-targeted CSS change silently collapses the mobile grid." Reverted immediately after confirming red→green; never committed.
+- **Assertion 2's target element.** The plan specified `document.documentElement.scrollWidth` vs `clientWidth`. Empirically, `Layout.astro`'s `overflow-x: hidden` is set on both `html` and `body` — and Chromium clamps `documentElement.scrollWidth` to its own `clientWidth` once `html` itself has `overflow-x: hidden`, so the literal assertion never caught the deliberate break (stayed passing even mid-regression). `document.body.scrollWidth` still reports the true unclamped content extent, so the spec asserts on that instead. Confirmed this correctly fails on the break and passes after the revert.
