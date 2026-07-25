@@ -1,10 +1,10 @@
 ---
 change_id: testing-highlight-correctness-recalculation-wiring
 title: Highlight correctness & recalculation wiring
-status: impl_reviewed
+status: archived
 created: 2026-06-23
-updated: 2026-06-28
-archived_at: null
+updated: 2026-07-25
+archived_at: 2026-07-25T13:00:55Z
 ---
 
 ## Notes
