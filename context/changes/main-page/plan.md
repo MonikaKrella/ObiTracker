@@ -169,15 +169,15 @@ Not applicable — no data or schema changes.
 
 #### Automated
 
-- [x] 1.1 Build succeeds: `npm run build`
-- [x] 1.2 Lint passes: `npm run lint`
-- [x] 1.3 Format check passes: `npm run format`
+- [x] 1.1 Build succeeds: `npm run build` — 60b9ff2
+- [x] 1.2 Lint passes: `npm run lint` — 60b9ff2
+- [x] 1.3 Format check passes: `npm run format` — 60b9ff2
 
 #### Manual
 
-- [x] 1.4 Welcome page shows bigger title, hero image, bigger buttons, no Topbar
-- [x] 1.5 Responsive check at mobile/tablet/desktop widths
-- [x] 1.6 Image has appropriate alt text
+- [x] 1.4 Welcome page shows bigger title, hero image, bigger buttons, no Topbar — 60b9ff2
+- [x] 1.5 Responsive check at mobile/tablet/desktop widths — 60b9ff2
+- [x] 1.6 Image has appropriate alt text — 60b9ff2
 
 ### Phase 2: Redirect logged-in users off `/`
 
