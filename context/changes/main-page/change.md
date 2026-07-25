@@ -1,7 +1,7 @@
 ---
 change_id: main-page
 title: Main page
-status: implementing
+status: implemented
 created: 2026-07-25
 updated: 2026-07-25
 archived_at: null

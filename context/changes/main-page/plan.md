@@ -183,11 +183,11 @@ Not applicable — no data or schema changes.
 
 #### Automated
 
-- [x] 2.1 Build succeeds: `npm run build`
-- [x] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 Build succeeds: `npm run build` — 7de778f
+- [x] 2.2 Lint passes: `npm run lint` — 7de778f
 
 #### Manual
 
-- [x] 2.3 Logged-in visit to `/` redirects to `/dashboard`
-- [x] 2.4 Logged-out visit to `/` still shows Welcome page
-- [x] 2.5 `/auth/signin` and `/auth/signup` redirect behavior unchanged
+- [x] 2.3 Logged-in visit to `/` redirects to `/dashboard` — 7de778f
+- [x] 2.4 Logged-out visit to `/` still shows Welcome page — 7de778f
+- [x] 2.5 `/auth/signin` and `/auth/signup` redirect behavior unchanged — 7de778f
