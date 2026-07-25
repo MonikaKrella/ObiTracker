@@ -1,10 +1,10 @@
 ---
 change_id: training-grid
 title: Training grid
-status: impl_reviewed
+status: archived
 created: 2026-06-17
-updated: 2026-06-21
-archived_at: null
+updated: 2026-07-25
+archived_at: 2026-07-25T12:51:30Z
 ---
 
 ## Notes

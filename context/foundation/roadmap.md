@@ -3,7 +3,7 @@ project: ObiTracker
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-06-09 # F-01, S-01, S-02 marked done (all merged to master, impl_reviewed)
+updated: 2026-07-25 # S-04 marked done (archived, north star complete)
 prd_version: 1
 main_goal: market-feedback
 top_blocker: time
@@ -33,7 +33,7 @@ Competitive dog obedience handlers need to know what to train _before_ they step
 | S-01 | auth-flow         | sign up and sign in with email + password; protected routes redirect unauthenticated users    | —             | FR-001                                         | done     |
 | S-02 | dog-management    | add a dog and switch between dogs from any authenticated screen                               | F-01, S-01    | FR-002, FR-003                                 | done     |
 | S-03 | training-elements | add, rename, and remove custom training elements for the selected dog                         | S-02          | FR-004                                         | proposed |
-| S-04 | training-grid     | view the colour-coded training grid, tick any visible cell, and see the grid update instantly | S-03          | FR-005, FR-006, FR-007, US-01                  | proposed |
+| S-04 | training-grid     | view the colour-coded training grid, tick any visible cell, and see the grid update instantly | S-03          | FR-005, FR-006, FR-007, US-01                  | done     |
 
 ## Streams
 
@@ -124,7 +124,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
   - _(resolved)_ Highlight count scope: only ticks within the currently selected window (7, 14, or 30 days) are counted — switching the window immediately recalculates highlights.
   - _(resolved)_ US-01 "30-day grid" wording is a documentation gap; grid is configurable 7/14/30 days per FR-005.
 - **Risk:** The highlight algorithm (top-3/bottom-3 with tie-expansion at rank 1 only) is the product's core differentiator; a subtle bug in the tie-breaking logic produces wrong highlights with no visible error. Requires a pure, unit-testable function and at least one edge-case scenario (all elements tied) exercised before launch.
-- **Status:** proposed
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -151,8 +151,9 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Done
 
-| ID   | Change ID      | Outcome                                                                                | Merged     |
-| ---- | -------------- | -------------------------------------------------------------------------------------- | ---------- |
-| F-01 | db-schema      | `dogs`, `training_elements`, `training_logs` live in Supabase with RLS                 | 2026-05-27 |
-| S-01 | auth-flow      | Email + password sign-up/sign-in; protected routes redirect unauthenticated users      | 2026-05-27 |
-| S-02 | dog-management | Add a dog, switch between dogs from header dropdown; selection persists across reloads | 2026-06-09 |
+| ID   | Change ID      | Outcome                                                                                          | Merged     |
+| ---- | -------------- | ------------------------------------------------------------------------------------------------ | ---------- |
+| F-01 | db-schema      | `dogs`, `training_elements`, `training_logs` live in Supabase with RLS                           | 2026-05-27 |
+| S-01 | auth-flow      | Email + password sign-up/sign-in; protected routes redirect unauthenticated users                | 2026-05-27 |
+| S-02 | dog-management | Add a dog, switch between dogs from header dropdown; selection persists across reloads           | 2026-06-09 |
+| S-04 | training-grid  | View the colour-coded training grid, tick any visible cell, see it update instantly (north star) | 2026-07-25 |
