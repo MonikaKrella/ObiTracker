@@ -1,10 +1,10 @@
 ---
 change_id: dog-management
 title: Add a dog and switch between dogs from any authenticated screen
-status: impl_reviewed
+status: archived
 created: 2026-05-31
-updated: 2026-06-08
-archived_at: null
+updated: 2026-07-25
+archived_at: 2026-07-25T12:49:54Z
 ---
 
 ## Notes
