@@ -1,10 +1,10 @@
 ---
 change_id: training-elements
 title: Training elements
-status: impl_reviewed
+status: archived
 created: 2026-06-09
-updated: 2026-06-14
-archived_at: null
+updated: 2026-07-25
+archived_at: 2026-07-25T12:53:40Z
 ---
 
 ## Notes

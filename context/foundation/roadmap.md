@@ -3,7 +3,7 @@ project: ObiTracker
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-07-25 # S-04 marked done (archived, north star complete)
+updated: 2026-07-25 # S-03, S-04 marked done (archived)
 prd_version: 1
 main_goal: market-feedback
 top_blocker: time
@@ -27,13 +27,13 @@ Competitive dog obedience handlers need to know what to train _before_ they step
 
 ## At a glance
 
-| ID   | Change ID         | Outcome (user can …)                                                                          | Prerequisites | PRD refs                                       | Status   |
-| ---- | ----------------- | --------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------- | -------- |
-| F-01 | db-schema         | (foundation) custom tables live in Supabase with RLS; data layer ready for app writes         | —             | FR-002, FR-003, FR-004, FR-005, FR-006, FR-007 | done     |
-| S-01 | auth-flow         | sign up and sign in with email + password; protected routes redirect unauthenticated users    | —             | FR-001                                         | done     |
-| S-02 | dog-management    | add a dog and switch between dogs from any authenticated screen                               | F-01, S-01    | FR-002, FR-003                                 | done     |
-| S-03 | training-elements | add, rename, and remove custom training elements for the selected dog                         | S-02          | FR-004                                         | proposed |
-| S-04 | training-grid     | view the colour-coded training grid, tick any visible cell, and see the grid update instantly | S-03          | FR-005, FR-006, FR-007, US-01                  | done     |
+| ID   | Change ID         | Outcome (user can …)                                                                          | Prerequisites | PRD refs                                       | Status |
+| ---- | ----------------- | --------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------- | ------ |
+| F-01 | db-schema         | (foundation) custom tables live in Supabase with RLS; data layer ready for app writes         | —             | FR-002, FR-003, FR-004, FR-005, FR-006, FR-007 | done   |
+| S-01 | auth-flow         | sign up and sign in with email + password; protected routes redirect unauthenticated users    | —             | FR-001                                         | done   |
+| S-02 | dog-management    | add a dog and switch between dogs from any authenticated screen                               | F-01, S-01    | FR-002, FR-003                                 | done   |
+| S-03 | training-elements | add, rename, and remove custom training elements for the selected dog                         | S-02          | FR-004                                         | done   |
+| S-04 | training-grid     | view the colour-coded training grid, tick any visible cell, and see the grid update instantly | S-03          | FR-005, FR-006, FR-007, US-01                  | done   |
 
 ## Streams
 
@@ -109,7 +109,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** — _(resolved 2026-05-27: deleting an element hard-deletes all its tick history — no soft delete)_
 - **Risk:** Deleting an element with training history is irreversible under hard delete; the element management screen may need a confirmation step, while the tick grid deliberately has none (single tap, FR-006).
-- **Status:** proposed
+- **Status:** done
 
 ### S-04: Training grid ← North star
 
@@ -151,9 +151,10 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Done
 
-| ID   | Change ID      | Outcome                                                                                          | Merged     |
-| ---- | -------------- | ------------------------------------------------------------------------------------------------ | ---------- |
-| F-01 | db-schema      | `dogs`, `training_elements`, `training_logs` live in Supabase with RLS                           | 2026-05-27 |
-| S-01 | auth-flow      | Email + password sign-up/sign-in; protected routes redirect unauthenticated users                | 2026-05-27 |
-| S-02 | dog-management | Add a dog, switch between dogs from header dropdown; selection persists across reloads           | 2026-06-09 |
-| S-04 | training-grid  | View the colour-coded training grid, tick any visible cell, see it update instantly (north star) | 2026-07-25 |
+| ID   | Change ID         | Outcome                                                                                          | Merged     |
+| ---- | ----------------- | ------------------------------------------------------------------------------------------------ | ---------- |
+| F-01 | db-schema         | `dogs`, `training_elements`, `training_logs` live in Supabase with RLS                           | 2026-05-27 |
+| S-01 | auth-flow         | Email + password sign-up/sign-in; protected routes redirect unauthenticated users                | 2026-05-27 |
+| S-02 | dog-management    | Add a dog, switch between dogs from header dropdown; selection persists across reloads           | 2026-06-09 |
+| S-03 | training-elements | Add, rename, and remove custom training elements for the selected dog                            | 2026-07-25 |
+| S-04 | training-grid     | View the colour-coded training grid, tick any visible cell, see it update instantly (north star) | 2026-07-25 |
