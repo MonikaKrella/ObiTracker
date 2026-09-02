@@ -1,19 +1,15 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Commands
 
-- `npm run dev` — start dev server (Cloudflare workerd runtime)
-- `npm run build` — production build (SSR via `@astrojs/cloudflare`)
-- `npm run preview` — preview production build
-- `npm run lint` — ESLint with type-checked rules
-- `npm run lint:fix` — auto-fix lint issues
-- `npm run format` — Prettier (includes prettier-plugin-astro + prettier-plugin-tailwindcss)
+See `@README.md` for `dev`/`build`/`preview`/`lint`/`lint:fix`/`format`. Additionally:
 
-Pre-commit hooks (husky + lint-staged) run `eslint --fix` on `*.{ts,tsx,astro}` and `prettier --write` on `*.{json,css,md}`.
+- `npm run test` — Vitest unit tests (`tests/unit/`)
+- `npm run test:e2e` — Playwright E2E tests (`tests/e2e/`; see the `/10x-e2e` skill for the authoring workflow)
 
-No test suite is configured — do not add one unless asked.
+Pre-commit hooks (husky + lint-staged, see `@package.json`) run `eslint --fix` on `*.{ts,tsx,astro}` and `prettier --write` on `*.{json,css,md}`.
+
+Unit tests (Vitest) and E2E tests (Playwright) are both configured and populated under `tests/`. Follow existing patterns in `tests/unit/` and `tests/e2e/` rather than introducing a new test runner or convention.
 
 ## Project: ObiTracker
 
