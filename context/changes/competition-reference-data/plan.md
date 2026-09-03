@@ -365,5 +365,5 @@ backfill or data-migration concern applies.
 
 #### Automated
 
-- [x] 3.1 New test passes: `npm run test -- competition-reference-data`
-- [x] 3.2 Full unit suite still passes: `npm run test`
+- [x] 3.1 New test passes: `npm run test -- competition-reference-data` — 381c4e7
+- [x] 3.2 Full unit suite still passes: `npm run test` — 381c4e7
