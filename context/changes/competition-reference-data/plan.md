@@ -358,12 +358,12 @@ backfill or data-migration concern applies.
 
 #### Automated
 
-- [x] 2.1 Type-checking passes: `npm run build`
-- [x] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 Type-checking passes: `npm run build` — cf720ed
+- [x] 2.2 Lint passes: `npm run lint` — cf720ed
 
 ### Phase 3: Tests
 
 #### Automated
 
-- [ ] 3.1 New test passes: `npm run test -- competition-reference-data`
-- [ ] 3.2 Full unit suite still passes: `npm run test`
+- [x] 3.1 New test passes: `npm run test -- competition-reference-data`
+- [x] 3.2 Full unit suite still passes: `npm run test`
