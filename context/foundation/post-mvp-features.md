@@ -8,40 +8,40 @@ We finished MVP phase. Now we need to proceed with V2 phase, as there are still 
 - classes are stable/permanent - they are not user specific. Each class have it's specific exercises - all of them are written in rules, so not user specific
 - exercises for each class should be stored in DB, each exercise has specific multiplier, which we also need to store
 - exercises for each class:
-CLASS 1 Exercise - multiplier
-1. Sitting in a group - 3 
-2. Heelwork - 4
-3. Position under march - 3
-4. Recall - 4
-5. Square - 4 
-6. Distance control 4 40
-7. Retrieve and jumping over a hurdle - 4
-8. Go around cones - 4
-9. General impression - 2
+CLASS 1 Exercise - multiplier - shortcut
+1. Sitting in a group - 3 - Group
+2. Heelwork - 4 - Heelwork
+3. Position under march - 3 - In march
+4. Recall - 4 - Recall
+5. Square - 4 - Box
+6. Distance control - 4 - Dist.contr.
+7. Retrieve and jumping over a hurdle - 4 - Retrieve
+8. Go around cones - 4 - Cones
+9. General impression - 2 - Impression
 
-CLASS 2 Exercise - multiplier
-1. Lying in a group - 3
-2. Heelwork - 4
-3. Positions under march - 3
-4. Recall - 3
-5. Square - 4
-6. Directed retrieve - 3
-7. Scent discrimination - 3
-8. Distance control - 4
-9. Send around cones, stop and jump - 3
-10. General impression - 2
+CLASS 2 Exercise - multiplier - shortcut
+1. Lying in a group - 3 - Group
+2. Heelwork - 4 - Heelwork
+3. Positions under march - 3 - In march
+4. Recall with stop- 3 - Recall
+5. Square - 4 - Box
+6. Directed retrieve - 3 - Dir.Retrieve
+7. Scent discrimination - 3 - Scent
+8. Distance control - 4 - Dist.contr.
+9. Send around cones, stop and jump - 3 - 3.8
+10. General impression - 2 - Impression
 
-CLASS 3 Exercise - multiplier
-1. Sittin in a group - 2
-2. Lying in a group and recall - 2
-3. Heelwork - 4
-4. Positions under march - 3
-5. Recall - 3
-6. Square - 4
-7. Directed retrieve - 3
-8. Send around cones, stop, retrieve and jump - 4
-9. Scent discrimination - 3
-10. Distance control - 4
+CLASS 3 Exercise - multiplier - shortcut
+1. Sitting in a group - 2 - Group-sit
+2. Lying in a group and recall - 2 - Group-down
+3. Heelwork - 4 - Heelwork
+4. Positions under march - 3 - In march
+5. Recall - 3 - Recall
+6. Square - 4 - Box
+7. Directed retrieve - 3 - Dir.Retreive
+8. Send around cones, stop, retrieve and jump - 4 - 3.8
+9. Scent discrimination - 3 - Scent
+10. Distance control - 4 - Dist.contr.
 
 - results should be displayed as grid, first column should contain exercises names, second column - exercises multipliers, then next columns will be for competition results. Headers for columns with results should be competition dates. In the cells user must be able to put raw points (from 0 - 10, also it is possible to get 5,5 points, or 7,25 points). Last row should be for tags, in the first column value will be "Tags", column with multiplier empty, and then cell in this column user can add tags by clicking on the cell, short ones like "qualifications", "championships", etc - when writen we will trunkate them an display as tooltips on hoover. Last column should have counted averages from all competitions for current exercise (average from pure points, not from muliplied points). For example exercise heelwork has muliplier 4. User writes pure values, so for example: 10, 8, 6 for this exercise from 3 diffeent competitions. In the average columns the value is 8 ((10+8+6)/3)
 - I want to have here highlighting algorithm too, but this one should work differently 
