@@ -346,20 +346,20 @@ backfill or data-migration concern applies.
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly: `npx supabase db reset`
-- [x] 1.2 Lint passes: `npm run lint`
+- [x] 1.1 Migration applies cleanly: `npx supabase db reset` — b1af13a
+- [x] 1.2 Lint passes: `npm run lint` — b1af13a
 
 #### Manual
 
-- [x] 1.3 `competition_classes` shows exactly 3 rows and `exercises` shows exactly 29 rows in Supabase Studio
-- [x] 1.4 Spot-checked multiplier values (Heelwork = 4 in all classes; Class 1 Distance control = 4) are correct in Studio
+- [x] 1.3 `competition_classes` shows exactly 3 rows and `exercises` shows exactly 29 rows in Supabase Studio — b1af13a
+- [x] 1.4 Spot-checked multiplier values (Heelwork = 4 in all classes; Class 1 Distance control = 4) are correct in Studio — b1af13a
 
 ### Phase 2: Types + Service Layer
 
 #### Automated
 
-- [ ] 2.1 Type-checking passes: `npm run build`
-- [ ] 2.2 Lint passes: `npm run lint`
+- [x] 2.1 Type-checking passes: `npm run build`
+- [x] 2.2 Lint passes: `npm run lint`
 
 ### Phase 3: Tests
 

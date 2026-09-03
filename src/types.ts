@@ -33,6 +33,24 @@ export interface TrainingLog {
   trained_on: string;
 }
 
+export interface CompetitionClass {
+  id: string;
+  name: string;
+  sort_position: number;
+  created_at: string;
+  class_number: number;
+}
+
+export interface Exercise {
+  id: string;
+  class_id: string;
+  name: string;
+  shortcut: string;
+  multiplier: number;
+  sort_position: number;
+  created_at: string;
+}
+
 // ---------------------------------------------------------------------------
 // Insert DTOs — fields required on INSERT (generated columns omitted)
 // ---------------------------------------------------------------------------
