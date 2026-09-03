@@ -1,11 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { getCompetitionClasses, getExercisesForClass } from "../../src/lib/services/competition";
-import { createAdminClient, createTestUser } from "../helpers/db";
-
-const SUPABASE_URL = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
-const ANON_KEY = process.env.SUPABASE_KEY ?? "";
+import {
+  getCompetitionClasses,
+  getExercisesForClass,
+  getExercisesForClassNumber,
+} from "../../src/lib/services/competition";
+import { createAdminClient, createAnonClient, createTestUser } from "../helpers/db";
 
 const EXPECTED_EXERCISE_COUNTS: Record<string, number> = {
   "Class 1": 9,
@@ -112,27 +112,33 @@ describe("competition reference data", () => {
     });
   });
 
+  describe("getExercisesForClassNumber", () => {
+    it("returns Class 1's 9 exercises for class_number 1", async () => {
+      const exercises = await getExercisesForClassNumber(authClient, 1);
+      expect(exercises).toHaveLength(9);
+    });
+
+    it("returns null when no class has the given class_number", async () => {
+      const exercises = await getExercisesForClassNumber(authClient, 99);
+      expect(exercises).toBeNull();
+    });
+  });
+
   describe("RLS boundary", () => {
     it("anon client cannot read competition_classes", async () => {
-      const anonClient = createClient(SUPABASE_URL, ANON_KEY);
-      const { data, error } = await anonClient.from("competition_classes").select("*");
+      const anonClient = createAnonClient();
+      const { error } = await anonClient.from("competition_classes").select("*");
 
-      if (error) {
-        expect(error).toBeDefined();
-      } else {
-        expect(data).toEqual([]);
-      }
+      // REVOKE SELECT ... FROM anon is a table-privilege revoke, so PostgREST
+      // deterministically returns a permission-denied error — never a silent [].
+      expect(error).toBeDefined();
     });
 
     it("anon client cannot read exercises", async () => {
-      const anonClient = createClient(SUPABASE_URL, ANON_KEY);
-      const { data, error } = await anonClient.from("exercises").select("*");
+      const anonClient = createAnonClient();
+      const { error } = await anonClient.from("exercises").select("*");
 
-      if (error) {
-        expect(error).toBeDefined();
-      } else {
-        expect(data).toEqual([]);
-      }
+      expect(error).toBeDefined();
     });
 
     it("authenticated client reads all 3 classes and 29 exercises", async () => {

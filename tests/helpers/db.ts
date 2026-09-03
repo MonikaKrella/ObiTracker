@@ -21,6 +21,13 @@ export function createAdminClient() {
   });
 }
 
+/** Unauthenticated (anon key, no session) client. Use for RLS-boundary checks. */
+export function createAnonClient() {
+  return createClient(SUPABASE_URL, ANON_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
+
 /**
  * Creates a test user via the admin API, signs them in to get a real user JWT,
  * and returns an authClient authenticated as that user.

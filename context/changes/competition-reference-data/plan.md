@@ -232,6 +232,23 @@ shape of `src/lib/services/training-elements.ts`.
 - Both throw on `result.error`, matching every existing service function's error
   handling (no swallowing, no fallback default beyond `?? []` on a null `data`).
 
+#### Addendum (post-plan, user-requested during implementation)
+
+While implementing this phase, the user asked for a dedicated `class_number`
+smallint column on `competition_classes` — distinct from `sort_position`
+(display order) — so exercises can be looked up by the rulebook's natural
+class number without going through `sort_position` or parsing it out of
+`name`. This added:
+
+- `supabase/migrations/20260903000002_add_class_number_to_competition_classes.sql`
+  — adds `class_number smallint NOT NULL UNIQUE`, backfilled to match
+  `sort_position` for the 3 existing rows (today the two are numerically
+  identical, but conceptually independent).
+- `CompetitionClass` in `src/types.ts` gains a `class_number: number` field.
+- `getExercisesForClassNumber(supabase, classNumber)` in
+  `src/lib/services/competition.ts` — looks up the class by `class_number`
+  and delegates to `getExercisesForClass`.
+
 ### Success Criteria:
 
 #### Automated Verification:

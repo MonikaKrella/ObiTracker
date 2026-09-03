@@ -33,17 +33,25 @@ export async function getExercisesForClass(supabase: SupabaseClient, classId: st
 
 /**
  * Returns all exercises for a competition class, looked up by its rulebook
- * class_number (1/2/3) rather than its internal id.
+ * class_number (1/2/3) rather than its internal id. Returns null if no class
+ * has that number.
  */
-export async function getExercisesForClassNumber(supabase: SupabaseClient, classNumber: number): Promise<Exercise[]> {
+export async function getExercisesForClassNumber(
+  supabase: SupabaseClient,
+  classNumber: number,
+): Promise<Exercise[] | null> {
   const classResult = await supabase
     .from("competition_classes")
     .select("id")
     .eq("class_number", classNumber)
-    .single<{ id: string }>();
+    .maybeSingle<{ id: string }>();
 
   if (classResult.error) {
     throw classResult.error;
+  }
+
+  if (!classResult.data) {
+    return null;
   }
 
   return getExercisesForClass(supabase, classResult.data.id);
