@@ -4,6 +4,7 @@ import {
   buildTicksByElement,
   buildTickCounts,
   logsToTickRecords,
+  ticksMapToTickRecords,
 } from "../../src/lib/training-grid-helpers";
 import type { TrainingElement } from "@/types";
 
@@ -131,5 +132,32 @@ describe("logsToTickRecords", () => {
 
   it("an empty logs array maps to an empty TickRecord array", () => {
     expect(logsToTickRecords([])).toEqual([]);
+  });
+});
+
+describe("ticksMapToTickRecords", () => {
+  it("flattens each element's date Set into one TickRecord per date", () => {
+    const ticks = new Map([
+      ["elem-a", new Set(["2026-06-01", "2026-06-02"])],
+      ["elem-b", new Set(["2026-06-03"])],
+    ]);
+    const result = ticksMapToTickRecords(ticks);
+    expect(result).toEqual(
+      expect.arrayContaining([
+        { elementId: "elem-a", trainedOn: "2026-06-01" },
+        { elementId: "elem-a", trainedOn: "2026-06-02" },
+        { elementId: "elem-b", trainedOn: "2026-06-03" },
+      ]),
+    );
+    expect(result).toHaveLength(3);
+  });
+
+  it("an element with an empty Set contributes no records", () => {
+    const ticks = new Map([["elem-a", new Set<string>()]]);
+    expect(ticksMapToTickRecords(ticks)).toEqual([]);
+  });
+
+  it("an empty ticks map maps to an empty TickRecord array", () => {
+    expect(ticksMapToTickRecords(new Map())).toEqual([]);
   });
 });

@@ -582,28 +582,28 @@ API route.
 
 #### Automated
 
-- [x] 5.1 Type checking passes: `npm run build`
-- [x] 5.2 Linting passes: `npm run lint`
-- [x] 5.3 Existing E2E spec still passes: `npm run test:e2e -- mobile-grid`
+- [x] 5.1 Type checking passes: `npm run build` — 33ce387
+- [x] 5.2 Linting passes: `npm run lint` — 33ce387
+- [x] 5.3 Existing E2E spec still passes: `npm run test:e2e -- mobile-grid` — 33ce387
 
 #### Manual
 
-- [x] 5.4 Grid renders identically to before for a dog with existing tick history
-- [x] 5.5 Forced construction failure still shows the service-unavailable overlay, not a crash
+- [x] 5.4 Grid renders identically to before for a dog with existing tick history — 33ce387
+- [x] 5.5 Forced construction failure still shows the service-unavailable overlay, not a crash — 33ce387
 
 ### Phase 6: Wire TrainingGrid.tsx
 
 #### Automated
 
-- [ ] 6.1 Unit tests pass: `npm run test`
-- [ ] 6.2 Type checking passes: `npm run build`
-- [ ] 6.3 Linting passes: `npm run lint`
+- [x] 6.1 Unit tests pass: `npm run test`
+- [x] 6.2 Type checking passes: `npm run build`
+- [x] 6.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 6.4 Tapping a cell ticks/unticks instantly with no visible change
-- [ ] 6.5 Highlights recompute correctly and instantly on tap
-- [ ] 6.6 Switching 7/14/30 window leaves highlighted rows unchanged
+- [x] 6.4 Tapping a cell ticks/unticks instantly with no visible change
+- [x] 6.5 Highlights recompute correctly and instantly on tap
+- [x] 6.6 Switching 7/14/30 window leaves highlighted rows unchanged
 
 ### Phase 7: Cleanup and documentation
 

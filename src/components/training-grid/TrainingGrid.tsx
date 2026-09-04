@@ -9,9 +9,9 @@ import {
   WINDOW_COOKIE_MAX_AGE,
   type WindowDays,
 } from "@/components/training-grid/window-options";
-import { computeHighlights } from "@/lib/highlight";
+import { TrainingBoard } from "@/lib/domain/training-board";
 import { formatHeaderDate } from "@/lib/dates";
-import { applyTick, buildTicksByElement, buildTickCounts } from "@/lib/training-grid-helpers";
+import { applyTick, buildTicksByElement, ticksMapToTickRecords } from "@/lib/training-grid-helpers";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import type { TrainingElement, TrainingLog } from "@/types";
@@ -51,10 +51,10 @@ function setWindowCookie(days: WindowDays) {
  * mirrors the SSR→island swap pattern in `TrainingElementsManager.tsx:98-110`,
  * just scoped to the row level instead of the whole component.
  *
- * `tickCounts`/`highlights` always cover the full 30-day `dates`/ticks data
- * — the window selector only slices which date columns are rendered, never
- * which ticks feed the highlight algorithm (see plan.md "Critical
- * Implementation Details").
+ * `highlights` always covers the full 30-day `dates`/ticks data — the window
+ * selector only slices which date columns are rendered, never which ticks
+ * feed the highlight algorithm (see plan.md "Critical Implementation
+ * Details").
  */
 export function TrainingGrid({
   dogId,
@@ -84,9 +84,10 @@ export function TrainingGrid({
     }
   }, [selectedWindow]);
 
-  const tickCounts = useMemo(() => buildTickCounts(elements, ticks), [elements, ticks]);
-
-  const highlights = useMemo(() => computeHighlights(elements, tickCounts), [elements, tickCounts]);
+  const highlights = useMemo(
+    () => TrainingBoard.create(elements, ticksMapToTickRecords(ticks)).highlights(),
+    [elements, ticks],
+  );
 
   const visibleDates = useMemo(() => dates.slice(-selectedWindow), [dates, selectedWindow]);
 

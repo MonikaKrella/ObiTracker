@@ -62,3 +62,17 @@ export function buildTickCounts(elements: TrainingElement[], ticks: Map<string, 
 export function logsToTickRecords(logs: Pick<TrainingLog, "element_id" | "trained_on">[]): TickRecord[] {
   return logs.map((log) => ({ elementId: log.element_id, trainedOn: log.trained_on }));
 }
+
+/**
+ * Flattens the client's tick state (Map<elementId, Set<date>>) into one
+ * TickRecord per ticked date — the shape TrainingBoard.create() expects.
+ */
+export function ticksMapToTickRecords(ticks: Map<string, Set<string>>): TickRecord[] {
+  const records: TickRecord[] = [];
+  for (const [elementId, dates] of ticks) {
+    for (const trainedOn of dates) {
+      records.push({ elementId, trainedOn });
+    }
+  }
+  return records;
+}
