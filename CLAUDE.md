@@ -47,6 +47,7 @@ All pages are server-rendered (`output: "server"` in `astro.config.mjs`). React 
 - **React hooks**: extract to `src/components/hooks/`.
 - **No Next.js directives** — no `"use client"` etc.
 - **Supabase migrations**: `supabase/migrations/` named `YYYYMMDDHHmmss_short_description.sql`. Always enable RLS on new tables. Write one policy per operation (SELECT, INSERT, UPDATE, DELETE) per role (authenticated, anon). Never use a single catch-all policy. Only `auth.users` is used currently — no custom tables yet.
+- **Domain layer**: src/lib/domain/ for aggregate roots that enforce a business invariant via a private constructor + create() factory (e.g. TrainingBoard). src/lib/services/ stays the thin data-access layer that constructs one from persisted rows.
 
 <!-- BEGIN @przeprogramowani/10x-cli -->
 

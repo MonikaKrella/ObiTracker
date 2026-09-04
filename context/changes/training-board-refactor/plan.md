@@ -595,25 +595,25 @@ API route.
 
 #### Automated
 
-- [x] 6.1 Unit tests pass: `npm run test`
-- [x] 6.2 Type checking passes: `npm run build`
-- [x] 6.3 Linting passes: `npm run lint`
+- [x] 6.1 Unit tests pass: `npm run test` — d5c71e7
+- [x] 6.2 Type checking passes: `npm run build` — d5c71e7
+- [x] 6.3 Linting passes: `npm run lint` — d5c71e7
 
 #### Manual
 
-- [x] 6.4 Tapping a cell ticks/unticks instantly with no visible change
-- [x] 6.5 Highlights recompute correctly and instantly on tap
-- [x] 6.6 Switching 7/14/30 window leaves highlighted rows unchanged
+- [x] 6.4 Tapping a cell ticks/unticks instantly with no visible change — d5c71e7
+- [x] 6.5 Highlights recompute correctly and instantly on tap — d5c71e7
+- [x] 6.6 Switching 7/14/30 window leaves highlighted rows unchanged — d5c71e7
 
 ### Phase 7: Cleanup and documentation
 
 #### Automated
 
-- [ ] 7.1 Grep confirms zero remaining references to `computeHighlights`/`highlight.ts` before deletion
-- [ ] 7.2 Full test suite passes: `npm run test`
-- [ ] 7.3 Type checking passes: `npm run build`
-- [ ] 7.4 Linting passes: `npm run lint`
+- [x] 7.1 Grep confirms zero remaining references to `computeHighlights`/`highlight.ts` before deletion
+- [x] 7.2 Full test suite passes: `npm run test`
+- [x] 7.3 Type checking passes: `npm run build`
+- [x] 7.4 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 7.5 Final end-to-end pass: grid is indistinguishable from before this refactor
+- [x] 7.5 Final end-to-end pass: grid is indistinguishable from before this refactor
