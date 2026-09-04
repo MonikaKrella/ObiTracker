@@ -609,11 +609,11 @@ API route.
 
 #### Automated
 
-- [x] 7.1 Grep confirms zero remaining references to `computeHighlights`/`highlight.ts` before deletion
-- [x] 7.2 Full test suite passes: `npm run test`
-- [x] 7.3 Type checking passes: `npm run build`
-- [x] 7.4 Linting passes: `npm run lint`
+- [x] 7.1 Grep confirms zero remaining references to `computeHighlights`/`highlight.ts` before deletion — 2ab7e08
+- [x] 7.2 Full test suite passes: `npm run test` — 2ab7e08
+- [x] 7.3 Type checking passes: `npm run build` — 2ab7e08
+- [x] 7.4 Linting passes: `npm run lint` — 2ab7e08
 
 #### Manual
 
-- [x] 7.5 Final end-to-end pass: grid is indistinguishable from before this refactor
+- [x] 7.5 Final end-to-end pass: grid is indistinguishable from before this refactor — 2ab7e08
