@@ -543,40 +543,40 @@ API route.
 
 #### Automated
 
-- [x] 1.1 Test file compiles once Phase 2 lands: `npm run test`
+- [x] 1.1 Test file compiles once Phase 2 lands: `npm run test` — 22b52f8
 
 ### Phase 2: Implement TrainingBoard
 
 #### Automated
 
-- [x] 2.1 Phase 1 tests pass: `npm run test`
-- [x] 2.2 Type checking passes: `npm run build`
-- [x] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Phase 1 tests pass: `npm run test` — 22b52f8
+- [x] 2.2 Type checking passes: `npm run build` — 22b52f8
+- [x] 2.3 Linting passes: `npm run lint` — 22b52f8
 
 ### Phase 3: loadTrainingBoard() repository
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass: `npm run test`
-- [ ] 3.2 Type checking passes: `npm run build`
-- [ ] 3.3 Linting passes: `npm run lint`
+- [x] 3.1 Unit tests pass: `npm run test`
+- [x] 3.2 Type checking passes: `npm run build`
+- [x] 3.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 3.4 Manually invoke against a seeded dog and confirm highlights match the current grid
+- [x] 3.4 Manually invoke against a seeded dog and confirm highlights match the current grid
 
 ### Phase 4: GET /api/dog/[id]/grid endpoint
 
 #### Automated
 
-- [ ] 4.1 Type checking passes: `npm run build`
-- [ ] 4.2 Linting passes: `npm run lint`
+- [x] 4.1 Type checking passes: `npm run build`
+- [x] 4.2 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 4.3 Signed-in request returns `{"highlights": {...}}` matching the grid
-- [ ] 4.4 Signed-out request returns `401`
-- [ ] 4.5 Request for another account's dog returns `404`
+- [x] 4.3 Signed-in request returns `{"highlights": {...}}` matching the grid
+- [x] 4.4 Signed-out request returns `401`
+- [x] 4.5 Request for another account's dog returns `404`
 
 ### Phase 5: Wire grid.astro
 

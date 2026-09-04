@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { applyTick, buildTicksByElement, buildTickCounts } from "../../src/lib/training-grid-helpers";
+import {
+  applyTick,
+  buildTicksByElement,
+  buildTickCounts,
+  logsToTickRecords,
+} from "../../src/lib/training-grid-helpers";
 import type { TrainingElement } from "@/types";
 
 /** Builds a minimal TrainingElement for test purposes — only `id` matters to these helpers. */
@@ -108,5 +113,23 @@ describe("design invariant: buildTickCounts is window-agnostic", () => {
 
     // The two values must differ — confirming buildTickCounts uses dateSet.size (30), not a filtered count (7)
     expect(fullCount).not.toBe(windowCount);
+  });
+});
+
+describe("logsToTickRecords", () => {
+  it("maps each log row's element_id/trained_on to a TickRecord's elementId/trainedOn", () => {
+    const logs = [
+      { element_id: "elem-a", trained_on: "2026-06-01" },
+      { element_id: "elem-b", trained_on: "2026-06-02" },
+    ];
+    const result = logsToTickRecords(logs);
+    expect(result).toEqual([
+      { elementId: "elem-a", trainedOn: "2026-06-01" },
+      { elementId: "elem-b", trainedOn: "2026-06-02" },
+    ]);
+  });
+
+  it("an empty logs array maps to an empty TickRecord array", () => {
+    expect(logsToTickRecords([])).toEqual([]);
   });
 });

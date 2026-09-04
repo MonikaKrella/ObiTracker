@@ -1,4 +1,5 @@
 import type { TrainingElement, TrainingLog } from "@/types";
+import type { TickRecord } from "@/lib/domain/training-board";
 
 /**
  * Initialises a tick map from SSR-fetched training log rows.
@@ -52,4 +53,12 @@ export function buildTickCounts(elements: TrainingElement[], ticks: Map<string, 
     }
   }
   return counts;
+}
+
+/**
+ * Maps raw persisted log rows to the TickRecord[] shape TrainingBoard.create()
+ * expects.
+ */
+export function logsToTickRecords(logs: Pick<TrainingLog, "element_id" | "trained_on">[]): TickRecord[] {
+  return logs.map((log) => ({ elementId: log.element_id, trainedOn: log.trained_on }));
 }
