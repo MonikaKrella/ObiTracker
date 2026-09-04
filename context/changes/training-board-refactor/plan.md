@@ -557,39 +557,39 @@ API route.
 
 #### Automated
 
-- [x] 3.1 Unit tests pass: `npm run test`
-- [x] 3.2 Type checking passes: `npm run build`
-- [x] 3.3 Linting passes: `npm run lint`
+- [x] 3.1 Unit tests pass: `npm run test` — 64a651e
+- [x] 3.2 Type checking passes: `npm run build` — 64a651e
+- [x] 3.3 Linting passes: `npm run lint` — 64a651e
 
 #### Manual
 
-- [x] 3.4 Manually invoke against a seeded dog and confirm highlights match the current grid
+- [x] 3.4 Manually invoke against a seeded dog and confirm highlights match the current grid — 64a651e
 
 ### Phase 4: GET /api/dog/[id]/grid endpoint
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `npm run build`
-- [x] 4.2 Linting passes: `npm run lint`
+- [x] 4.1 Type checking passes: `npm run build` — 64a651e
+- [x] 4.2 Linting passes: `npm run lint` — 64a651e
 
 #### Manual
 
-- [x] 4.3 Signed-in request returns `{"highlights": {...}}` matching the grid
-- [x] 4.4 Signed-out request returns `401`
-- [x] 4.5 Request for another account's dog returns `404`
+- [x] 4.3 Signed-in request returns `{"highlights": {...}}` matching the grid — 64a651e
+- [x] 4.4 Signed-out request returns `401` — 64a651e
+- [x] 4.5 Request for another account's dog returns `404` — 64a651e
 
 ### Phase 5: Wire grid.astro
 
 #### Automated
 
-- [ ] 5.1 Type checking passes: `npm run build`
-- [ ] 5.2 Linting passes: `npm run lint`
-- [ ] 5.3 Existing E2E spec still passes: `npm run test:e2e -- mobile-grid`
+- [x] 5.1 Type checking passes: `npm run build`
+- [x] 5.2 Linting passes: `npm run lint`
+- [x] 5.3 Existing E2E spec still passes: `npm run test:e2e -- mobile-grid`
 
 #### Manual
 
-- [ ] 5.4 Grid renders identically to before for a dog with existing tick history
-- [ ] 5.5 Forced construction failure still shows the service-unavailable overlay, not a crash
+- [x] 5.4 Grid renders identically to before for a dog with existing tick history
+- [x] 5.5 Forced construction failure still shows the service-unavailable overlay, not a crash
 
 ### Phase 6: Wire TrainingGrid.tsx
 

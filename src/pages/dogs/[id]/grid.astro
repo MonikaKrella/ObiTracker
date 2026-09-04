@@ -7,6 +7,8 @@ import { getTrainingLogs } from "@/lib/services/training-logs";
 import { getTrainingWindow, generateDateRange } from "@/lib/dates";
 import { TrainingGrid } from "@/components/training-grid/TrainingGrid";
 import { WINDOW_COOKIE_NAME, isWindowDays, type WindowDays } from "@/components/training-grid/window-options";
+import { TrainingBoard } from "@/lib/domain/training-board";
+import { logsToTickRecords } from "@/lib/training-grid-helpers";
 import type { TrainingElement, TrainingLog } from "@/types";
 
 // selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
@@ -31,17 +33,25 @@ const rawWindow = Number(Astro.cookies.get(WINDOW_COOKIE_NAME)?.value);
 const initialWindow: WindowDays = isWindowDays(rawWindow) ? rawWindow : 30;
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
-const serviceUnavailable = !supabase;
+let serviceUnavailable = !supabase;
 const dogs = supabase ? await getDogsList(supabase) : [];
 
 let elements: TrainingElement[] = [];
 let initialTicks: Pick<TrainingLog, "element_id" | "trained_on">[] = [];
 
 if (supabase) {
-  [elements, initialTicks] = await Promise.all([
-    getTrainingElements(supabase, selectedDog.id),
-    getTrainingLogs(supabase, selectedDog.id, startDate, endDate),
-  ]);
+  try {
+    [elements, initialTicks] = await Promise.all([
+      getTrainingElements(supabase, selectedDog.id),
+      getTrainingLogs(supabase, selectedDog.id, startDate, endDate),
+    ]);
+    // Constructed purely to validate the fetched data before rendering — its
+    // highlights() result is not passed as a prop; TrainingGrid.tsx recomputes
+    // its own copy client-side (see plan.md "What We're NOT Doing").
+    TrainingBoard.create(elements, logsToTickRecords(initialTicks));
+  } catch {
+    serviceUnavailable = true;
+  }
 }
 ---
 
