@@ -1,4 +1,5 @@
 import type { TrainingElement, TrainingLog } from "@/types";
+import type { TickRecord } from "@/lib/domain/training-board";
 
 /**
  * Initialises a tick map from SSR-fetched training log rows.
@@ -39,17 +40,23 @@ export function applyTick(
 }
 
 /**
- * Returns a map of element ID → total tick count across ALL dates in the
- * ticks Set (never filtered by the display window). This is intentional:
- * highlight ranking must be window-agnostic so that switching between 7/14/30d
- * columns never changes which rows are highlighted green or red.
+ * Maps raw persisted log rows to the TickRecord[] shape TrainingBoard.create()
+ * expects.
  */
-export function buildTickCounts(elements: TrainingElement[], ticks: Map<string, Set<string>>): Map<string, number> {
-  const counts = new Map<string, number>(elements.map((e) => [e.id, 0]));
-  for (const [elementId, dateSet] of ticks) {
-    if (counts.has(elementId)) {
-      counts.set(elementId, dateSet.size);
+export function logsToTickRecords(logs: Pick<TrainingLog, "element_id" | "trained_on">[]): TickRecord[] {
+  return logs.map((log) => ({ elementId: log.element_id, trainedOn: log.trained_on }));
+}
+
+/**
+ * Flattens the client's tick state (Map<elementId, Set<date>>) into one
+ * TickRecord per ticked date — the shape TrainingBoard.create() expects.
+ */
+export function ticksMapToTickRecords(ticks: Map<string, Set<string>>): TickRecord[] {
+  const records: TickRecord[] = [];
+  for (const [elementId, dates] of ticks) {
+    for (const trainedOn of dates) {
+      records.push({ elementId, trainedOn });
     }
   }
-  return counts;
+  return records;
 }

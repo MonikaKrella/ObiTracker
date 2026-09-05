@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { applyTick, buildTicksByElement, buildTickCounts } from "../../src/lib/training-grid-helpers";
+import {
+  applyTick,
+  buildTicksByElement,
+  logsToTickRecords,
+  ticksMapToTickRecords,
+} from "../../src/lib/training-grid-helpers";
 import type { TrainingElement } from "@/types";
 
 /** Builds a minimal TrainingElement for test purposes — only `id` matters to these helpers. */
@@ -65,48 +70,47 @@ describe("buildTicksByElement", () => {
   });
 });
 
-describe("buildTickCounts", () => {
-  it("returns correct counts: elem-a with 3 ticks, elem-b with 0", () => {
-    const elements = [makeElement("elem-a"), makeElement("elem-b")];
-    const ticks = new Map([
-      ["elem-a", new Set(["2026-06-01", "2026-06-02", "2026-06-03"])],
-      ["elem-b", new Set<string>()],
+describe("logsToTickRecords", () => {
+  it("maps each log row's element_id/trained_on to a TickRecord's elementId/trainedOn", () => {
+    const logs = [
+      { element_id: "elem-a", trained_on: "2026-06-01" },
+      { element_id: "elem-b", trained_on: "2026-06-02" },
+    ];
+    const result = logsToTickRecords(logs);
+    expect(result).toEqual([
+      { elementId: "elem-a", trainedOn: "2026-06-01" },
+      { elementId: "elem-b", trainedOn: "2026-06-02" },
     ]);
-    const result = buildTickCounts(elements, ticks);
-    expect(result.get("elem-a")).toBe(3);
-    expect(result.get("elem-b")).toBe(0);
   });
 
-  it("elements absent from the ticks map default to 0", () => {
-    const elements = [makeElement("elem-a"), makeElement("elem-b")];
-    const ticks = new Map<string, Set<string>>();
-    const result = buildTickCounts(elements, ticks);
-    expect(result.get("elem-a")).toBe(0);
-    expect(result.get("elem-b")).toBe(0);
+  it("an empty logs array maps to an empty TickRecord array", () => {
+    expect(logsToTickRecords([])).toEqual([]);
   });
 });
 
-describe("design invariant: buildTickCounts is window-agnostic", () => {
-  it("counts all 30 ticks regardless of a 7-day display window, confirming highlight ranking ignores the window", () => {
-    const element = makeElement("elem-a");
-    // Generate 30 distinct date strings — one per day in reverse order
-    const allDates = Array.from({ length: 30 }, (_, i) => {
-      const d = new Date("2026-06-25T00:00:00Z");
-      d.setUTCDate(d.getUTCDate() - i);
-      return d.toISOString().slice(0, 10);
-    });
-    const ticks = new Map([["elem-a", new Set(allDates)]]);
+describe("ticksMapToTickRecords", () => {
+  it("flattens each element's date Set into one TickRecord per date", () => {
+    const ticks = new Map([
+      ["elem-a", new Set(["2026-06-01", "2026-06-02"])],
+      ["elem-b", new Set(["2026-06-03"])],
+    ]);
+    const result = ticksMapToTickRecords(ticks);
+    expect(result).toEqual(
+      expect.arrayContaining([
+        { elementId: "elem-a", trainedOn: "2026-06-01" },
+        { elementId: "elem-a", trainedOn: "2026-06-02" },
+        { elementId: "elem-b", trainedOn: "2026-06-03" },
+      ]),
+    );
+    expect(result).toHaveLength(3);
+  });
 
-    // buildTickCounts counts the full Set — all 30 dates
-    const fullCount = buildTickCounts([element], ticks).get("elem-a");
-    expect(fullCount).toBe(30);
+  it("an element with an empty Set contributes no records", () => {
+    const ticks = new Map([["elem-a", new Set<string>()]]);
+    expect(ticksMapToTickRecords(ticks)).toEqual([]);
+  });
 
-    // A window-sensitive alternative would only count dates within a 7-day slice
-    const sevenDayDates = new Set(allDates.slice(0, 7));
-    const windowCount = [...(ticks.get("elem-a") ?? [])].filter((d) => sevenDayDates.has(d)).length;
-    expect(windowCount).toBe(7);
-
-    // The two values must differ — confirming buildTickCounts uses dateSet.size (30), not a filtered count (7)
-    expect(fullCount).not.toBe(windowCount);
+  it("an empty ticks map maps to an empty TickRecord array", () => {
+    expect(ticksMapToTickRecords(new Map())).toEqual([]);
   });
 });
