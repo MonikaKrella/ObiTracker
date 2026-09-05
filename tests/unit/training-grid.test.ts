@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   applyTick,
   buildTicksByElement,
-  buildTickCounts,
   logsToTickRecords,
   ticksMapToTickRecords,
 } from "../../src/lib/training-grid-helpers";
@@ -68,52 +67,6 @@ describe("buildTicksByElement", () => {
     const result = buildTicksByElement(elements, ticks);
     expect(result.get("elem-a")).toEqual(new Set());
     expect(result.has("unknown-id")).toBe(false);
-  });
-});
-
-describe("buildTickCounts", () => {
-  it("returns correct counts: elem-a with 3 ticks, elem-b with 0", () => {
-    const elements = [makeElement("elem-a"), makeElement("elem-b")];
-    const ticks = new Map([
-      ["elem-a", new Set(["2026-06-01", "2026-06-02", "2026-06-03"])],
-      ["elem-b", new Set<string>()],
-    ]);
-    const result = buildTickCounts(elements, ticks);
-    expect(result.get("elem-a")).toBe(3);
-    expect(result.get("elem-b")).toBe(0);
-  });
-
-  it("elements absent from the ticks map default to 0", () => {
-    const elements = [makeElement("elem-a"), makeElement("elem-b")];
-    const ticks = new Map<string, Set<string>>();
-    const result = buildTickCounts(elements, ticks);
-    expect(result.get("elem-a")).toBe(0);
-    expect(result.get("elem-b")).toBe(0);
-  });
-});
-
-describe("design invariant: buildTickCounts is window-agnostic", () => {
-  it("counts all 30 ticks regardless of a 7-day display window, confirming highlight ranking ignores the window", () => {
-    const element = makeElement("elem-a");
-    // Generate 30 distinct date strings — one per day in reverse order
-    const allDates = Array.from({ length: 30 }, (_, i) => {
-      const d = new Date("2026-06-25T00:00:00Z");
-      d.setUTCDate(d.getUTCDate() - i);
-      return d.toISOString().slice(0, 10);
-    });
-    const ticks = new Map([["elem-a", new Set(allDates)]]);
-
-    // buildTickCounts counts the full Set — all 30 dates
-    const fullCount = buildTickCounts([element], ticks).get("elem-a");
-    expect(fullCount).toBe(30);
-
-    // A window-sensitive alternative would only count dates within a 7-day slice
-    const sevenDayDates = new Set(allDates.slice(0, 7));
-    const windowCount = [...(ticks.get("elem-a") ?? [])].filter((d) => sevenDayDates.has(d)).length;
-    expect(windowCount).toBe(7);
-
-    // The two values must differ — confirming buildTickCounts uses dateSet.size (30), not a filtered count (7)
-    expect(fullCount).not.toBe(windowCount);
   });
 });
 

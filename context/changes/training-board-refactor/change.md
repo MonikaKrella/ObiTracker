@@ -1,7 +1,7 @@
 ---
 change_id: training-board-refactor
 title: Training board — invariant aggregate-guardian refactor
-status: implemented
+status: impl_reviewed
 created: 2026-09-04
 updated: 2026-09-04
 archived_at: null

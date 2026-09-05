@@ -40,22 +40,6 @@ export function applyTick(
 }
 
 /**
- * Returns a map of element ID → total tick count across ALL dates in the
- * ticks Set (never filtered by the display window). This is intentional:
- * highlight ranking must be window-agnostic so that switching between 7/14/30d
- * columns never changes which rows are highlighted green or red.
- */
-export function buildTickCounts(elements: TrainingElement[], ticks: Map<string, Set<string>>): Map<string, number> {
-  const counts = new Map<string, number>(elements.map((e) => [e.id, 0]));
-  for (const [elementId, dateSet] of ticks) {
-    if (counts.has(elementId)) {
-      counts.set(elementId, dateSet.size);
-    }
-  }
-  return counts;
-}
-
-/**
  * Maps raw persisted log rows to the TickRecord[] shape TrainingBoard.create()
  * expects.
  */
