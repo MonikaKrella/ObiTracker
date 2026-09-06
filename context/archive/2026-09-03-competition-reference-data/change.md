@@ -1,10 +1,10 @@
 ---
 change_id: competition-reference-data
 title: Competition reference data (F-01)
-status: impl_reviewed
+status: archived
 created: 2026-09-03
-updated: 2026-09-03
-archived_at: null
+updated: 2026-09-06
+archived_at: 2026-09-06T16:04:12Z
 ---
 
 ## Notes
