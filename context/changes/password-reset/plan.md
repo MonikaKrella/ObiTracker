@@ -251,33 +251,33 @@ No data migration. No new Supabase migration file — this change is entirely ap
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `npm run test`
-- [x] 1.2 Type checking passes: `npm run build`
-- [x] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test` — aeefad7
+- [x] 1.2 Type checking passes: `npm run build` — aeefad7
+- [x] 1.3 Linting passes: `npm run lint` — aeefad7
 
 #### Manual
 
-- [ ] 1.4 Registered email → reset-link-sent page → email arrives
-- [ ] 1.5 Unregistered email → identical outcome, no distinguishable error
-- [ ] 1.6 Invalid email format → validation error, stays on forgot-password
-- [ ] 1.7 Resend cooldown disabled then becomes a working link after 60s
-- [ ] 1.8 Logged-in handler visiting /auth/forgot-password redirects to /dashboard
-- [ ] 1.9 "Forgot password?" link visible and functional on /auth/signin
+- [x] 1.4 Registered email → reset-link-sent page → email arrives — aeefad7
+- [x] 1.5 Unregistered email → identical outcome, no distinguishable error — aeefad7
+- [x] 1.6 Invalid email format → validation error, stays on forgot-password — aeefad7
+- [x] 1.7 Resend cooldown disabled then becomes a working link after 60s — aeefad7
+- [x] 1.8 Logged-in handler visiting /auth/forgot-password redirects to /dashboard — aeefad7
+- [x] 1.9 "Forgot password?" link visible and functional on /auth/signin — aeefad7
 
 ### Phase 2: Verify link and set new password
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `npm run test`
-- [ ] 2.2 Type checking passes: `npm run build`
-- [ ] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test`
+- [x] 2.2 Type checking passes: `npm run build`
+- [x] 2.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.4 Fresh reset link lands on /auth/reset-password with a recovery session
-- [ ] 2.5 Setting new password redirects to /dashboard, signed in
-- [ ] 2.6 Sign out + sign back in with new password succeeds
-- [ ] 2.7 Reused/expired link redirects to /auth/signin with specific message
-- [ ] 2.8 Direct visit to /auth/reset-password while signed out redirects to /auth/signin
-- [ ] 2.9 Mismatched/too-short password shows validation error
-- [ ] 2.10 Existing signup → confirm-email → dashboard flow unregressed
+- [x] 2.4 Fresh reset link lands on /auth/reset-password with a recovery session
+- [x] 2.5 Setting new password redirects to /dashboard, signed in
+- [x] 2.6 Sign out + sign back in with new password succeeds
+- [x] 2.7 Reused/expired link redirects to /auth/signin with specific message
+- [x] 2.8 Direct visit to /auth/reset-password while signed out redirects to /auth/signin
+- [x] 2.9 Mismatched/too-short password shows validation error
+- [x] 2.10 Existing signup → confirm-email → dashboard flow unregressed
