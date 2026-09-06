@@ -18,6 +18,7 @@ export default function SignUpForm({ serverError }: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
+  const [submitting, setSubmitting] = useState(false);
 
   function validate() {
     const next: typeof errors = {};
@@ -51,7 +52,12 @@ export default function SignUpForm({ serverError }: Props) {
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     if (!validate()) {
       e.preventDefault();
+      return;
     }
+    // Native form submission navigates the browser away, which can take a
+    // moment (server calls Supabase before redirecting) — disable the button
+    // immediately so a slow response can't be double-submitted.
+    setSubmitting(true);
   }
 
   const passwordHint =
@@ -126,7 +132,7 @@ export default function SignUpForm({ serverError }: Props) {
 
       <ServerError message={serverError} />
 
-      <SubmitButton pendingText="Creating account..." icon={<UserPlus className="size-4" />}>
+      <SubmitButton pendingText="Creating account..." icon={<UserPlus className="size-4" />} disabled={submitting}>
         Create account
       </SubmitButton>
     </form>

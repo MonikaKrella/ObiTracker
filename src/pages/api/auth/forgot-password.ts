@@ -36,5 +36,11 @@ export const POST: APIRoute = async (context) => {
     );
   }
 
+  if (error) {
+    // Logged for ops visibility only — the client always sees the same
+    // success redirect regardless of this error, per anti-enumeration above.
+    console.error("resetPasswordForEmail failed:", error);
+  }
+
   return context.redirect("/auth/reset-link-sent");
 };

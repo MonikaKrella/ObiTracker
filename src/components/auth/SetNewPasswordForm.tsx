@@ -17,6 +17,7 @@ export default function SetNewPasswordForm({ serverError }: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
+  const [submitting, setSubmitting] = useState(false);
 
   function validate() {
     const next: typeof errors = {};
@@ -46,7 +47,12 @@ export default function SetNewPasswordForm({ serverError }: Props) {
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     if (!validate()) {
       e.preventDefault();
+      return;
     }
+    // Native form submission navigates the browser away, which can take a
+    // moment (server calls Supabase before redirecting) — disable the button
+    // immediately so a slow response can't be double-submitted.
+    setSubmitting(true);
   }
 
   const passwordHint =
@@ -107,7 +113,7 @@ export default function SetNewPasswordForm({ serverError }: Props) {
 
       <ServerError message={serverError} />
 
-      <SubmitButton pendingText="Setting new password..." icon={<KeyRound className="size-4" />}>
+      <SubmitButton pendingText="Setting new password..." icon={<KeyRound className="size-4" />} disabled={submitting}>
         Set new password
       </SubmitButton>
     </form>
