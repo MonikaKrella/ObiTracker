@@ -14,10 +14,15 @@ const otpTypeSchema = z.enum([
   "email_change",
 ]);
 
+const RECOVERY_LINK_ERROR =
+  "This reset link didn't work — it may have expired, already been used, or only works on the device/browser you requested it from. Request a new one from the sign-in page.";
+
 export const GET: APIRoute = async (context) => {
   const code = context.url.searchParams.get("code");
   const token_hash = context.url.searchParams.get("token_hash");
   const type = context.url.searchParams.get("type");
+  const flow = context.url.searchParams.get("flow");
+  const successRedirect = flow === "recovery" ? "/auth/reset-password" : "/dashboard";
 
   // The two flows are mutually exclusive — reject if both params are present.
   if (code && token_hash) {
@@ -35,9 +40,10 @@ export const GET: APIRoute = async (context) => {
     // reads it automatically and writes the session cookies before the redirect fires.
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
-      return context.redirect(`/auth/signin?error=${encodeURIComponent(error.message)}`);
+      const message = flow === "recovery" ? RECOVERY_LINK_ERROR : error.message;
+      return context.redirect(`/auth/signin?error=${encodeURIComponent(message)}`);
     }
-    return context.redirect("/dashboard");
+    return context.redirect(successRedirect);
   }
 
   if (token_hash && type) {
@@ -49,9 +55,10 @@ export const GET: APIRoute = async (context) => {
     // OTP / magic-link flow (non-PKCE).
     const { error } = await supabase.auth.verifyOtp({ token_hash, type: parsedType.data });
     if (error) {
-      return context.redirect(`/auth/signin?error=${encodeURIComponent(error.message)}`);
+      const message = flow === "recovery" ? RECOVERY_LINK_ERROR : error.message;
+      return context.redirect(`/auth/signin?error=${encodeURIComponent(message)}`);
     }
-    return context.redirect("/dashboard");
+    return context.redirect(successRedirect);
   }
 
   return context.redirect("/auth/signin?error=Invalid+confirmation+link");

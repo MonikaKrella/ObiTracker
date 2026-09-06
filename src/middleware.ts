@@ -2,8 +2,8 @@ import { defineMiddleware } from "astro:middleware";
 import { createClient } from "@/lib/supabase";
 import { getDogById } from "@/lib/services/dogs";
 
-const PROTECTED_ROUTES = ["/dashboard", "/dogs"];
-const UNAUTHENTICATED_ONLY_ROUTES = ["/", "/auth/signin", "/auth/signup"];
+const PROTECTED_ROUTES = ["/dashboard", "/dogs", "/auth/reset-password"];
+const UNAUTHENTICATED_ONLY_ROUTES = ["/", "/auth/signin", "/auth/signup", "/auth/forgot-password"];
 
 // Matches /dogs/<uuid> — UUID-only segments so /dogs/new is never treated as an ID.
 const DOG_ID_REGEX = /^\/dogs\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i;

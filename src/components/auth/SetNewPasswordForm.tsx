@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Mail, Lock, UserPlus } from "lucide-react";
+import { Lock, KeyRound } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
 import { PasswordToggle } from "@/components/auth/PasswordToggle";
 import { SubmitButton } from "@/components/auth/SubmitButton";
@@ -11,23 +11,16 @@ interface Props {
   serverError?: string | null;
 }
 
-export default function SignUpForm({ serverError }: Props) {
-  const [email, setEmail] = useState("");
+export default function SetNewPasswordForm({ serverError }: Props) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
+  const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
   const [submitting, setSubmitting] = useState(false);
 
   function validate() {
     const next: typeof errors = {};
-
-    if (!email.trim()) {
-      next.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      next.email = "Enter a valid email address";
-    }
 
     if (!password) {
       next.password = "Password is required";
@@ -46,7 +39,9 @@ export default function SignUpForm({ serverError }: Props) {
   }
 
   function clearError(field: keyof typeof errors) {
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   }
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -69,24 +64,10 @@ export default function SignUpForm({ serverError }: Props) {
     ) : undefined;
 
   return (
-    <form method="POST" action="/api/auth/signup" className="space-y-4" onSubmit={handleSubmit} noValidate>
-      <FormField
-        id="email"
-        type="email"
-        label="Email"
-        value={email}
-        onChange={(v) => {
-          setEmail(v);
-          clearError("email");
-        }}
-        placeholder="you@example.com"
-        error={errors.email}
-        icon={<Mail className="size-4" />}
-      />
-
+    <form method="POST" action="/api/auth/reset-password" className="space-y-4" onSubmit={handleSubmit} noValidate>
       <FormField
         id="password"
-        label="Password"
+        label="New password"
         type={showPassword ? "text" : "password"}
         value={password}
         onChange={(v) => {
@@ -110,7 +91,7 @@ export default function SignUpForm({ serverError }: Props) {
       <FormField
         id="confirmPassword"
         name="confirmPassword"
-        label="Confirm password"
+        label="Confirm new password"
         type={showConfirmPassword ? "text" : "password"}
         value={confirmPassword}
         onChange={(v) => {
@@ -132,8 +113,8 @@ export default function SignUpForm({ serverError }: Props) {
 
       <ServerError message={serverError} />
 
-      <SubmitButton pendingText="Creating account..." icon={<UserPlus className="size-4" />} disabled={submitting}>
-        Create account
+      <SubmitButton pendingText="Setting new password..." icon={<KeyRound className="size-4" />} disabled={submitting}>
+        Set new password
       </SubmitButton>
     </form>
   );
