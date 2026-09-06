@@ -468,17 +468,17 @@ Both new tables are additive — no existing data is touched or migrated. No bac
 
 #### Automated
 
-- [x] 2.1 Unit tests pass (all-time/last-year/last-6-months + leap-year case)
-- [x] 2.2 Type checking passes
-- [x] 2.3 Linting passes
+- [x] 2.1 Unit tests pass (all-time/last-year/last-6-months + leap-year case) — 9d918b7
+- [x] 2.2 Type checking passes — 9d918b7
+- [x] 2.3 Linting passes — 9d918b7
 
 ### Phase 3: CompetitionBoard Aggregate — Averages
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass (empty/single/multiple scores, unknown-exercise error)
-- [ ] 3.2 Type checking passes
-- [ ] 3.3 Linting passes
+- [x] 3.1 Unit tests pass (empty/single/multiple scores, unknown-exercise error)
+- [x] 3.2 Type checking passes
+- [x] 3.3 Linting passes
 
 ### Phase 4: CompetitionBoard Aggregate — Highlighting Algorithm
 
