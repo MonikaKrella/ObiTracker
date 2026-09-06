@@ -29,6 +29,7 @@
 - **Context**: Any React component/island that calls a mutating API route (POST/PATCH/DELETE for create, rename, delete, reorder, etc.)
 - **Problem**: API routes correctly return `401 { error: "Unauthorized" }` when `context.locals.user` is null (expired session). It's easy to spec the "primary" action's dialog (e.g. an Add or Rename dialog) with explicit `401 → window.location.href = "/auth/signin"` handling, then under-specify a sibling action (e.g. a Delete confirmation dialog or a "Save order" button) with only a generic `error → toast.error(...)` branch. The result: an expired session on that one action shows a confusing toast (often literally "Unauthorized") instead of sending the user to sign in, silently breaking any "any action redirects to /auth/signin on 401" success criterion.
 - **Rule**: For every mutating action handler in a feature, check `res.status === 401` first and respond with `window.location.href = "/auth/signin"` — before any toast-based 400/409/500 handling. Apply this uniformly to _all_ action handlers (including destructive/confirmation-dialog actions and bulk/reorder actions), not just the first one written. When reviewing a plan, grep every fetch-based handler's contract for a `401 →` bullet and flag any that are missing one.
+- **Exception**: A modal dialog that is only reachable from within an already-loaded, already-protected page — not a standalone route, not deep-linkable (e.g. an "Add X" dialog opened by a button click) — may fall through to its generic toast-based error handling on 401 instead of redirecting. The user is already on a protected page; the modal's own failure doesn't need to interrupt them with a navigation. This exception does **not** extend to inline handlers that are the primary way a user interacts with page content (e.g. a grid cell's per-cell edit or toggle) — those still redirect. (User-confirmed on `competition-results-core` plan review, finding F1 — `AddCompetitionDialog.tsx`.)
 - **Applies to**: plan, implement, impl-review
 
 ## Explicitly revoke EXECUTE from `anon` on RPC functions meant for `authenticated` only
@@ -51,3 +52,10 @@
 - **Problem**: Without a central list, each new page has to self-guard instead of relying on the middleware's common redirect — easy to forget, and the omission is silent (the route just becomes publicly accessible).
 - **Rule**: Always add new Astro page routes that require a logged-in user to `PROTECTED_ROUTES` in `src/middleware.ts`. The middleware's centralized redirect to `/auth/signin` only fires for paths explicitly listed there.
 - **Applies to**: plan, implement, impl-review
+
+## Ask before triaging — never self-classify a finding as "obvious" and decide alone
+
+- **Context**: Triage of any findings list — any planning or review skill triaging multiple findings/decisions from a structured review (e.g. /10x-plan-review, /10x-impl-review) or any task with several open items to resolve.
+- **Problem**: The assistant labeled some findings "low-impact/obvious" using the review's own severity tags and silently applied its own fix without asking — but the user disagreed with one of those classifications and had to stop and correct it after the fact, after downstream files were already touched.
+- **Rule**: If there are any pending questions, unresolved issues, or gaps, or missing information / decisions — ask, and do not make your own decisions.
+- **Applies to**: all
