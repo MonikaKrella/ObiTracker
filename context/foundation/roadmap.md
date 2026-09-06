@@ -3,7 +3,7 @@ project: ObiTracker
 version: 1
 status: draft
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-06
 prd_version: 2
 main_goal: quality
 top_blocker: capacity
@@ -29,8 +29,8 @@ The MVP proved the core training-grid loop; V2 closes five gaps surfaced by real
 
 | ID   | Change ID                  | Outcome (user can …)                                                                                                                | Prerequisites | PRD refs                                              | Status   |
 | ---- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------- | ----------------------------------------------------- | -------- |
-| F-01 | competition-reference-data | (foundation) three competition classes and their exercises/multipliers/shortcut names are seeded as fixed, queryable reference data | —             | FR-005, FR-006                                        | ready    |
-| F-02 | training-board-refactor    | (foundation) highlight classification is computed by a dedicated, fail-fast domain service, byte-identical to today's output        | —             | FR-017, FR-018, FR-019                                | ready    |
+| F-01 | competition-reference-data | (foundation) three competition classes and their exercises/multipliers/shortcut names are seeded as fixed, queryable reference data | —             | FR-005, FR-006                                        | done     |
+| F-02 | training-board-refactor    | (foundation) highlight classification is computed by a dedicated, fail-fast domain service, byte-identical to today's output        | —             | FR-017, FR-018, FR-019                                | done     |
 | S-01 | competition-results-core   | select a class, enter raw per-exercise scores, see live averages and top-2/bottom-2 highlighting, filtered by time window           | F-01          | FR-007, FR-009, FR-010, FR-012, FR-013, FR-014, US-01 | proposed |
 | S-02 | element-exercise-linking   | link a training element to one competition exercise and see a color-coded indicator column on the training grid                     | F-01          | FR-015, FR-016                                        | proposed |
 | S-03 | default-competition-class  | mark one class as their default per dog, so it displays automatically on page load                                                  | S-01          | FR-008                                                | proposed |
@@ -56,11 +56,11 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 - **Frontend:** present — Astro 6 SSR + React 19 islands, Tailwind 4, shadcn/ui; training grid at `src/pages/dogs/[id]/grid.astro`, dashboard at `src/pages/dashboard.astro`.
 - **Backend / API:** present — Astro SSR API routes at `src/pages/api/dog/**` and `src/pages/api/auth/**`; middleware at `src/middleware.ts`.
-- **Data:** present for MVP entities — `dogs`, `training_elements`, `training_logs` live in Supabase with RLS (`supabase/migrations/20260530*`–`20260719*`); **absent** for V2 — no competition, exercise, class, or element-exercise-link tables exist anywhere in `supabase/migrations/`.
-- **Auth:** present for signup/signin/signout (`src/pages/auth/`, `src/pages/api/auth/{signin,signup,signout}.ts`, cookie-based sessions via `src/lib/supabase.ts`); **absent** — no password-reset request or confirm flow exists (`grep` for reset-related routes returns nothing).
+- **Data:** present for MVP entities — `dogs`, `training_elements`, `training_logs` live in Supabase with RLS (`supabase/migrations/20260530*`–`20260719*`); present for F-01's competition classes/exercises/multipliers (`competition-reference-data`, archived); **absent** for the rest of V2 — no element-exercise-link table exists yet (needs S-02).
+- **Auth:** present for signup/signin/signout/password-reset (`src/pages/auth/`, `src/pages/api/auth/{signin,signup,signout,forgot-password,reset-password,confirm}.ts`, cookie-based sessions via `src/lib/supabase.ts`) — password-reset (S-05, `password-reset` change) shipped 2026-09-06; two production Supabase dashboard steps (reset-link expiry window, custom SMTP) are still tracked as open in that change's notes before it's archived.
 - **Deploy / infra:** present — `wrangler.jsonc` (Cloudflare Workers), GitHub Actions CI (`.github/workflows/ci.yml`).
 - **Observability:** absent — unchanged from V1; no V2 NFR requires it either.
-- **Domain layer (highlight classification):** absent — `computeHighlights()` lives only in `TrainingGrid.tsx`'s `useMemo` (`src/lib/highlight.ts`); no `src/lib/domain/` directory exists; no service, repository, or API route returns a highlight classification independently, confirmed by `context/domain/02-invariant-aggregate-refactor.md`.
+- **Domain layer (highlight classification):** present — `TrainingBoard` aggregate (`src/lib/domain/training-board.ts`) with a fail-fast `create()` factory, a `loadTrainingBoard()` repository, and `GET /api/dog/[id]/grid` now own highlight classification independently of `TrainingGrid.tsx` (F-02, `training-board-refactor`, archived); byte-identical output to the prior `useMemo`-only implementation.
 
 ## Foundations
 
@@ -75,7 +75,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** — (the exact exercise/multiplier tables for all three classes are already specified in `context/foundation/post-mvp-notes.md`, sourced from the rulebook)
 - **Risk:** this data is not user-editable for this change (FR-005's Socrates round explicitly rejected in-app admin editing) — a seeding error in a multiplier or exercise name is not self-correcting through the UI and would silently skew every downstream average; get it right once at migration time.
-- **Status:** ready
+- **Status:** done
 
 ### F-02: TrainingBoard domain refactor
 
@@ -88,7 +88,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** — (a full phased design already exists in `context/domain/02-invariant-aggregate-refactor.md`, including the exact test-first port of all 9 existing trace-table cases)
 - **Risk:** the guardrail demands byte-identical output before and after — the risk isn't building the service, it's silent behavioral drift during the move; the existing phased plan's test-first port is the mitigation, and Phase 5 of that plan explicitly calls out the one existing test whose meaning must flip (from "asserts a swallow" to "asserts a throw").
-- **Status:** ready
+- **Status:** done
 
 ## Slices
 
@@ -194,4 +194,5 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Done
 
-(Empty on first generation of the V2 roadmap. `/10x-archive` appends an entry here — and flips that item's `Status` to `done` — when a change whose `Change ID` matches a roadmap item is archived.)
+- **F-01: (foundation) three competition classes and their exercises/multipliers/shortcut names are seeded as fixed, queryable reference data** — Archived 2026-09-06 → `context/archive/2026-09-03-competition-reference-data/`. Lesson: —.
+- **F-02: (foundation) highlight classification is computed by a dedicated, fail-fast domain service, byte-identical to today's output** — Archived 2026-09-06 → `context/archive/2026-09-04-training-board-refactor/`. Lesson: —.
