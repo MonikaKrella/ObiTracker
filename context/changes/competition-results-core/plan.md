@@ -476,17 +476,17 @@ Both new tables are additive — no existing data is touched or migrated. No bac
 
 #### Automated
 
-- [x] 3.1 Unit tests pass (empty/single/multiple scores, unknown-exercise error)
-- [x] 3.2 Type checking passes
-- [x] 3.3 Linting passes
+- [x] 3.1 Unit tests pass (empty/single/multiple scores, unknown-exercise error) — 52afaad
+- [x] 3.2 Type checking passes — 52afaad
+- [x] 3.3 Linting passes — 52afaad
 
 ### Phase 4: CompetitionBoard Aggregate — Highlighting Algorithm
 
 #### Automated
 
-- [ ] 4.1 Unit tests pass (oracle-discipline trace table)
-- [ ] 4.2 Type checking passes
-- [ ] 4.3 Linting passes
+- [x] 4.1 Unit tests pass (oracle-discipline trace table)
+- [x] 4.2 Type checking passes
+- [x] 4.3 Linting passes
 
 ### Phase 5: Service Layer, Repository & Integration Tests
 

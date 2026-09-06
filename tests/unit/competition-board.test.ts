@@ -81,3 +81,126 @@ describe("CompetitionBoard.averages", () => {
     expect(() => CompetitionBoard.create(exercises, scoresFrom([["unknown", 5]]))).toThrow(UnknownExerciseScoreError);
   });
 });
+
+describe("CompetitionBoard.highlights", () => {
+  it("no ranked exercises (all unscored) → all null", () => {
+    const exercises = makeExercises(["A", "B", "C"]);
+    const board = CompetitionBoard.create(exercises, []);
+    expect(Object.fromEntries(board.highlights())).toEqual({ A: null, B: null, C: null });
+  });
+
+  it("single ranked exercise → degenerate all-equal case, no highlight", () => {
+    const exercises = makeExercises(["A"]);
+    const board = CompetitionBoard.create(exercises, scoresFrom([["A", 8]]));
+    expect(Object.fromEntries(board.highlights())).toEqual({ A: null });
+  });
+
+  it("all defined averages equal → ranking skipped entirely, no highlight", () => {
+    const exercises = makeExercises(["A", "B", "C"]);
+    const board = CompetitionBoard.create(
+      exercises,
+      scoresFrom([
+        ["A", 8],
+        ["B", 8],
+        ["C", 8],
+      ]),
+    );
+    expect(Object.fromEntries(board.highlights())).toEqual({ A: null, B: null, C: null });
+  });
+
+  it("4 exercises, all-unique averages 10,8,6,4 → clean top-2/bottom-2, no ties", () => {
+    const exercises = makeExercises(["A", "B", "C", "D"]);
+    const board = CompetitionBoard.create(
+      exercises,
+      scoresFrom([
+        ["A", 10],
+        ["B", 8],
+        ["C", 6],
+        ["D", 4],
+      ]),
+    );
+    expect(Object.fromEntries(board.highlights())).toEqual({
+      A: "green",
+      B: "green",
+      C: "red",
+      D: "red",
+    });
+  });
+
+  it("rank-1 3-way tie (A=B=C=10), D=4 → the whole tied top group is included even though it exceeds 2", () => {
+    const exercises = makeExercises(["A", "B", "C", "D"]);
+    const board = CompetitionBoard.create(
+      exercises,
+      scoresFrom([
+        ["A", 10],
+        ["B", 10],
+        ["C", 10],
+        ["D", 4],
+      ]),
+    );
+    expect(Object.fromEntries(board.highlights())).toEqual({
+      A: "green",
+      B: "green",
+      C: "green",
+      D: "red",
+    });
+  });
+
+  it("rank-2-boundary tie: A=10, B=C=D=8, E=2 → the tied group crossing the threshold is included in full", () => {
+    const exercises = makeExercises(["A", "B", "C", "D", "E"]);
+    const board = CompetitionBoard.create(
+      exercises,
+      scoresFrom([
+        ["A", 10],
+        ["B", 8],
+        ["C", 8],
+        ["D", 8],
+        ["E", 2],
+      ]),
+    );
+    expect(Object.fromEntries(board.highlights())).toEqual({
+      A: "green",
+      B: "green",
+      C: "green",
+      D: "green",
+      E: "red",
+    });
+  });
+
+  it("green/red overlap (only 3 exercises scored, B=C tied at the bottom of the top-2 walk and the top of the bottom-2 walk) → resolved to green", () => {
+    const exercises = makeExercises(["A", "B", "C"]);
+    const board = CompetitionBoard.create(
+      exercises,
+      scoresFrom([
+        ["A", 10],
+        ["B", 8],
+        ["C", 8],
+      ]),
+    );
+    expect(Object.fromEntries(board.highlights())).toEqual({
+      A: "green",
+      B: "green",
+      C: "green",
+    });
+  });
+
+  it("mix of ranked + unranked exercises: A=10,B=8,C=4,D=2 ranked, E unscored → E stays null and is excluded from ranking", () => {
+    const exercises = makeExercises(["A", "B", "C", "D", "E"]);
+    const board = CompetitionBoard.create(
+      exercises,
+      scoresFrom([
+        ["A", 10],
+        ["B", 8],
+        ["C", 4],
+        ["D", 2],
+      ]),
+    );
+    expect(Object.fromEntries(board.highlights())).toEqual({
+      A: "green",
+      B: "green",
+      C: "red",
+      D: "red",
+      E: null,
+    });
+  });
+});
