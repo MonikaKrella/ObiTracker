@@ -454,23 +454,23 @@ Both new tables are additive — no existing data is touched or migrated. No bac
 
 #### Automated
 
-- [x] 1.1 Migrations apply cleanly
-- [x] 1.2 Type checking passes
-- [x] 1.3 Linting passes
-- [x] 1.4 service_role grant verification query confirms access
+- [x] 1.1 Migrations apply cleanly — f3b13c6
+- [x] 1.2 Type checking passes — f3b13c6
+- [x] 1.3 Linting passes — f3b13c6
+- [x] 1.4 service_role grant verification query confirms access — f3b13c6
 
 #### Manual
 
-- [x] 1.5 Supabase Studio shows both tables with RLS + expected policies
-- [x] 1.6 Out-of-range/non-quarter-point score insert fails in SQL editor
+- [x] 1.5 Supabase Studio shows both tables with RLS + expected policies — f3b13c6
+- [x] 1.6 Out-of-range/non-quarter-point score insert fails in SQL editor — f3b13c6
 
 ### Phase 2: Calendar-Period Time-Window Helper
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass (all-time/last-year/last-6-months + leap-year case)
-- [ ] 2.2 Type checking passes
-- [ ] 2.3 Linting passes
+- [x] 2.1 Unit tests pass (all-time/last-year/last-6-months + leap-year case)
+- [x] 2.2 Type checking passes
+- [x] 2.3 Linting passes
 
 ### Phase 3: CompetitionBoard Aggregate — Averages
 
