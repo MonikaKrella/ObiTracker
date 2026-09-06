@@ -268,16 +268,16 @@ No data migration. No new Supabase migration file — this change is entirely ap
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm run test`
-- [x] 2.2 Type checking passes: `npm run build`
-- [x] 2.3 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests pass: `npm run test` — f7ebb07
+- [x] 2.2 Type checking passes: `npm run build` — f7ebb07
+- [x] 2.3 Linting passes: `npm run lint` — f7ebb07
 
 #### Manual
 
-- [x] 2.4 Fresh reset link lands on /auth/reset-password with a recovery session
-- [x] 2.5 Setting new password redirects to /dashboard, signed in
-- [x] 2.6 Sign out + sign back in with new password succeeds
-- [x] 2.7 Reused/expired link redirects to /auth/signin with specific message
-- [x] 2.8 Direct visit to /auth/reset-password while signed out redirects to /auth/signin
-- [x] 2.9 Mismatched/too-short password shows validation error
-- [x] 2.10 Existing signup → confirm-email → dashboard flow unregressed
+- [x] 2.4 Fresh reset link lands on /auth/reset-password with a recovery session — f7ebb07
+- [x] 2.5 Setting new password redirects to /dashboard, signed in — f7ebb07
+- [x] 2.6 Sign out + sign back in with new password succeeds — f7ebb07
+- [x] 2.7 Reused/expired link redirects to /auth/signin with specific message — f7ebb07
+- [x] 2.8 Direct visit to /auth/reset-password while signed out redirects to /auth/signin — f7ebb07
+- [x] 2.9 Mismatched/too-short password shows validation error — f7ebb07
+- [x] 2.10 Existing signup → confirm-email → dashboard flow unregressed — f7ebb07
