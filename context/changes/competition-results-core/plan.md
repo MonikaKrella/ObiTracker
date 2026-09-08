@@ -484,17 +484,17 @@ Both new tables are additive — no existing data is touched or migrated. No bac
 
 #### Automated
 
-- [x] 4.1 Unit tests pass (oracle-discipline trace table)
-- [x] 4.2 Type checking passes
-- [x] 4.3 Linting passes
+- [x] 4.1 Unit tests pass (oracle-discipline trace table) — 9a629fe
+- [x] 4.2 Type checking passes — 9a629fe
+- [x] 4.3 Linting passes — 9a629fe
 
 ### Phase 5: Service Layer, Repository & Integration Tests
 
 #### Automated
 
-- [ ] 5.1 Unit/integration tests pass
-- [ ] 5.2 Type checking passes
-- [ ] 5.3 Linting passes
+- [x] 5.1 Unit/integration tests pass
+- [x] 5.2 Type checking passes
+- [x] 5.3 Linting passes
 
 ### Phase 6: API Routes
 
