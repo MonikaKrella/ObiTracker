@@ -1,0 +1,109 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { createClient } from "@/lib/supabase";
+import { getDogsList } from "@/lib/services/dogs";
+import { getCompetitionClasses, getExercisesForClass } from "@/lib/services/competition";
+import { getCompetitionsForDogClass, getCompetitionScores } from "@/lib/services/competitions";
+import { getCompetitionWindow, type CompetitionTimeWindow } from "@/lib/dates";
+import { CompetitionBoard } from "@/lib/domain/competition-board";
+import { CompetitionResultsGrid } from "@/components/competition-results/CompetitionResultsGrid";
+import {
+  COMPETITION_WINDOW_COOKIE_NAME,
+  isCompetitionTimeWindow,
+} from "@/components/competition-results/window-options";
+import type { CompetitionClass, Competition, CompetitionScore, Exercise } from "@/types";
+
+// selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
+// if the dog is not found, soft-deleted, or owned by another user.
+// The null guard below is a defensive fallback for TypeScript's benefit.
+const { selectedDog } = Astro.locals;
+if (!selectedDog) {
+  return Astro.redirect("/dashboard");
+}
+
+// The display selector is persisted as a cookie (not localStorage) specifically
+// so it can be resolved here, server-side, and rendered correctly on the very
+// first paint — mirrors grid.astro's 7/14/30 window cookie.
+const rawWindow = Astro.cookies.get(COMPETITION_WINDOW_COOKIE_NAME)?.value ?? "";
+const initialWindow: CompetitionTimeWindow = isCompetitionTimeWindow(rawWindow) ? rawWindow : "all-time";
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+let serviceUnavailable = !supabase;
+const dogs = supabase ? await getDogsList(supabase) : [];
+
+let classes: CompetitionClass[] = [];
+let exercises: Exercise[] = [];
+let competitions: Competition[] = [];
+let scores: Pick<CompetitionScore, "competition_id" | "exercise_id" | "score">[] = [];
+let selectedClassId = "";
+
+if (supabase) {
+  try {
+    classes = await getCompetitionClasses(supabase);
+
+    const requestedClassId = Astro.url.searchParams.get("classId");
+    const requestedClass = requestedClassId ? classes.find((c) => c.id === requestedClassId) : undefined;
+    const defaultClass = classes.find((c) => c.class_number === 1);
+    selectedClassId = (requestedClass ?? defaultClass)?.id ?? "";
+
+    if (selectedClassId) {
+      // Always fetch the "all-time" superset here — independent of the
+      // cookie-persisted display window — so the client-side window selector
+      // (CompetitionResultsGrid.tsx) can filter columns/averages/highlights
+      // without an extra round trip, mirroring how grid.astro always fetches
+      // its fixed 30-day window regardless of the 7/14/30 display selector.
+      const { startDate, endDate } = getCompetitionWindow("all-time");
+      [exercises, competitions] = await Promise.all([
+        getExercisesForClass(supabase, selectedClassId),
+        getCompetitionsForDogClass(supabase, selectedDog.id, selectedClassId, startDate, endDate),
+      ]);
+      scores = await getCompetitionScores(
+        supabase,
+        competitions.map((competition) => competition.id),
+      );
+
+      // Constructed purely to validate the fetched data before rendering — its
+      // averages()/highlights() results are not passed as props;
+      // CompetitionResultsGrid.tsx recomputes its own copy client-side (see
+      // plan.md "What We're NOT Doing").
+      CompetitionBoard.create(
+        exercises,
+        scores.map((score) => ({ exerciseId: score.exercise_id, score: score.score })),
+      );
+    }
+  } catch {
+    serviceUnavailable = true;
+  }
+}
+---
+
+<AuthLayout title={`${selectedDog.name} – Competition results`} dogs={dogs}>
+  <div class="space-y-6">
+    <a
+      href={`/dogs/${selectedDog.id}/dashboard`}
+      class="text-sm text-purple-300 transition-colors hover:text-purple-100 hover:underline"
+    >
+      ← Back to {selectedDog.name}'s dashboard
+    </a>
+
+    <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+      Competition results
+    </h1>
+
+    <!-- Full-bleed break-out — see grid.astro for the identical rationale. -->
+    <div class="mx-[calc(50%-50vw)] px-4 lg:px-8">
+      <CompetitionResultsGrid
+        client:load
+        dogId={selectedDog.id}
+        dogName={selectedDog.name}
+        exercises={exercises}
+        competitions={competitions}
+        scores={scores}
+        classes={classes}
+        selectedClassId={selectedClassId}
+        initialWindow={initialWindow}
+        serviceUnavailable={serviceUnavailable}
+      />
+    </div>
+  </div>
+</AuthLayout>

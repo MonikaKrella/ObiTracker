@@ -500,28 +500,28 @@ Both new tables are additive — no existing data is touched or migrated. No bac
 
 #### Automated
 
-- [x] 6.1 Unit/integration tests pass
-- [x] 6.2 Type checking passes
-- [x] 6.3 Linting passes
+- [x] 6.1 Unit/integration tests pass — 3f3f0b0
+- [x] 6.2 Type checking passes — 3f3f0b0
+- [x] 6.3 Linting passes — 3f3f0b0
 
 #### Manual
 
-- [x] 6.4 POST/409/PUT/400/DELETE/401/cross-account-404 all verified manually
+- [x] 6.4 POST/409/PUT/400/DELETE/401/cross-account-404 all verified manually — 3f3f0b0
 
 ### Phase 7: UI — Competition Results Page
 
 #### Automated
 
-- [ ] 7.1 Type checking passes
-- [ ] 7.2 Linting passes
-- [ ] 7.3 Unit tests pass
+- [x] 7.1 Type checking passes
+- [x] 7.2 Linting passes
+- [x] 7.3 Unit tests pass
 
 #### Manual
 
-- [ ] 7.4 Desktop walkthrough (class select, add competition, scores, averages, highlights, window switch)
-- [ ] 7.5 Mobile viewport walkthrough (zoom-on-focus, sticky-right scroll, sticky corner rendering)
-- [ ] 7.6 Invalid score rejected client- and server-side
-- [ ] 7.7 401 redirect on sign-out mid-edit
+- [x] 7.4 Desktop walkthrough (class select, add competition, scores, averages, highlights, window switch)
+- [x] 7.5 Mobile viewport walkthrough (zoom-on-focus, sticky-right scroll, sticky corner rendering)
+- [x] 7.6 Invalid score rejected client- and server-side
+- [x] 7.7 401 redirect on sign-out mid-edit
 
 ### Phase 8: Mobile E2E
 
