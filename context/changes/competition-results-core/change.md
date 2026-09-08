@@ -3,7 +3,7 @@ change_id: competition-results-core
 title: Competition results core
 status: implementing
 created: 2026-09-06
-updated: 2026-09-06
+updated: 2026-09-08
 archived_at: null
 ---
 

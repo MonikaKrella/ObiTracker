@@ -492,21 +492,21 @@ Both new tables are additive — no existing data is touched or migrated. No bac
 
 #### Automated
 
-- [x] 5.1 Unit/integration tests pass
-- [x] 5.2 Type checking passes
-- [x] 5.3 Linting passes
+- [x] 5.1 Unit/integration tests pass — 3742a04
+- [x] 5.2 Type checking passes — 3742a04
+- [x] 5.3 Linting passes — 3742a04
 
 ### Phase 6: API Routes
 
 #### Automated
 
-- [ ] 6.1 Unit/integration tests pass
-- [ ] 6.2 Type checking passes
-- [ ] 6.3 Linting passes
+- [x] 6.1 Unit/integration tests pass
+- [x] 6.2 Type checking passes
+- [x] 6.3 Linting passes
 
 #### Manual
 
-- [ ] 6.4 POST/409/PUT/400/DELETE/401/cross-account-404 all verified manually
+- [x] 6.4 POST/409/PUT/400/DELETE/401/cross-account-404 all verified manually
 
 ### Phase 7: UI — Competition Results Page
 
