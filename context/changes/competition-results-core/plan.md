@@ -527,9 +527,9 @@ Both new tables are additive — no existing data is touched or migrated. No bac
 
 #### Automated
 
-- [x] 8.1 E2E tests pass
-- [x] 8.2 Linting passes
+- [x] 8.1 E2E tests pass — abc6121
+- [x] 8.2 Linting passes — abc6121
 
 #### Manual
 
-- [x] 8.3 Visual smoke-check on device/emulation matches automated assertions
+- [x] 8.3 Visual smoke-check on device/emulation matches automated assertions — abc6121
