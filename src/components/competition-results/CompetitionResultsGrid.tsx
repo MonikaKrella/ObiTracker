@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Loader2Icon } from "lucide-react";
 import { useMounted } from "@/components/hooks/useMounted";
 import { CompetitionBoard, type ScoreRecord } from "@/lib/domain/competition-board";
 import { getCompetitionWindow, formatHeaderDate, type CompetitionTimeWindow } from "@/lib/dates";
@@ -88,6 +89,15 @@ export function CompetitionResultsGrid({
   const [competitions, setCompetitions] = useState(initialCompetitions);
   const [scoresByCompetition, setScoresByCompetition] = useState(() => buildScoresByCompetition(initialScores));
   const [selectedWindow, setSelectedWindow] = useState<CompetitionTimeWindow>(initialWindow);
+  // Not reset back to false anywhere — set right before the full-page
+  // navigation below, so it just stays true until the browser unloads this
+  // page (mirrors the "stay loading — navigating away" convention used by
+  // AddElementDialog.tsx et al.). Combined with `!mounted` below, this covers
+  // both moments a handler observed looking like a broken page rather than a
+  // loading one: the SSR→hydrate gap on first paint, and the blank/frozen
+  // browser tab during a class switch's full navigation round trip.
+  const [isNavigating, setIsNavigating] = useState(false);
+  const isLoading = !mounted || isNavigating;
 
   function handleWindowChange(next: CompetitionTimeWindow) {
     setSelectedWindow(next);
@@ -95,6 +105,7 @@ export function CompetitionResultsGrid({
   }
 
   function handleClassChange(classId: string) {
+    setIsNavigating(true);
     window.location.href = `/dogs/${dogId}/competition-results?classId=${classId}`;
   }
 
@@ -147,7 +158,17 @@ export function CompetitionResultsGrid({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="relative space-y-3">
+      {isLoading && (
+        <div
+          role="status"
+          className="absolute inset-0 z-50 flex items-center justify-center gap-2 rounded-2xl bg-black/40 text-sm text-white/80"
+        >
+          <Loader2Icon className="size-4 animate-spin" aria-hidden="true" />
+          Loading…
+        </div>
+      )}
+
       {/* Row 1: class select + add-competition — the pair that needs to stay
           together, wrapping onto its own second line as a unit if the
           viewport is too narrow for both, rather than the time-window row
@@ -190,7 +211,10 @@ export function CompetitionResultsGrid({
       {visibleCompetitions.length === 0 ? (
         <EmptyCompetitionsGrid exercises={exercises} />
       ) : (
-        <div className="w-full overflow-x-auto [overflow-y:clip] rounded-2xl border border-white/10 bg-white/5">
+        <div
+          data-testid="competition-results-scroll"
+          className="w-full overflow-x-auto [overflow-y:clip] rounded-2xl border border-white/10 bg-white/5"
+        >
           <table
             role="grid"
             aria-label={`Competition results for ${dogName}`}

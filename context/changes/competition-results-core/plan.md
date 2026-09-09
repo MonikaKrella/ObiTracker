@@ -512,24 +512,24 @@ Both new tables are additive — no existing data is touched or migrated. No bac
 
 #### Automated
 
-- [x] 7.1 Type checking passes
-- [x] 7.2 Linting passes
-- [x] 7.3 Unit tests pass
+- [x] 7.1 Type checking passes — fac7e75
+- [x] 7.2 Linting passes — fac7e75
+- [x] 7.3 Unit tests pass — fac7e75
 
 #### Manual
 
-- [x] 7.4 Desktop walkthrough (class select, add competition, scores, averages, highlights, window switch)
-- [x] 7.5 Mobile viewport walkthrough (zoom-on-focus, sticky-right scroll, sticky corner rendering)
-- [x] 7.6 Invalid score rejected client- and server-side
-- [x] 7.7 401 redirect on sign-out mid-edit
+- [x] 7.4 Desktop walkthrough (class select, add competition, scores, averages, highlights, window switch) — fac7e75
+- [x] 7.5 Mobile viewport walkthrough (zoom-on-focus, sticky-right scroll, sticky corner rendering) — fac7e75
+- [x] 7.6 Invalid score rejected client- and server-side — fac7e75
+- [x] 7.7 401 redirect on sign-out mid-edit — fac7e75
 
 ### Phase 8: Mobile E2E
 
 #### Automated
 
-- [ ] 8.1 E2E tests pass
-- [ ] 8.2 Linting passes
+- [x] 8.1 E2E tests pass
+- [x] 8.2 Linting passes
 
 #### Manual
 
-- [ ] 8.3 Visual smoke-check on device/emulation matches automated assertions
+- [x] 8.3 Visual smoke-check on device/emulation matches automated assertions
