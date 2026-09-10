@@ -2,7 +2,12 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase";
 import { getDogById } from "@/lib/services/dogs";
-import { competitionBelongsToDog, upsertCompetitionScore, deleteCompetitionScore } from "@/lib/services/competitions";
+import {
+  competitionBelongsToDog,
+  exerciseBelongsToClass,
+  upsertCompetitionScore,
+  deleteCompetitionScore,
+} from "@/lib/services/competitions";
 
 export const prerender = false;
 
@@ -70,6 +75,11 @@ export const PUT: APIRoute = async (context) => {
       return Response.json({ error: "Not found" }, { status: 404 });
     }
 
+    const belongsToClass = await exerciseBelongsToClass(supabase, competitionId, exerciseId);
+    if (!belongsToClass) {
+      return Response.json({ error: "Not found" }, { status: 404 });
+    }
+
     await upsertCompetitionScore(supabase, competitionId, exerciseId, context.locals.user.id, score);
     return Response.json({ success: true });
   } catch (err) {
@@ -101,6 +111,11 @@ export const DELETE: APIRoute = async (context) => {
 
     const belongsToDog = await competitionBelongsToDog(supabase, dogId, competitionId);
     if (!belongsToDog) {
+      return Response.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const belongsToClass = await exerciseBelongsToClass(supabase, competitionId, exerciseId);
+    if (!belongsToClass) {
       return Response.json({ error: "Not found" }, { status: 404 });
     }
 

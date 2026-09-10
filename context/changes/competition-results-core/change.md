@@ -1,13 +1,15 @@
 ---
 change_id: competition-results-core
 title: Competition results core
-status: implemented
+status: impl_reviewed
 created: 2026-09-06
-updated: 2026-09-09
+updated: 2026-09-10
 archived_at: null
 ---
 
 ## Notes
+
+- 2026-09-10: Ran `/10x-impl-review` (full plan, all 8 phases). 4 findings (0 critical, 3 warnings, 1 observation), all triaged and fixed same session: `loadCompetitionBoard` (Phase 5) was built to contract but never called — extended its return type to include `exercises`/`scores` and wired `competition-results.astro` to call it, removing the duplicated inline fetch logic; removed an unused `cn` npm package (accidental `shadcn@latest add select` side-effect); reformatted 6 brace-style violations in `competitions.ts` per the lessons.md rule; added an `exerciseBelongsToClass()` app-level guard to the score PUT/DELETE routes so a cross-class `exerciseId` 404s cleanly instead of surfacing as a raw RLS-violation 500. All verified green (`astro check`, `lint`, `test` — 102/102). See `reviews/impl-review.md` for full detail.
 
 <!-- Free-form notes for this change: links, ad-hoc context, decisions that don't belong in research/frame/plan. -->
 

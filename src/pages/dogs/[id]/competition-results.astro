@@ -2,10 +2,9 @@
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import { createClient } from "@/lib/supabase";
 import { getDogsList } from "@/lib/services/dogs";
-import { getCompetitionClasses, getExercisesForClass } from "@/lib/services/competition";
-import { getCompetitionsForDogClass, getCompetitionScores } from "@/lib/services/competitions";
-import { getCompetitionWindow, type CompetitionTimeWindow } from "@/lib/dates";
-import { CompetitionBoard } from "@/lib/domain/competition-board";
+import { getCompetitionClasses } from "@/lib/services/competition";
+import { loadCompetitionBoard } from "@/lib/services/competition-board";
+import type { CompetitionTimeWindow } from "@/lib/dates";
 import { CompetitionResultsGrid } from "@/components/competition-results/CompetitionResultsGrid";
 import {
   COMPETITION_WINDOW_COOKIE_NAME,
@@ -52,24 +51,17 @@ if (supabase) {
       // (CompetitionResultsGrid.tsx) can filter columns/averages/highlights
       // without an extra round trip, mirroring how grid.astro always fetches
       // its fixed 30-day window regardless of the 7/14/30 display selector.
-      const { startDate, endDate } = getCompetitionWindow("all-time");
-      [exercises, competitions] = await Promise.all([
-        getExercisesForClass(supabase, selectedClassId),
-        getCompetitionsForDogClass(supabase, selectedDog.id, selectedClassId, startDate, endDate),
-      ]);
-      scores = await getCompetitionScores(
+      // The returned `board` is discarded — its averages()/highlights() are
+      // not passed as props; CompetitionResultsGrid.tsx recomputes its own
+      // copy client-side (see plan.md "What We're NOT Doing"). Calling
+      // loadCompetitionBoard still gets us its fail-fast validation of the
+      // fetched rows before rendering.
+      ({ exercises, competitions, scores } = await loadCompetitionBoard(
         supabase,
-        competitions.map((competition) => competition.id),
-      );
-
-      // Constructed purely to validate the fetched data before rendering — its
-      // averages()/highlights() results are not passed as props;
-      // CompetitionResultsGrid.tsx recomputes its own copy client-side (see
-      // plan.md "What We're NOT Doing").
-      CompetitionBoard.create(
-        exercises,
-        scores.map((score) => ({ exerciseId: score.exercise_id, score: score.score })),
-      );
+        selectedDog.id,
+        selectedClassId,
+        "all-time",
+      ));
     }
   } catch {
     serviceUnavailable = true;

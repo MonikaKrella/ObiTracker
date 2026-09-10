@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { CompetitionBoard, type ScoreRecord } from "@/lib/domain/competition-board";
-import type { Competition } from "@/types";
+import type { Competition, CompetitionScore, Exercise } from "@/types";
 import { getCompetitionWindow, type CompetitionTimeWindow } from "@/lib/dates";
 import { getExercisesForClass } from "@/lib/services/competition";
 import { getCompetitionsForDogClass, getCompetitionScores } from "@/lib/services/competitions";
@@ -8,15 +8,21 @@ import { getCompetitionsForDogClass, getCompetitionScores } from "@/lib/services
 /**
  * Assembles a validated `CompetitionBoard` for a dog+class+window, mirroring
  * `loadTrainingBoard`'s `Promise.all` + fail-fast-construct pattern. Returns
- * `competitions` alongside the board since the UI needs the raw list (dates,
- * ids) independent of the aggregate.
+ * `exercises`/`competitions`/`scores` alongside the board since a page shell
+ * needs the raw rows to pass as props to a client island — a `CompetitionBoard`
+ * instance itself can't cross the server->island prop boundary.
  */
 export async function loadCompetitionBoard(
   supabase: SupabaseClient,
   dogId: string,
   classId: string,
   window: CompetitionTimeWindow,
-): Promise<{ board: CompetitionBoard; competitions: Competition[] }> {
+): Promise<{
+  board: CompetitionBoard;
+  exercises: Exercise[];
+  competitions: Competition[];
+  scores: Pick<CompetitionScore, "competition_id" | "exercise_id" | "score">[];
+}> {
   const { startDate, endDate } = getCompetitionWindow(window);
 
   const [exercises, competitions] = await Promise.all([
@@ -34,5 +40,5 @@ export async function loadCompetitionBoard(
   }));
 
   const board = CompetitionBoard.create(exercises, scoreRecords);
-  return { board, competitions };
+  return { board, exercises, competitions, scores };
 }

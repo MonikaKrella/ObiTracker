@@ -28,7 +28,9 @@ export async function getCompetitionsForDogClass(
 
   const result = await query.order("competed_on", { ascending: true });
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
   return (result.data as Competition[] | null) ?? [];
 }
 
@@ -51,7 +53,9 @@ export async function createCompetition(
     .select()
     .single();
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
   return result.data as Competition;
 }
 
@@ -73,7 +77,9 @@ export async function getCompetitionScores(
     .select("competition_id, exercise_id, score")
     .in("competition_id", competitionIds);
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
   return result.data;
 }
 
@@ -99,7 +105,9 @@ export async function upsertCompetitionScore(
       { onConflict: "competition_id,exercise_id" },
     );
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
 }
 
 /**
@@ -117,7 +125,9 @@ export async function deleteCompetitionScore(
     .eq("competition_id", competitionId)
     .eq("exercise_id", exerciseId);
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
 }
 
 /**
@@ -138,6 +148,46 @@ export async function competitionBelongsToDog(
     .eq("dog_id", dogId)
     .maybeSingle();
 
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
   return result.data !== null;
+}
+
+/**
+ * Checks whether an exercise belongs to the same class as the given
+ * competition. Used as an app-level guard before writing a dependent
+ * `competition_scores` row — defense in depth alongside the RLS `WITH CHECK`
+ * clause's identical cross-FK check — so a mismatch 404s cleanly instead of
+ * surfacing as a raw RLS-violation 500.
+ */
+export async function exerciseBelongsToClass(
+  supabase: SupabaseClient,
+  competitionId: string,
+  exerciseId: string,
+): Promise<boolean> {
+  const competitionResult = await supabase
+    .from("competitions")
+    .select("class_id")
+    .eq("id", competitionId)
+    .maybeSingle();
+
+  if (competitionResult.error) {
+    throw competitionResult.error;
+  }
+  if (competitionResult.data === null) {
+    return false;
+  }
+
+  const exerciseResult = await supabase
+    .from("exercises")
+    .select("id")
+    .eq("id", exerciseId)
+    .eq("class_id", competitionResult.data.class_id)
+    .maybeSingle();
+
+  if (exerciseResult.error) {
+    throw exerciseResult.error;
+  }
+  return exerciseResult.data !== null;
 }
