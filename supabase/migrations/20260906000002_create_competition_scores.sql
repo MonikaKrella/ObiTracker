@@ -58,7 +58,7 @@ CREATE POLICY competition_scores_insert_authenticated
       SELECT 1 FROM exercises
       JOIN competitions ON competitions.id = competition_id
       WHERE exercises.id = exercise_id
-        AND exercises.class_id = competitions.class_id
+        AND exercises.class_number = competitions.class_number
     )
   );
 
@@ -76,7 +76,7 @@ CREATE POLICY competition_scores_update_authenticated
       SELECT 1 FROM exercises
       JOIN competitions ON competitions.id = competition_id
       WHERE exercises.id = exercise_id
-        AND exercises.class_id = competitions.class_id
+        AND exercises.class_number = competitions.class_number
     )
   );
 

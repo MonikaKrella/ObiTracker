@@ -4,10 +4,10 @@
 -- delete UI/API route exists either.
 --
 -- account_id is denormalized from dogs.account_id, mirroring training_logs:
---   1. Enables the (account_id, dog_id, class_id, competed_on) composite
+--   1. Enables the (account_id, dog_id, class_number, competed_on) composite
 --      index the window-filtered averaging/highlighting read path needs.
 --   2. Allows an O(1) RLS check on SELECT/DELETE instead of a multi-hop JOIN.
--- App code must always populate dog_id, class_id, and account_id consistently.
+-- App code must always populate dog_id, class_number, and account_id consistently.
 --
 -- DELETE policy/grant are included now (CLAUDE.md's one-policy-per-operation
 -- convention), even though no delete UI/API route exists this slice. This is
@@ -18,11 +18,11 @@
 CREATE TABLE competitions (
   id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   dog_id      uuid        NOT NULL REFERENCES dogs(id) ON DELETE CASCADE,
-  class_id    uuid        NOT NULL REFERENCES competition_classes(id),
+  class_number smallint   NOT NULL CHECK (class_number IN (1, 2, 3)),
   account_id  uuid        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   competed_on date        NOT NULL,
   created_at  timestamptz NOT NULL DEFAULT NOW(),
-  CONSTRAINT competitions_dog_class_date_unique UNIQUE (dog_id, class_id, competed_on)
+  CONSTRAINT competitions_dog_class_date_unique UNIQUE (dog_id, class_number, competed_on)
 );
 
 -- Enable row-level security
@@ -62,7 +62,7 @@ GRANT SELECT, INSERT, DELETE ON TABLE competitions TO service_role;
 
 -- Composite index: covers the window-filtered query (competitions per dog+class within a date range)
 CREATE INDEX competitions_account_dog_class_date_idx
-  ON competitions (account_id, dog_id, class_id, competed_on);
+  ON competitions (account_id, dog_id, class_number, competed_on);
 
 -- Rollback (execute in order to undo this migration):
 -- DROP INDEX  IF EXISTS competitions_account_dog_class_date_idx;
