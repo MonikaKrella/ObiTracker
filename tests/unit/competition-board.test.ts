@@ -6,7 +6,7 @@ import type { Exercise } from "@/types";
 function makeExercises(ids: string[]): Exercise[] {
   return ids.map((id, i) => ({
     id,
-    class_id: "class-1",
+    class_number: 1,
     name: id,
     shortcut: id,
     multiplier: 4,

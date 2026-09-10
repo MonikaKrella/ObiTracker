@@ -10,7 +10,7 @@ describe("data integrity", () => {
   let authClient: SupabaseClient;
   let userId: string;
   let dogId: string;
-  let classId: string;
+  let classNumber: number;
   let exerciseId: string;
   let userCleanup: () => Promise<void>;
 
@@ -19,20 +19,12 @@ describe("data integrity", () => {
     ({ userId, authClient, cleanup: userCleanup } = await createTestUser(admin));
     ({ dogId } = await seedDog(admin, userId));
 
-    const classResult = await admin
-      .from("competition_classes")
-      .select("id")
-      .eq("class_number", 1)
-      .single<{ id: string }>();
-    if (classResult.error) {
-      throw classResult.error;
-    }
-    classId = classResult.data.id;
+    classNumber = 1;
 
     const exerciseResult = await admin
       .from("exercises")
       .select("id")
-      .eq("class_id", classId)
+      .eq("class_number", classNumber)
       .order("sort_position", { ascending: true })
       .limit(1)
       .single<{ id: string }>();
@@ -138,7 +130,7 @@ describe("data integrity", () => {
 
   describe("competition_scores score range / quarter-point CHECK constraint", () => {
     it("rejects a score above 10 (10.1)", async () => {
-      const { competitionId } = await seedCompetition(admin, dogId, classId, userId, "2026-02-01");
+      const { competitionId } = await seedCompetition(admin, dogId, classNumber, userId, "2026-02-01");
       const { error } = await admin
         .from("competition_scores")
         .insert({ competition_id: competitionId, exercise_id: exerciseId, account_id: userId, score: 10.1 });
@@ -146,7 +138,7 @@ describe("data integrity", () => {
     });
 
     it("rejects a score not on a quarter-point increment (5.3)", async () => {
-      const { competitionId } = await seedCompetition(admin, dogId, classId, userId, "2026-02-02");
+      const { competitionId } = await seedCompetition(admin, dogId, classNumber, userId, "2026-02-02");
       const { error } = await admin
         .from("competition_scores")
         .insert({ competition_id: competitionId, exercise_id: exerciseId, account_id: userId, score: 5.3 });
@@ -154,7 +146,7 @@ describe("data integrity", () => {
     });
 
     it("rejects a negative score (-1)", async () => {
-      const { competitionId } = await seedCompetition(admin, dogId, classId, userId, "2026-02-03");
+      const { competitionId } = await seedCompetition(admin, dogId, classNumber, userId, "2026-02-03");
       const { error } = await admin
         .from("competition_scores")
         .insert({ competition_id: competitionId, exercise_id: exerciseId, account_id: userId, score: -1 });
@@ -162,14 +154,14 @@ describe("data integrity", () => {
     });
   });
 
-  describe("competitions unique(dog_id, class_id, competed_on) constraint", () => {
+  describe("competitions unique(dog_id, class_number, competed_on) constraint", () => {
     it("rejects a second competition on the same dog+class+date", async () => {
       const competedOn = "2026-02-04";
-      await seedCompetition(admin, dogId, classId, userId, competedOn);
+      await seedCompetition(admin, dogId, classNumber, userId, competedOn);
 
       const { error } = await admin
         .from("competitions")
-        .insert({ dog_id: dogId, class_id: classId, account_id: userId, competed_on: competedOn });
+        .insert({ dog_id: dogId, class_number: classNumber, account_id: userId, competed_on: competedOn });
       expect(error).toBeDefined();
     });
   });
@@ -177,7 +169,7 @@ describe("data integrity", () => {
   describe("competition_scores concurrent-upsert corruption guard", () => {
     // Covers Risk #3's analog for editable-in-place scores.
     it("concurrent upserts to the same (competition_id, exercise_id) leave exactly one of the two written values", async () => {
-      const { competitionId } = await seedCompetition(admin, dogId, classId, userId, "2026-02-05");
+      const { competitionId } = await seedCompetition(admin, dogId, classNumber, userId, "2026-02-05");
 
       const results = await Promise.allSettled([
         upsertCompetitionScore(authClient, competitionId, exerciseId, userId, 7),

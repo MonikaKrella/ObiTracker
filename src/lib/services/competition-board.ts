@@ -15,7 +15,7 @@ import { getCompetitionsForDogClass, getCompetitionScores } from "@/lib/services
 export async function loadCompetitionBoard(
   supabase: SupabaseClient,
   dogId: string,
-  classId: string,
+  classNumber: number,
   window: CompetitionTimeWindow,
 ): Promise<{
   board: CompetitionBoard;
@@ -26,8 +26,8 @@ export async function loadCompetitionBoard(
   const { startDate, endDate } = getCompetitionWindow(window);
 
   const [exercises, competitions] = await Promise.all([
-    getExercisesForClass(supabase, classId),
-    getCompetitionsForDogClass(supabase, dogId, classId, startDate, endDate),
+    getExercisesForClass(supabase, classNumber),
+    getCompetitionsForDogClass(supabase, dogId, classNumber, startDate, endDate),
   ]);
 
   const scores = await getCompetitionScores(

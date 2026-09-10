@@ -126,13 +126,13 @@ export async function seedElement(admin: SupabaseClient, dogId: string, name: st
 export async function seedCompetition(
   admin: SupabaseClient,
   dogId: string,
-  classId: string,
+  classNumber: number,
   accountId: string,
   competedOn: string,
 ): Promise<{ competitionId: string }> {
   const result: PostgrestSingleResponse<{ id: string }> = await admin
     .from("competitions")
-    .insert({ dog_id: dogId, class_id: classId, account_id: accountId, competed_on: competedOn })
+    .insert({ dog_id: dogId, class_number: classNumber, account_id: accountId, competed_on: competedOn })
     .select("id")
     .single();
   if (result.error) {

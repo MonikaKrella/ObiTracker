@@ -34,8 +34,8 @@ describe("cross-account authorization (Risk #4)", () => {
   let authClientB: SupabaseClient;
   let dogAId: string;
   let elementAId: string;
-  let class1Id: string;
-  let class2Id: string;
+  let class1Number: number;
+  let class2Number: number;
   let class1Exercise1Id: string;
   let class2Exercise1Id: string;
   let cleanupA: () => Promise<void> = () => Promise.resolve();
@@ -50,34 +50,20 @@ describe("cross-account authorization (Risk #4)", () => {
     ({ dogId: dogAId } = await seedDog(admin, userAId));
     ({ elementId: elementAId } = await seedElement(admin, dogAId, "Sit"));
 
-    const classesResult = await admin
-      .from("competition_classes")
-      .select("id, class_number")
-      .in("class_number", [1, 2])
-      .order("class_number", { ascending: true });
-    if (classesResult.error) {
-      throw classesResult.error;
-    }
-    const classes = classesResult.data as { id: string; class_number: number }[];
-    const foundClass1Id = classes.find((c) => c.class_number === 1)?.id;
-    const foundClass2Id = classes.find((c) => c.class_number === 2)?.id;
-    if (!foundClass1Id || !foundClass2Id) {
-      throw new Error("Class 1 or Class 2 not found");
-    }
-    class1Id = foundClass1Id;
-    class2Id = foundClass2Id;
+    class1Number = 1;
+    class2Number = 2;
 
     const exercisesResult = await admin
       .from("exercises")
-      .select("id, class_id")
-      .in("class_id", [class1Id, class2Id])
+      .select("id, class_number")
+      .in("class_number", [class1Number, class2Number])
       .order("sort_position", { ascending: true });
     if (exercisesResult.error) {
       throw exercisesResult.error;
     }
-    const exercises = exercisesResult.data as { id: string; class_id: string }[];
-    const foundClass1ExerciseId = exercises.find((e) => e.class_id === class1Id)?.id;
-    const foundClass2ExerciseId = exercises.find((e) => e.class_id === class2Id)?.id;
+    const exercises = exercisesResult.data as { id: string; class_number: number }[];
+    const foundClass1ExerciseId = exercises.find((e) => e.class_number === class1Number)?.id;
+    const foundClass2ExerciseId = exercises.find((e) => e.class_number === class2Number)?.id;
     if (!foundClass1ExerciseId || !foundClass2ExerciseId) {
       throw new Error("Class 1 or Class 2 exercise not found");
     }
@@ -172,19 +158,19 @@ describe("cross-account authorization (Risk #4)", () => {
 
   describe("competitions", () => {
     it("getCompetitionsForDogClass returns [] for another account's dog", async () => {
-      await seedCompetition(admin, dogAId, class1Id, userAId, "2026-01-01");
-      const result = await getCompetitionsForDogClass(authClientB, dogAId, class1Id, null, "2026-12-31");
+      await seedCompetition(admin, dogAId, class1Number, userAId, "2026-01-01");
+      const result = await getCompetitionsForDogClass(authClientB, dogAId, class1Number, null, "2026-12-31");
       expect(result).toEqual([]);
     });
 
     it("createCompetition rejects when targeting another account's dog", async () => {
-      await expect(createCompetition(authClientB, dogAId, class1Id, userBId, "2026-01-02")).rejects.toBeDefined();
+      await expect(createCompetition(authClientB, dogAId, class1Number, userBId, "2026-01-02")).rejects.toBeDefined();
     });
   });
 
   describe("competition_scores", () => {
     it("getCompetitionScores returns [] for another account's competitions", async () => {
-      const { competitionId } = await seedCompetition(admin, dogAId, class1Id, userAId, "2026-01-03");
+      const { competitionId } = await seedCompetition(admin, dogAId, class1Number, userAId, "2026-01-03");
       await seedCompetitionScore(admin, competitionId, class1Exercise1Id, userAId, 8);
 
       const result = await getCompetitionScores(authClientB, [competitionId]);
@@ -192,7 +178,7 @@ describe("cross-account authorization (Risk #4)", () => {
     });
 
     it("upsertCompetitionScore rejects when targeting another account's competition", async () => {
-      const { competitionId } = await seedCompetition(admin, dogAId, class1Id, userAId, "2026-01-04");
+      const { competitionId } = await seedCompetition(admin, dogAId, class1Number, userAId, "2026-01-04");
 
       await expect(
         upsertCompetitionScore(authClientB, competitionId, class1Exercise1Id, userBId, 6),
@@ -200,7 +186,7 @@ describe("cross-account authorization (Risk #4)", () => {
     });
 
     it("upsertCompetitionScore rejects when exerciseId belongs to a different class than the competition's class", async () => {
-      const { competitionId } = await seedCompetition(admin, dogAId, class1Id, userAId, "2026-01-05");
+      const { competitionId } = await seedCompetition(admin, dogAId, class1Number, userAId, "2026-01-05");
 
       await expect(
         upsertCompetitionScore(authClientA, competitionId, class2Exercise1Id, userAId, 6),
@@ -208,7 +194,7 @@ describe("cross-account authorization (Risk #4)", () => {
     });
 
     it("deleteCompetitionScore does not delete another account's score", async () => {
-      const { competitionId } = await seedCompetition(admin, dogAId, class1Id, userAId, "2026-01-06");
+      const { competitionId } = await seedCompetition(admin, dogAId, class1Number, userAId, "2026-01-06");
       await seedCompetitionScore(admin, competitionId, class1Exercise1Id, userAId, 7);
 
       await deleteCompetitionScore(authClientB, competitionId, class1Exercise1Id);
@@ -225,7 +211,7 @@ describe("cross-account authorization (Risk #4)", () => {
     });
 
     it("competitionBelongsToDog returns false for another account's competition", async () => {
-      const { competitionId } = await seedCompetition(admin, dogAId, class1Id, userAId, "2026-01-07");
+      const { competitionId } = await seedCompetition(admin, dogAId, class1Number, userAId, "2026-01-07");
       const result = await competitionBelongsToDog(authClientB, dogAId, competitionId);
       expect(result).toBe(false);
     });

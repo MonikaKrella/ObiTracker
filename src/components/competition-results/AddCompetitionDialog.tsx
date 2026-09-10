@@ -16,7 +16,7 @@ import type { Competition } from "@/types";
 
 interface Props {
   dogId: string;
-  classId: string;
+  classNumber: number;
   onAdded: (competition: Competition) => void;
 }
 
@@ -33,7 +33,7 @@ function todayUtcDate(): string {
  * — the documented exception to the 401-redirect lesson applies (see
  * context/foundation/lessons.md). A 401 falls through to the generic toast.
  */
-export function AddCompetitionDialog({ dogId, classId, onAdded }: Props) {
+export function AddCompetitionDialog({ dogId, classNumber, onAdded }: Props) {
   const [open, setOpen] = React.useState(false);
   const [competedOn, setCompetedOn] = React.useState(todayUtcDate);
   const [loading, setLoading] = React.useState(false);
@@ -52,7 +52,7 @@ export function AddCompetitionDialog({ dogId, classId, onAdded }: Props) {
       const res = await fetch(`/api/dog/${dogId}/competitions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ classId, competedOn }),
+        body: JSON.stringify({ classNumber, competedOn }),
       });
       if (res.status === 409) {
         toast.error("A competition already exists on this date for this class");

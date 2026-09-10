@@ -2,7 +2,6 @@
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import { createClient } from "@/lib/supabase";
 import { getDogsList } from "@/lib/services/dogs";
-import { getCompetitionClasses } from "@/lib/services/competition";
 import { loadCompetitionBoard } from "@/lib/services/competition-board";
 import type { CompetitionTimeWindow } from "@/lib/dates";
 import { CompetitionResultsGrid } from "@/components/competition-results/CompetitionResultsGrid";
@@ -10,7 +9,8 @@ import {
   COMPETITION_WINDOW_COOKIE_NAME,
   isCompetitionTimeWindow,
 } from "@/components/competition-results/window-options";
-import type { CompetitionClass, Competition, CompetitionScore, Exercise } from "@/types";
+import { COMPETITION_CLASSES } from "@/const";
+import type { Competition, CompetitionScore, Exercise } from "@/types";
 
 // selectedDog is guaranteed non-null by middleware: it redirects to /dashboard
 // if the dog is not found, soft-deleted, or owned by another user.
@@ -30,39 +30,32 @@ const supabase = createClient(Astro.request.headers, Astro.cookies);
 let serviceUnavailable = !supabase;
 const dogs = supabase ? await getDogsList(supabase) : [];
 
-let classes: CompetitionClass[] = [];
 let exercises: Exercise[] = [];
 let competitions: Competition[] = [];
 let scores: Pick<CompetitionScore, "competition_id" | "exercise_id" | "score">[] = [];
-let selectedClassId = "";
+const defaultClass = COMPETITION_CLASSES.find((c) => c.sort_position === 1);
+const requestedClassNumber = Number(Astro.url.searchParams.get("classNumber"));
+const requestedClass = COMPETITION_CLASSES.find((c) => c.class_number === requestedClassNumber);
+const selectedClassNumber = (requestedClass ?? defaultClass)?.class_number ?? 1;
 
 if (supabase) {
   try {
-    classes = await getCompetitionClasses(supabase);
-
-    const requestedClassId = Astro.url.searchParams.get("classId");
-    const requestedClass = requestedClassId ? classes.find((c) => c.id === requestedClassId) : undefined;
-    const defaultClass = classes.find((c) => c.class_number === 1);
-    selectedClassId = (requestedClass ?? defaultClass)?.id ?? "";
-
-    if (selectedClassId) {
-      // Always fetch the "all-time" superset here — independent of the
-      // cookie-persisted display window — so the client-side window selector
-      // (CompetitionResultsGrid.tsx) can filter columns/averages/highlights
-      // without an extra round trip, mirroring how grid.astro always fetches
-      // its fixed 30-day window regardless of the 7/14/30 display selector.
-      // The returned `board` is discarded — its averages()/highlights() are
-      // not passed as props; CompetitionResultsGrid.tsx recomputes its own
-      // copy client-side (see plan.md "What We're NOT Doing"). Calling
-      // loadCompetitionBoard still gets us its fail-fast validation of the
-      // fetched rows before rendering.
-      ({ exercises, competitions, scores } = await loadCompetitionBoard(
-        supabase,
-        selectedDog.id,
-        selectedClassId,
-        "all-time",
-      ));
-    }
+    // Always fetch the "all-time" superset here — independent of the
+    // cookie-persisted display window — so the client-side window selector
+    // (CompetitionResultsGrid.tsx) can filter columns/averages/highlights
+    // without an extra round trip, mirroring how grid.astro always fetches
+    // its fixed 30-day window regardless of the 7/14/30 display selector.
+    // The returned `board` is discarded — its averages()/highlights() are
+    // not passed as props; CompetitionResultsGrid.tsx recomputes its own
+    // copy client-side (see plan.md "What We're NOT Doing"). Calling
+    // loadCompetitionBoard still gets us its fail-fast validation of the
+    // fetched rows before rendering.
+    ({ exercises, competitions, scores } = await loadCompetitionBoard(
+      supabase,
+      selectedDog.id,
+      selectedClassNumber,
+      "all-time",
+    ));
   } catch {
     serviceUnavailable = true;
   }
@@ -91,8 +84,7 @@ if (supabase) {
         exercises={exercises}
         competitions={competitions}
         scores={scores}
-        classes={classes}
-        selectedClassId={selectedClassId}
+        selectedClassNumber={selectedClassNumber}
         initialWindow={initialWindow}
         serviceUnavailable={serviceUnavailable}
       />

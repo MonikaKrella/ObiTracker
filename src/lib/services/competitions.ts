@@ -11,7 +11,7 @@ import type { Competition, CompetitionScore } from "@/types";
 export async function getCompetitionsForDogClass(
   supabase: SupabaseClient,
   dogId: string,
-  classId: string,
+  classNumber: number,
   startDate: string | null,
   endDate: string,
 ): Promise<Competition[]> {
@@ -19,7 +19,7 @@ export async function getCompetitionsForDogClass(
     .from("competitions")
     .select("*")
     .eq("dog_id", dogId)
-    .eq("class_id", classId)
+    .eq("class_number", classNumber)
     .lte("competed_on", endDate);
 
   if (startDate !== null) {
@@ -43,13 +43,13 @@ export async function getCompetitionsForDogClass(
 export async function createCompetition(
   supabase: SupabaseClient,
   dogId: string,
-  classId: string,
+  classNumber: number,
   accountId: string,
   competedOn: string,
 ): Promise<Competition> {
   const result = await supabase
     .from("competitions")
-    .insert({ dog_id: dogId, class_id: classId, account_id: accountId, competed_on: competedOn })
+    .insert({ dog_id: dogId, class_number: classNumber, account_id: accountId, competed_on: competedOn })
     .select()
     .single();
 
@@ -168,7 +168,7 @@ export async function exerciseBelongsToClass(
 ): Promise<boolean> {
   const competitionResult = await supabase
     .from("competitions")
-    .select("class_id")
+    .select("class_number")
     .eq("id", competitionId)
     .maybeSingle();
 
@@ -183,7 +183,7 @@ export async function exerciseBelongsToClass(
     .from("exercises")
     .select("id")
     .eq("id", exerciseId)
-    .eq("class_id", competitionResult.data.class_id)
+    .eq("class_number", competitionResult.data.class_number)
     .maybeSingle();
 
   if (exerciseResult.error) {

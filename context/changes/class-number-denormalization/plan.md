@@ -291,27 +291,27 @@ Because the 4 migrations are edited in place rather than appended to, any local 
 
 #### Automated
 
-- [x] 1.1 Local Supabase reset applies all migrations cleanly: `npx supabase db reset`
-- [x] 1.2 `20260903000002_add_class_number_to_competition_classes.sql` no longer exists
+- [x] 1.1 Local Supabase reset applies all migrations cleanly: `npx supabase db reset` — 8360880
+- [x] 1.2 `20260903000002_add_class_number_to_competition_classes.sql` no longer exists — 8360880
 
 #### Manual
 
-- [x] 1.3 Inspect `exercises`/`competitions` schemas — `class_number` CHECK columns exist, `class_id`/`competition_classes` do not
-- [x] 1.4 Spot-check seeded exercise rows match the original 29-row dataset, keyed by `class_number`
+- [x] 1.3 Inspect `exercises`/`competitions` schemas — `class_number` CHECK columns exist, `class_id`/`competition_classes` do not — 8360880
+- [x] 1.4 Spot-check seeded exercise rows match the original 29-row dataset, keyed by `class_number` — 8360880
 
 ### Phase 2: Application code & tests
 
 #### Automated
 
-- [ ] 2.1 Typecheck passes: `npx astro check`
-- [ ] 2.2 Linting passes: `npm run lint`
-- [ ] 2.3 Unit tests pass: `npm run test`
-- [ ] 2.4 Repo-wide grep for `class_id`/`classId`/`competition_classes`/`CompetitionClass` in `src/` and `tests/` returns zero hits
+- [x] 2.1 Typecheck passes: `npx astro check`
+- [x] 2.2 Linting passes: `npm run lint`
+- [x] 2.3 Unit tests pass: `npm run test`
+- [x] 2.4 Repo-wide grep for `class_id`/`classId`/`competition_classes`/`CompetitionClass` in `src/` and `tests/` returns zero hits
 
 #### Manual
 
-- [ ] 2.5 Switch between all 3 classes via the Select — grid renders correctly for each
-- [ ] 2.6 Class switch updates `?classNumber=N` and reloads correctly
-- [ ] 2.7 Add competition succeeds; duplicate dog+class+date still 409s
-- [ ] 2.8 Score cell entry/edit still works
-- [ ] 2.9 Invalid/missing `?classNumber=` falls back to Class 1 without erroring
+- [x] 2.5 Switch between all 3 classes via the Select — grid renders correctly for each
+- [x] 2.6 Class switch updates `?classNumber=N` and reloads correctly
+- [x] 2.7 Add competition succeeds; duplicate dog+class+date still 409s
+- [x] 2.8 Score cell entry/edit still works
+- [x] 2.9 Invalid/missing `?classNumber=` falls back to Class 1 without erroring

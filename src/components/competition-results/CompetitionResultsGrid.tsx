@@ -14,7 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScoreCell } from "@/components/competition-results/ScoreCell";
 import { AddCompetitionDialog } from "@/components/competition-results/AddCompetitionDialog";
 import { cn } from "@/lib/utils";
-import type { Competition, CompetitionClass, CompetitionScore, Exercise } from "@/types";
+import { COMPETITION_CLASSES } from "@/const";
+import type { Competition, CompetitionScore, Exercise } from "@/types";
 
 interface Props {
   dogId: string;
@@ -22,8 +23,7 @@ interface Props {
   exercises: Exercise[];
   competitions: Competition[];
   scores: Pick<CompetitionScore, "competition_id" | "exercise_id" | "score">[];
-  classes: CompetitionClass[];
-  selectedClassId: string;
+  selectedClassNumber: number;
   initialWindow: CompetitionTimeWindow;
   serviceUnavailable: boolean;
 }
@@ -80,8 +80,7 @@ export function CompetitionResultsGrid({
   exercises,
   competitions: initialCompetitions,
   scores: initialScores,
-  classes,
-  selectedClassId,
+  selectedClassNumber,
   initialWindow,
   serviceUnavailable,
 }: Props) {
@@ -104,9 +103,10 @@ export function CompetitionResultsGrid({
     setWindowCookie(next);
   }
 
-  function handleClassChange(classId: string) {
+  function handleClassChange(value: string) {
+    const classNumber = Number(value);
     setIsNavigating(true);
-    window.location.href = `/dogs/${dogId}/competition-results?classId=${classId}`;
+    window.location.href = `/dogs/${dogId}/competition-results?classNumber=${classNumber}`;
   }
 
   function handleScoreChange(competitionId: string, exerciseId: string, score: number | null) {
@@ -174,20 +174,20 @@ export function CompetitionResultsGrid({
           viewport is too narrow for both, rather than the time-window row
           wedging itself between them. */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Select value={selectedClassId} onValueChange={handleClassChange}>
+        <Select value={String(selectedClassNumber)} onValueChange={handleClassChange}>
           <SelectTrigger aria-label="Competition class" disabled={!mounted}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {classes.map((cls) => (
-              <SelectItem key={cls.id} value={cls.id}>
+            {COMPETITION_CLASSES.map((cls) => (
+              <SelectItem key={cls.class_number} value={String(cls.class_number)}>
                 {cls.name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        <AddCompetitionDialog dogId={dogId} classId={selectedClassId} onAdded={handleCompetitionAdded} />
+        <AddCompetitionDialog dogId={dogId} classNumber={selectedClassNumber} onAdded={handleCompetitionAdded} />
       </div>
 
       {/* Row 2: time-window selector, always below row 1. */}
