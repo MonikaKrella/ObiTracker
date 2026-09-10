@@ -303,15 +303,15 @@ Because the 4 migrations are edited in place rather than appended to, any local 
 
 #### Automated
 
-- [x] 2.1 Typecheck passes: `npx astro check`
-- [x] 2.2 Linting passes: `npm run lint`
-- [x] 2.3 Unit tests pass: `npm run test`
-- [x] 2.4 Repo-wide grep for `class_id`/`classId`/`competition_classes`/`CompetitionClass` in `src/` and `tests/` returns zero hits
+- [x] 2.1 Typecheck passes: `npx astro check` — dca9769
+- [x] 2.2 Linting passes: `npm run lint` — dca9769
+- [x] 2.3 Unit tests pass: `npm run test` — dca9769
+- [x] 2.4 Repo-wide grep for `class_id`/`classId`/`competition_classes`/`CompetitionClass` in `src/` and `tests/` returns zero hits — dca9769
 
 #### Manual
 
-- [x] 2.5 Switch between all 3 classes via the Select — grid renders correctly for each
-- [x] 2.6 Class switch updates `?classNumber=N` and reloads correctly
-- [x] 2.7 Add competition succeeds; duplicate dog+class+date still 409s
-- [x] 2.8 Score cell entry/edit still works
-- [x] 2.9 Invalid/missing `?classNumber=` falls back to Class 1 without erroring
+- [x] 2.5 Switch between all 3 classes via the Select — grid renders correctly for each — dca9769
+- [x] 2.6 Class switch updates `?classNumber=N` and reloads correctly — dca9769
+- [x] 2.7 Add competition succeeds; duplicate dog+class+date still 409s — dca9769
+- [x] 2.8 Score cell entry/edit still works — dca9769
+- [x] 2.9 Invalid/missing `?classNumber=` falls back to Class 1 without erroring — dca9769
