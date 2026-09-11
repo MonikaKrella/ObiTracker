@@ -1,13 +1,15 @@
 ---
 change_id: class-number-denormalization
 title: Class number denormalization
-status: implemented
+status: impl_reviewed
 created: 2026-09-09
-updated: 2026-09-10
+updated: 2026-09-11
 archived_at: null
 ---
 
 ## Notes
+
+**Addendum (2026-09-11, impl review F1)**: The Phase 1 exercise-reseed rewrite in `supabase/migrations/20260903000001_create_competition_reference_data.sql` also renamed the Class 1/2/3 exercise previously called `'Square'` (shortcut `'Box'`, unchanged) to `'Sending to box'`. This was a deliberate data correction bundled into the migration rewrite, not a mechanical side effect — confirmed with the user during impl review, since the plan had otherwise promised byte-for-byte name preservation. No other exercise names changed.
 
 **Depends on**: `competition-results-core` must be fully implemented first (it is — see research.md). **Decision (2026-09-10, user)**: ship both changes together in one PR/branch rather than merging `competition-results-core` first — this avoids a prod deploy window where `class_id`/`competition_classes` exist and then need a separate live-data migration. `competition-results-core` should not be archived separately; it closes out together with this change when the combined PR merges.
 

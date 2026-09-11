@@ -74,7 +74,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Prerequisites:** —
 - **Parallel with:** F-02, S-05, S-06
 - **Blockers:** —
-- **Unknowns:** — (the exact exercise/multiplier tables for all three classes are already specified in `context/foundation/post-mvp-notes.md`, sourced from the rulebook)
+- **Unknowns:** — (the exact exercise/multiplier tables for all three classes are already specified in `context/foundation/post-mvp-features.md`, sourced from the rulebook)
 - **Risk:** this data is not user-editable for this change (FR-005's Socrates round explicitly rejected in-app admin editing) — a seeding error in a multiplier or exercise name is not self-correcting through the UI and would silently skew every downstream average; get it right once at migration time.
 - **Status:** done
 
