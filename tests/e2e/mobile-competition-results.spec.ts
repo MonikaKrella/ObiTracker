@@ -13,7 +13,8 @@ import path from "node:path";
 const SEED_PATH = path.join("playwright", ".auth", "seed.json");
 const SCALE_TOLERANCE = 0.05;
 const COMPETITION_COUNT = 5; // enough date columns to overflow a 393px-wide mobile viewport
-// exercises.name (Class 1's first exercise, fixed rulebook reference data —
+// exercises.name (Class 3's first exercise — the page's blind-fallback class
+// per the default-competition-class feature, fixed rulebook reference data —
 // see 20260903000001_create_competition_reference_data.sql). ScoreCell.tsx's
 // aria-label always uses this full name, regardless of viewport.
 const EXERCISE_NAME = "Sitting in a group";
@@ -21,7 +22,7 @@ const EXERCISE_NAME = "Sitting in a group";
 // (< Tailwind's `sm` breakpoint), CompetitionResultsGrid.tsx hides the full
 // name behind `hidden sm:inline` and shows only the shortcut, so this is the
 // row header's actual accessible name here — not EXERCISE_NAME.
-const EXERCISE_SHORTCUT = "Group";
+const EXERCISE_SHORTCUT = "Group-sit";
 
 function isoDaysAgo(daysAgo: number): string {
   const d = new Date();
@@ -49,9 +50,10 @@ test("competition results grid stays at full mobile scale, keeps its sticky aver
   // compile of this island's chunk can take longer than 5s.
   await expect(page.getByRole("button", { name: "All time" })).toBeEnabled({ timeout: 15000 });
 
-  // Setup: add COMPETITION_COUNT competitions (Class 1 is this page's
-  // default) via the real dialog — enough date columns to force the results
-  // table to overflow its scroll container on a 393px mobile viewport.
+  // Setup: add COMPETITION_COUNT competitions (Class 3 is this page's
+  // blind-fallback default for a dog with no marked default) via the real
+  // dialog — enough date columns to force the results table to overflow its
+  // scroll container on a 393px mobile viewport.
   const competedOnDates = Array.from({ length: COMPETITION_COUNT }, (_, i) => isoDaysAgo(i));
   for (const competedOn of competedOnDates) {
     await page.getByRole("button", { name: "Add competition" }).click();
