@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, Star } from "lucide-react";
+import { toast } from "sonner";
 import { useMounted } from "@/components/hooks/useMounted";
 import { CompetitionBoard, type ScoreRecord } from "@/lib/domain/competition-board";
 import { getCompetitionWindow, formatHeaderDate, type CompetitionTimeWindow } from "@/lib/dates";
@@ -24,6 +25,7 @@ interface Props {
   competitions: Competition[];
   scores: Pick<CompetitionScore, "competition_id" | "exercise_id" | "score">[];
   selectedClassNumber: number;
+  dogDefaultClassNumber: number | null;
   initialWindow: CompetitionTimeWindow;
   serviceUnavailable: boolean;
 }
@@ -81,6 +83,7 @@ export function CompetitionResultsGrid({
   competitions: initialCompetitions,
   scores: initialScores,
   selectedClassNumber,
+  dogDefaultClassNumber: initialDogDefaultClassNumber,
   initialWindow,
   serviceUnavailable,
 }: Props) {
@@ -88,6 +91,9 @@ export function CompetitionResultsGrid({
   const [competitions, setCompetitions] = useState(initialCompetitions);
   const [scoresByCompetition, setScoresByCompetition] = useState(() => buildScoresByCompetition(initialScores));
   const [selectedWindow, setSelectedWindow] = useState<CompetitionTimeWindow>(initialWindow);
+  const [dogDefaultClassNumber, setDogDefaultClassNumber] = useState(initialDogDefaultClassNumber);
+  const [isTogglingDefault, setIsTogglingDefault] = useState(false);
+  const isCurrentDefault = selectedClassNumber === dogDefaultClassNumber;
   // Not reset back to false anywhere — set right before the full-page
   // navigation below, so it just stays true until the browser unloads this
   // page (mirrors the "stay loading — navigating away" convention used by
@@ -107,6 +113,32 @@ export function CompetitionResultsGrid({
     const classNumber = Number(value);
     setIsNavigating(true);
     window.location.href = `/dogs/${dogId}/competition-results?classNumber=${classNumber}`;
+  }
+
+  async function handleToggleDefault() {
+    const nextClassNumber = isCurrentDefault ? null : selectedClassNumber;
+    setIsTogglingDefault(true);
+    try {
+      const res = await fetch(`/api/dog/${dogId}/default-class`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ classNumber: nextClassNumber }),
+      });
+      if (res.status === 401) {
+        window.location.href = "/auth/signin";
+        return;
+      }
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(data.error ?? "Failed to update default class");
+      }
+      setDogDefaultClassNumber(nextClassNumber);
+      toast.success(nextClassNumber === null ? "Default cleared" : `Class ${nextClassNumber} set as default`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save — please try again");
+    } finally {
+      setIsTogglingDefault(false);
+    }
   }
 
   function handleScoreChange(competitionId: string, exerciseId: string, score: number | null) {
@@ -174,18 +206,34 @@ export function CompetitionResultsGrid({
           viewport is too narrow for both, rather than the time-window row
           wedging itself between them. */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Select value={String(selectedClassNumber)} onValueChange={handleClassChange}>
-          <SelectTrigger aria-label="Competition class" disabled={!mounted}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {COMPETITION_CLASSES.map((cls) => (
-              <SelectItem key={cls.class_number} value={String(cls.class_number)}>
-                {cls.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={String(selectedClassNumber)} onValueChange={handleClassChange}>
+            <SelectTrigger aria-label="Competition class" disabled={!mounted}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {COMPETITION_CLASSES.map((cls) => (
+                <SelectItem key={cls.class_number} value={String(cls.class_number)}>
+                  {cls.name}
+                  {cls.class_number === dogDefaultClassNumber && <span className="text-white/40"> · Default</span>}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <button
+            type="button"
+            disabled={!mounted || isTogglingDefault}
+            aria-label={isCurrentDefault ? "Clear default" : "Set as default"}
+            title={isCurrentDefault ? "Clear default" : "Set as default"}
+            onClick={() => {
+              void handleToggleDefault();
+            }}
+            className="disabled:opacity-50"
+          >
+            <Star className={cn("size-5 text-yellow-400", isCurrentDefault && "fill-yellow-400")} />
+          </button>
+        </div>
 
         <AddCompetitionDialog dogId={dogId} classNumber={selectedClassNumber} onAdded={handleCompetitionAdded} />
       </div>

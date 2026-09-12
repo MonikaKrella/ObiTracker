@@ -33,10 +33,12 @@ const dogs = supabase ? await getDogsList(supabase) : [];
 let exercises: Exercise[] = [];
 let competitions: Competition[] = [];
 let scores: Pick<CompetitionScore, "competition_id" | "exercise_id" | "score">[] = [];
-const defaultClass = COMPETITION_CLASSES.find((c) => c.sort_position === 1);
+const markedDefaultClass = COMPETITION_CLASSES.find((c) => c.class_number === selectedDog.default_class_number);
+const lastClass = COMPETITION_CLASSES.find((c) => c.sort_position === 3);
+const defaultClass = markedDefaultClass ?? lastClass;
 const requestedClassNumber = Number(Astro.url.searchParams.get("classNumber"));
 const requestedClass = COMPETITION_CLASSES.find((c) => c.class_number === requestedClassNumber);
-const selectedClassNumber = (requestedClass ?? defaultClass)?.class_number ?? 1;
+const selectedClassNumber = (requestedClass ?? defaultClass)?.class_number ?? 3;
 
 if (supabase) {
   try {
@@ -85,6 +87,7 @@ if (supabase) {
         competitions={competitions}
         scores={scores}
         selectedClassNumber={selectedClassNumber}
+        dogDefaultClassNumber={selectedDog.default_class_number}
         initialWindow={initialWindow}
         serviceUnavailable={serviceUnavailable}
       />
