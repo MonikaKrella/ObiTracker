@@ -14,6 +14,7 @@ export interface Dog {
   updated_at: string;
   is_deleted: boolean;
   deleted_at: string | null;
+  default_class_number: number | null;
 }
 
 export interface TrainingElement {
