@@ -39,3 +39,6 @@ playwright-report/
 test-results/
 playwright/.auth/
 .playwright-cli/
+
+#local
+local/
