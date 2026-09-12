@@ -1,10 +1,10 @@
 ---
 change_id: competition-results-core
 title: Competition results core
-status: impl_reviewed
+status: archived
 created: 2026-09-06
-updated: 2026-09-10
-archived_at: null
+updated: 2026-09-12
+archived_at: 2026-09-12T12:48:49Z
 ---
 
 ## Notes
