@@ -54,3 +54,44 @@ export function formatHeaderDate(dateStr: string): string {
   const [, month, day] = dateStr.split("-");
   return `${day}.${month}`;
 }
+
+export type CompetitionTimeWindow = "all-time" | "last-year" | "last-6-months";
+
+/**
+ * Returns the last day-of-month (1-31) for `month` (0-indexed, UTC calendar).
+ */
+function daysInUtcMonth(year: number, month: number): number {
+  return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+}
+
+/**
+ * Subtracts `monthsBack` calendar months from `today`, clamping the day to
+ * the target month's last valid day when it would otherwise overflow (e.g.
+ * Aug 31 minus 6 months, or a leap-year Feb 29 minus 12 months landing on a
+ * non-leap year) — avoids native `Date` arithmetic rolling into the
+ * following month.
+ */
+function subtractCalendarMonths(today: Date, monthsBack: number): string {
+  const totalMonths = today.getUTCFullYear() * 12 + today.getUTCMonth() - monthsBack;
+  const targetYear = Math.floor(totalMonths / 12);
+  const targetMonth = totalMonths - targetYear * 12;
+  const day = Math.min(today.getUTCDate(), daysInUtcMonth(targetYear, targetMonth));
+  return new Date(Date.UTC(targetYear, targetMonth, day)).toISOString().slice(0, 10);
+}
+
+/**
+ * Returns the inclusive date bounds for a named calendar-period window
+ * ending at `today`. Accepts `today` as a parameter for SSR determinism and
+ * testability, mirroring `getTrainingWindow`'s shape.
+ */
+export function getCompetitionWindow(
+  window: CompetitionTimeWindow,
+  today: Date = new Date(),
+): { startDate: string | null; endDate: string } {
+  const endDate = today.toISOString().slice(0, 10);
+  if (window === "all-time") {
+    return { startDate: null, endDate };
+  }
+  const monthsBack = window === "last-year" ? 12 : 6;
+  return { startDate: subtractCalendarMonths(today, monthsBack), endDate };
+}

@@ -1,27 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { CompetitionClass, Exercise } from "@/types";
-
-/**
- * Returns all competition classes, ordered by their fixed rulebook position.
- */
-export async function getCompetitionClasses(supabase: SupabaseClient): Promise<CompetitionClass[]> {
-  const result = await supabase.from("competition_classes").select("*").order("sort_position", { ascending: true });
-
-  if (result.error) {
-    throw result.error;
-  }
-
-  return (result.data as CompetitionClass[] | null) ?? [];
-}
+import type { Exercise } from "@/types";
 
 /**
  * Returns all exercises for a competition class, ordered by their fixed rulebook position.
  */
-export async function getExercisesForClass(supabase: SupabaseClient, classId: string): Promise<Exercise[]> {
+export async function getExercisesForClass(supabase: SupabaseClient, classNumber: number): Promise<Exercise[]> {
   const result = await supabase
     .from("exercises")
     .select("*")
-    .eq("class_id", classId)
+    .eq("class_number", classNumber)
     .order("sort_position", { ascending: true });
 
   if (result.error) {
@@ -29,30 +16,4 @@ export async function getExercisesForClass(supabase: SupabaseClient, classId: st
   }
 
   return (result.data as Exercise[] | null) ?? [];
-}
-
-/**
- * Returns all exercises for a competition class, looked up by its rulebook
- * class_number (1/2/3) rather than its internal id. Returns null if no class
- * has that number.
- */
-export async function getExercisesForClassNumber(
-  supabase: SupabaseClient,
-  classNumber: number,
-): Promise<Exercise[] | null> {
-  const classResult = await supabase
-    .from("competition_classes")
-    .select("id")
-    .eq("class_number", classNumber)
-    .maybeSingle<{ id: string }>();
-
-  if (classResult.error) {
-    throw classResult.error;
-  }
-
-  if (!classResult.data) {
-    return null;
-  }
-
-  return getExercisesForClass(supabase, classResult.data.id);
 }

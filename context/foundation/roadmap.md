@@ -37,17 +37,18 @@ The MVP proved the core training-grid loop; V2 closes five gaps surfaced by real
 | S-04 | competition-tags           | add up to 3 short tags per competition, truncated with a hover tooltip                                                              | S-01          | FR-011                                                | proposed |
 | S-05 | password-reset             | request a password-reset link by email and set a new password twice to regain account access                                        | —             | FR-001, FR-002                                        | ready    |
 | S-06 | dog-rename                 | rename an existing dog                                                                                                              | —             | FR-003, FR-004                                        | ready    |
+| S-07 | delete-competition         | edit or delete an existing competition entry (e.g. fix a mis-typed date), beyond S-01's add-only + per-cell overwrite               | S-01          | none yet — flagged during S-01 planning               | proposed |
 
 ## Streams
 
 Navigation aid — groups items that share a Prerequisites chain. Canonical ordering still lives in the dependency graph below; this table is the proposed reading order across parallel tracks.
 
-| Stream | Theme                    | Chain                                              | Note                                                                                                          |
-| ------ | ------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| A      | Competition scoring loop | `F-01` → `S-01` → `S-03` / `S-04`, `F-01` → `S-02` | Critical path to the north star; invest deeply here per the `quality` goal — data + domain layer.             |
-| B      | Domain hygiene           | `F-02`                                             | Isolated refactor, no in-round consumer; sequenced eagerly anyway because `quality` biases foundations early. |
-| C      | Account recovery         | `S-05`                                             | Standalone auth completeness item — no dependency on Stream A or B.                                           |
-| D      | Dog identity fix         | `S-06`                                             | Standalone CRUD completeness item — no dependency on any other stream.                                        |
+| Stream | Theme                    | Chain                                                       | Note                                                                                                          |
+| ------ | ------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| A      | Competition scoring loop | `F-01` → `S-01` → `S-03` / `S-04` / `S-07`, `F-01` → `S-02` | Critical path to the north star; invest deeply here per the `quality` goal — data + domain layer.             |
+| B      | Domain hygiene           | `F-02`                                                      | Isolated refactor, no in-round consumer; sequenced eagerly anyway because `quality` biases foundations early. |
+| C      | Account recovery         | `S-05`                                                      | Standalone auth completeness item — no dependency on Stream A or B.                                           |
+| D      | Dog identity fix         | `S-06`                                                      | Standalone CRUD completeness item — no dependency on any other stream.                                        |
 
 ## Baseline
 
@@ -73,7 +74,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Prerequisites:** —
 - **Parallel with:** F-02, S-05, S-06
 - **Blockers:** —
-- **Unknowns:** — (the exact exercise/multiplier tables for all three classes are already specified in `context/foundation/post-mvp-notes.md`, sourced from the rulebook)
+- **Unknowns:** — (the exact exercise/multiplier tables for all three classes are already specified in `context/foundation/post-mvp-features.md`, sourced from the rulebook)
 - **Risk:** this data is not user-editable for this change (FR-005's Socrates round explicitly rejected in-app admin editing) — a seeding error in a multiplier or exercise name is not self-correcting through the UI and would silently skew every downstream average; get it right once at migration time.
 - **Status:** done
 
@@ -166,6 +167,18 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** low — closes a known asymmetry with training elements (which already support rename); no uniqueness constraint is required (the PRD's Socrates round explicitly ruled this out — dogs are keyed by ID everywhere).
 - **Status:** ready
 
+### S-07: Delete competition
+
+- **Outcome:** user can edit or delete an existing competition entry (e.g. fix a mis-typed date) instead of only being able to add a competition and overwrite individual scores.
+- **Change ID:** delete-competition
+- **PRD refs:** none yet — this FR does not exist in `prd-v2.md`; flagged during `/10x-plan competition-results-core` planning (2026-09-06) when scoping S-01 deliberately excluded competition-level edit/delete to keep that already-largest slice from growing further.
+- **Prerequisites:** S-01
+- **Parallel with:** S-02, S-03, S-04
+- **Blockers:** —
+- **Unknowns:** whether this should be a full edit (change the date in place) or delete-and-recreate; whether deleting a competition should warn about the scores it cascades away. Owner: user. Block: no — `/10x-plan` can resolve both with reasonable defaults when this slice is picked up.
+- **Risk:** low — additive UI + a cascade-delete on a schema that already exists after S-01; the main risk is under-scoping the confirmation UX for a destructive action.
+- **Status:** proposed
+
 ## Backlog Handoff
 
 | Roadmap ID | Change ID                  | Suggested issue title                                                          | Ready for `/10x-plan` | Notes                                                                                                                  |
@@ -178,10 +191,12 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-04       | competition-tags           | Add tags to a competition                                                      | no                    | Needs S-01 done first                                                                                                  |
 | S-05       | password-reset             | Password-reset flow (request link, set new password)                           | yes                   | Run `/10x-plan password-reset`                                                                                         |
 | S-06       | dog-rename                 | Rename a dog                                                                   | yes                   | Run `/10x-plan dog-rename`                                                                                             |
+| S-07       | delete-competition         | Edit or delete a competition entry                                             | no                    | Needs S-01 done first; no PRD FR backs this yet — see Open Roadmap Questions                                           |
 
 ## Open Roadmap Questions
 
 1. **Is admin-editable competition class/exercise reference data (classes, exercises, multipliers) worth building later?** — Flagged during the FR-005 Socrates round; not blocking delivery of this roadmap. Owner: user. Block: no slices — F-01 ships with fixed, migration-seeded data regardless of the answer.
+2. **Should `prd-v2.md` be amended with a new FR for competition edit/delete (S-07)?** — Flagged during `/10x-plan competition-results-core` (2026-09-06): S-01 was scoped add-only, and S-07 was added directly to the roadmap without a backing PRD FR. Owner: user. Block: no — S-07 is far enough downstream (behind S-01) that this can be resolved before it's picked up.
 
 ## Parked
 

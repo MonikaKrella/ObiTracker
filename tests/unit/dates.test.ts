@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateDateRange, getTrainingWindow, isFutureUtcDate } from "../../src/lib/dates";
+import { generateDateRange, getCompetitionWindow, getTrainingWindow, isFutureUtcDate } from "../../src/lib/dates";
 
 describe("getTrainingWindow", () => {
   it("windowDays=7, today=2026-06-25 → startDate=2026-06-19, endDate=2026-06-25", () => {
@@ -53,6 +53,42 @@ describe("generateDateRange", () => {
     const window = getTrainingWindow(30, today);
     const dates = generateDateRange(30, window.endDate);
     expect(dates[0]).toBe(window.startDate);
+  });
+});
+
+describe("getCompetitionWindow", () => {
+  it("all-time → startDate=null, endDate=today", () => {
+    const today = new Date("2026-06-25T00:00:00Z");
+    const result = getCompetitionWindow("all-time", today);
+    expect(result.startDate).toBeNull();
+    expect(result.endDate).toBe("2026-06-25");
+  });
+
+  it("last-year, today=2026-06-25 → startDate=2025-06-25, endDate=2026-06-25", () => {
+    const today = new Date("2026-06-25T00:00:00Z");
+    const result = getCompetitionWindow("last-year", today);
+    expect(result.startDate).toBe("2025-06-25");
+    expect(result.endDate).toBe("2026-06-25");
+  });
+
+  it("last-6-months, today=2026-06-25 → startDate=2025-12-25, endDate=2026-06-25", () => {
+    const today = new Date("2026-06-25T00:00:00Z");
+    const result = getCompetitionWindow("last-6-months", today);
+    expect(result.startDate).toBe("2025-12-25");
+    expect(result.endDate).toBe("2026-06-25");
+  });
+
+  it("leap-year boundary: last-year from 2028-02-29 clamps to 2027-02-28 (not rollover to 2027-03-01)", () => {
+    const today = new Date("2028-02-29T00:00:00Z");
+    const result = getCompetitionWindow("last-year", today);
+    expect(result.startDate).toBe("2027-02-28");
+    expect(result.endDate).toBe("2028-02-29");
+  });
+
+  it("month-length overflow: last-6-months from 2026-08-31 clamps to 2026-02-28 (not rollover to Mar)", () => {
+    const today = new Date("2026-08-31T00:00:00Z");
+    const result = getCompetitionWindow("last-6-months", today);
+    expect(result.startDate).toBe("2026-02-28");
   });
 });
 

@@ -121,3 +121,41 @@ export async function seedElement(admin: SupabaseClient, dogId: string, name: st
   }
   return { elementId: result.data.id };
 }
+
+/** Inserts a competition row (service-role, bypasses RLS). */
+export async function seedCompetition(
+  admin: SupabaseClient,
+  dogId: string,
+  classNumber: number,
+  accountId: string,
+  competedOn: string,
+): Promise<{ competitionId: string }> {
+  const result: PostgrestSingleResponse<{ id: string }> = await admin
+    .from("competitions")
+    .insert({ dog_id: dogId, class_number: classNumber, account_id: accountId, competed_on: competedOn })
+    .select("id")
+    .single();
+  if (result.error) {
+    throw result.error;
+  }
+  return { competitionId: result.data.id };
+}
+
+/** Inserts a competition_scores row (service-role, bypasses RLS). */
+export async function seedCompetitionScore(
+  admin: SupabaseClient,
+  competitionId: string,
+  exerciseId: string,
+  accountId: string,
+  score: number,
+): Promise<{ scoreId: string }> {
+  const result: PostgrestSingleResponse<{ id: string }> = await admin
+    .from("competition_scores")
+    .insert({ competition_id: competitionId, exercise_id: exerciseId, account_id: accountId, score })
+    .select("id")
+    .single();
+  if (result.error) {
+    throw result.error;
+  }
+  return { scoreId: result.data.id };
+}
