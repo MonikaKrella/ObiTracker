@@ -1,10 +1,10 @@
 ---
 change_id: class-number-denormalization
 title: Class number denormalization
-status: impl_reviewed
+status: archived
 created: 2026-09-09
-updated: 2026-09-11
-archived_at: null
+updated: 2026-09-12
+archived_at: 2026-09-12T12:50:12Z
 ---
 
 ## Notes
