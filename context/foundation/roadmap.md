@@ -3,7 +3,7 @@ project: ObiTracker
 version: 1
 status: draft
 created: 2026-09-02
-updated: 2026-09-06
+updated: 2026-09-12
 prd_version: 2
 main_goal: quality
 top_blocker: capacity
@@ -31,7 +31,7 @@ The MVP proved the core training-grid loop; V2 closes five gaps surfaced by real
 | ---- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------- | ----------------------------------------------------- | -------- |
 | F-01 | competition-reference-data | (foundation) three competition classes and their exercises/multipliers/shortcut names are seeded as fixed, queryable reference data | —             | FR-005, FR-006                                        | done     |
 | F-02 | training-board-refactor    | (foundation) highlight classification is computed by a dedicated, fail-fast domain service, byte-identical to today's output        | —             | FR-017, FR-018, FR-019                                | done     |
-| S-01 | competition-results-core   | select a class, enter raw per-exercise scores, see live averages and top-2/bottom-2 highlighting, filtered by time window           | F-01          | FR-007, FR-009, FR-010, FR-012, FR-013, FR-014, US-01 | proposed |
+| S-01 | competition-results-core   | select a class, enter raw per-exercise scores, see live averages and top-2/bottom-2 highlighting, filtered by time window           | F-01          | FR-007, FR-009, FR-010, FR-012, FR-013, FR-014, US-01 | done     |
 | S-02 | element-exercise-linking   | link a training element to one competition exercise and see a color-coded indicator column on the training grid                     | F-01          | FR-015, FR-016                                        | proposed |
 | S-03 | default-competition-class  | mark one class as their default per dog, so it displays automatically on page load                                                  | S-01          | FR-008                                                | proposed |
 | S-04 | competition-tags           | add up to 3 short tags per competition, truncated with a hover tooltip                                                              | S-01          | FR-011                                                | proposed |
@@ -104,7 +104,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Interaction between the grid's horizontal+vertical scroll (once competition columns exceed screen width, per FR-009) and the existing loading-indicator NFR — the training grid already has a proven pattern for this, but it should be confirmed rather than assumed identical. Owner: team. Block: no.
 - **Risk:** this is the largest slice in the roadmap by FR count, but FR-013's own Socrates resolution explicitly requires the time-window selector, the average column, and the highlight computation to move together atomically (splitting them risks reproducing the exact "average disagrees with what's highlighted" confusion the PRD rejected). The risk is under-scoping any one of the three, not the slice being oversized for its own sake.
-- **Status:** proposed
+- **Status:** done
 
 ### S-02: Element-exercise linking
 
@@ -211,3 +211,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 - **F-01: (foundation) three competition classes and their exercises/multipliers/shortcut names are seeded as fixed, queryable reference data** — Archived 2026-09-06 → `context/archive/2026-09-03-competition-reference-data/`. Lesson: —.
 - **F-02: (foundation) highlight classification is computed by a dedicated, fail-fast domain service, byte-identical to today's output** — Archived 2026-09-06 → `context/archive/2026-09-04-training-board-refactor/`. Lesson: —.
+- **S-01: select a class, enter raw per-exercise scores, see live averages and top-2/bottom-2 highlighting, filtered by time window** — Archived 2026-09-12 → `context/archive/2026-09-06-competition-results-core/`. Lesson: —.
