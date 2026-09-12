@@ -1,7 +1,7 @@
 ---
 change_id: default-competition-class
 title: Default competition class
-status: implemented
+status: impl_reviewed
 created: 2026-09-12
 updated: 2026-09-12
 archived_at: null
