@@ -74,3 +74,24 @@ export async function softDeleteDog(supabase: SupabaseClient, dogId: string): Pr
   if (result.error) throw result.error;
   return result.data as boolean;
 }
+
+/**
+ * Sets or clears (when classNumber is null) the dog's marked default competition
+ * class, scoped to the given dog. Returns the updated dog, or null if no row
+ * matched (not found, or not owned — RLS makes a cross-account row invisible).
+ */
+export async function setDefaultClassNumber(
+  supabase: SupabaseClient,
+  dogId: string,
+  classNumber: number | null,
+): Promise<Dog | null> {
+  const result = await supabase
+    .from("dogs")
+    .update({ default_class_number: classNumber })
+    .eq("id", dogId)
+    .select()
+    .maybeSingle();
+
+  if (result.error) throw result.error;
+  return result.data as Dog | null;
+}

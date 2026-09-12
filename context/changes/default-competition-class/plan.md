@@ -219,26 +219,26 @@ The schema addition is purely additive — the new column defaults to `NULL` for
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly
-- [x] 1.2 Type checking passes
-- [x] 1.3 Linting passes
+- [x] 1.1 Migration applies cleanly — dbc428f
+- [x] 1.2 Type checking passes — dbc428f
+- [x] 1.3 Linting passes — dbc428f
 
 #### Manual
 
-- [x] 1.4 Supabase Studio shows the new column with CHECK constraint
-- [x] 1.5 Out-of-range value rejected in SQL editor
+- [x] 1.4 Supabase Studio shows the new column with CHECK constraint — dbc428f
+- [x] 1.5 Out-of-range value rejected in SQL editor — dbc428f
 
 ### Phase 2: Service, API & Test Coverage
 
 #### Automated
 
-- [ ] 2.1 Unit/integration tests pass
-- [ ] 2.2 Type checking passes
-- [ ] 2.3 Linting passes
+- [x] 2.1 Unit/integration tests pass
+- [x] 2.2 Type checking passes
+- [x] 2.3 Linting passes
 
 #### Manual
 
-- [ ] 2.4 PATCH set/clear/invalid/cross-account/signed-out all verified manually
+- [x] 2.4 PATCH set/clear/invalid/cross-account/signed-out all verified manually
 
 ### Phase 3: UI — Default Toggle & Dropdown Badge
 

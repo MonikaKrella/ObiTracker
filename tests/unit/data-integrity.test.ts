@@ -154,6 +154,36 @@ describe("data integrity", () => {
     });
   });
 
+  describe("dogs.default_class_number CHECK constraint", () => {
+    it("rejects an out-of-range value (4)", async () => {
+      const { error } = await admin.from("dogs").update({ default_class_number: 4 }).eq("id", dogId);
+      expect(error).toBeDefined();
+    });
+
+    it("accepts NULL after a prior non-null value (the clear path)", async () => {
+      const { error: setError } = await admin
+        .from("dogs")
+        .update({ default_class_number: classNumber })
+        .eq("id", dogId);
+      if (setError) {
+        throw setError;
+      }
+
+      const { error: clearError } = await admin.from("dogs").update({ default_class_number: null }).eq("id", dogId);
+      expect(clearError).toBeNull();
+
+      const { data, error } = await admin
+        .from("dogs")
+        .select("default_class_number")
+        .eq("id", dogId)
+        .single<{ default_class_number: number | null }>();
+      if (error) {
+        throw error;
+      }
+      expect(data.default_class_number).toBeNull();
+    });
+  });
+
   describe("competitions unique(dog_id, class_number, competed_on) constraint", () => {
     it("rejects a second competition on the same dog+class+date", async () => {
       const competedOn = "2026-02-04";
