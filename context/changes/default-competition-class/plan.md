@@ -244,16 +244,16 @@ The schema addition is purely additive — the new column defaults to `NULL` for
 
 #### Automated
 
-- [x] 3.1 Type checking passes
-- [x] 3.2 Linting passes
-- [x] 3.3 Unit tests pass
+- [x] 3.1 Type checking passes — 99d5266
+- [x] 3.2 Linting passes — 99d5266
+- [x] 3.3 Unit tests pass — 99d5266
 
 #### Manual
 
-- [x] 3.4 Dog with no marked default opens on Class 3 (not Class 1) with no `?classNumber=`
-- [x] 3.5 Set default via star toggle, reload, opens on that class
-- [x] 3.6 Dropdown marker follows the actual default, not the viewed class; non-default star renders outlined
-- [x] 3.7 Clear default via star toggle, reload, falls back to Class 3
-- [x] 3.8 Star tooltip/aria-label text matches fill state at every step
-- [x] 3.9 Mobile toolbar row wraps without overlap
-- [x] 3.10 401 redirect on sign-out mid-session
+- [x] 3.4 Dog with no marked default opens on Class 3 (not Class 1) with no `?classNumber=` — 99d5266
+- [x] 3.5 Set default via star toggle, reload, opens on that class — 99d5266
+- [x] 3.6 Dropdown marker follows the actual default, not the viewed class; non-default star renders outlined — 99d5266
+- [x] 3.7 Clear default via star toggle, reload, falls back to Class 3 — 99d5266
+- [x] 3.8 Star tooltip/aria-label text matches fill state at every step — 99d5266
+- [x] 3.9 Mobile toolbar row wraps without overlap — 99d5266
+- [x] 3.10 401 redirect on sign-out mid-session — 99d5266
