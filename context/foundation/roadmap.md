@@ -3,7 +3,7 @@ project: ObiTracker
 version: 1
 status: draft
 created: 2026-09-02
-updated: 2026-09-12
+updated: 2026-09-13
 prd_version: 2
 main_goal: quality
 top_blocker: capacity
@@ -129,7 +129,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** low — a preference flag layered on S-01's existing class dropdown; realized risk was the Class 1 → Class 3 blind-fallback switch taking effect for every dog as soon as it shipped, which required updating `mobile-competition-results.spec.ts`'s stale Class 1 assumption (fixed post-merge, 2026-09-12).
-- **Status:** done (impl_reviewed, not yet archived — `context/changes/default-competition-class/`)
+- **Status:** done
 
 ### S-04: Competition tags
 
@@ -212,3 +212,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **F-01: (foundation) three competition classes and their exercises/multipliers/shortcut names are seeded as fixed, queryable reference data** — Archived 2026-09-06 → `context/archive/2026-09-03-competition-reference-data/`. Lesson: —.
 - **F-02: (foundation) highlight classification is computed by a dedicated, fail-fast domain service, byte-identical to today's output** — Archived 2026-09-06 → `context/archive/2026-09-04-training-board-refactor/`. Lesson: —.
 - **S-01: select a class, enter raw per-exercise scores, see live averages and top-2/bottom-2 highlighting, filtered by time window** — Archived 2026-09-12 → `context/archive/2026-09-06-competition-results-core/`. Lesson: —.
+- **S-03: user can mark one class as their default per dog; that class's results display automatically the next time the competition-results page loads for that dog. Shipped with an additional behavior change beyond the original scope: the blind fallback for a dog with no marked default moved from Class 1 to Class 3 (the last class — dogs spend the longest time there), applying to every dog, existing and new.** — Archived 2026-09-13 → `context/archive/2026-09-12-default-competition-class/`. Lesson: —.
