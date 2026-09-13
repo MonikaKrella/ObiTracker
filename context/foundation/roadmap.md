@@ -33,9 +33,9 @@ The MVP proved the core training-grid loop; V2 closes five gaps surfaced by real
 | F-02 | training-board-refactor    | (foundation) highlight classification is computed by a dedicated, fail-fast domain service, byte-identical to today's output        | —             | FR-017, FR-018, FR-019                                | done     |
 | S-01 | competition-results-core   | select a class, enter raw per-exercise scores, see live averages and top-2/bottom-2 highlighting, filtered by time window           | F-01          | FR-007, FR-009, FR-010, FR-012, FR-013, FR-014, US-01 | done     |
 | S-02 | element-exercise-linking   | link a training element to one competition exercise and see a color-coded indicator column on the training grid                     | F-01          | FR-015, FR-016                                        | proposed |
-| S-03 | default-competition-class  | mark one class as their default per dog, so it displays automatically on page load                                                  | S-01          | FR-008                                                | proposed |
+| S-03 | default-competition-class  | mark one class as their default per dog, so it displays automatically on page load                                                  | S-01          | FR-008                                                | done     |
 | S-04 | competition-tags           | add up to 3 short tags per competition, truncated with a hover tooltip                                                              | S-01          | FR-011                                                | proposed |
-| S-05 | password-reset             | request a password-reset link by email and set a new password twice to regain account access                                        | —             | FR-001, FR-002                                        | ready    |
+| S-05 | password-reset             | request a password-reset link by email and set a new password twice to regain account access                                        | —             | FR-001, FR-002                                        | done     |
 | S-06 | dog-rename                 | rename an existing dog                                                                                                              | —             | FR-003, FR-004                                        | ready    |
 | S-07 | delete-competition         | edit or delete an existing competition entry (e.g. fix a mis-typed date), beyond S-01's add-only + per-cell overwrite               | S-01          | none yet — flagged during S-01 planning               | proposed |
 
@@ -57,7 +57,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 - **Frontend:** present — Astro 6 SSR + React 19 islands, Tailwind 4, shadcn/ui; training grid at `src/pages/dogs/[id]/grid.astro`, dashboard at `src/pages/dashboard.astro`.
 - **Backend / API:** present — Astro SSR API routes at `src/pages/api/dog/**` and `src/pages/api/auth/**`; middleware at `src/middleware.ts`.
-- **Data:** present for MVP entities — `dogs`, `training_elements`, `training_logs` live in Supabase with RLS (`supabase/migrations/20260530*`–`20260719*`); present for F-01's competition classes/exercises/multipliers (`competition-reference-data`, archived); **absent** for the rest of V2 — no element-exercise-link table exists yet (needs S-02).
+- **Data:** present for MVP entities — `dogs`, `training_elements`, `training_logs` live in Supabase with RLS (`supabase/migrations/20260530*`–`20260719*`); present for F-01's competition classes/exercises/multipliers (`competition-reference-data`, archived); present for S-03's `dogs.default_class_number` (`supabase/migrations/20260912000001_dogs_add_default_class_number.sql`); **absent** for the rest of V2 — no element-exercise-link table exists yet (needs S-02).
 - **Auth:** present for signup/signin/signout/password-reset (`src/pages/auth/`, `src/pages/api/auth/{signin,signup,signout,forgot-password,reset-password,confirm}.ts`, cookie-based sessions via `src/lib/supabase.ts`) — password-reset (S-05, `password-reset` change) shipped 2026-09-06; two production Supabase dashboard steps (reset-link expiry window, custom SMTP) are still tracked as open in that change's notes before it's archived.
 - **Deploy / infra:** present — `wrangler.jsonc` (Cloudflare Workers), GitHub Actions CI (`.github/workflows/ci.yml`).
 - **Observability:** absent — unchanged from V1; no V2 NFR requires it either.
@@ -95,7 +95,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ### S-01: Competition results core ← North star
 
-- **Outcome:** user can, per dog, select a competition class (defaulting to Class 1 or the handler's marked default), enter raw per-exercise scores (0–10, quarter-point increments) for a competition, see each exercise's average recalculate immediately from raw points, and see the top-2 strongest and bottom-2 weakest exercise averages highlighted — all filtered to the handler's selected time window (all-time / last year / last 6 months), which also governs which competition columns are visible.
+- **Outcome:** user can, per dog, select a competition class (defaulting to the handler's marked default, or Class 3 if none is marked — see S-03), enter raw per-exercise scores (0–10, quarter-point increments) for a competition, see each exercise's average recalculate immediately from raw points, and see the top-2 strongest and bottom-2 weakest exercise averages highlighted — all filtered to the handler's selected time window (all-time / last year / last 6 months), which also governs which competition columns are visible.
 - **Change ID:** competition-results-core
 - **PRD refs:** FR-007, FR-009, FR-010, FR-012, FR-013, FR-014, US-01
 - **Prerequisites:** F-01
@@ -121,15 +121,15 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ### S-03: Default competition class
 
-- **Outcome:** user can mark one class as their default per dog; that class's results display automatically the next time the competition-results page loads for that dog, instead of always falling back to Class 1.
+- **Outcome:** user can mark one class as their default per dog; that class's results display automatically the next time the competition-results page loads for that dog. Shipped with an additional behavior change beyond the original scope: the blind fallback for a dog with no marked default moved from Class 1 to Class 3 (the last class — dogs spend the longest time there), applying to every dog, existing and new.
 - **Change ID:** default-competition-class
 - **PRD refs:** FR-008
 - **Prerequisites:** S-01
 - **Parallel with:** S-02, S-04
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** low — a preference flag layered on S-01's existing class dropdown; the main risk is forgetting the "Class 1 if none marked" fallback on a handler's very first visit.
-- **Status:** proposed
+- **Risk:** low — a preference flag layered on S-01's existing class dropdown; realized risk was the Class 1 → Class 3 blind-fallback switch taking effect for every dog as soon as it shipped, which required updating `mobile-competition-results.spec.ts`'s stale Class 1 assumption (fixed post-merge, 2026-09-12).
+- **Status:** done (impl_reviewed, not yet archived — `context/changes/default-competition-class/`)
 
 ### S-04: Competition tags
 
@@ -152,8 +152,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Parallel with:** F-01, F-02, S-01, S-02, S-03, S-04, S-06
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** low — matches the existing signup password field's pattern (double-entry, hidden-by-default toggle); the main risk is under-specifying the "surface any write failure before the handler navigates away" NFR on the set-new-password step.
-- **Status:** ready
+- **Risk:** low — matches the existing signup password field's pattern (double-entry, hidden-by-default toggle); realized risk was scope drift on the double-submit guard (3 warnings in impl-review, all resolved — see `reviews/impl-review.md`) rather than the NFR itself.
+- **Status:** done (impl_reviewed, not yet archived — `context/changes/password-reset/`); two production Supabase dashboard steps (reset-link expiry window, custom SMTP) remain open per the Baseline note above
 
 ### S-06: Dog rename
 
@@ -187,9 +187,9 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | F-02       | training-board-refactor    | Extract highlight classification into a TrainingBoard domain service           | yes                   | Run `/10x-plan training-board-refactor`; design already drafted in `context/domain/02-invariant-aggregate-refactor.md` |
 | S-01       | competition-results-core   | Competition results grid: score entry, live averages, top-2/bottom-2 highlight | no                    | Needs F-01 done first; this is the north star                                                                          |
 | S-02       | element-exercise-linking   | Link training elements to competition exercises + indicator column             | no                    | Needs F-01 done first                                                                                                  |
-| S-03       | default-competition-class  | Mark a default competition class per dog                                       | no                    | Needs S-01 done first                                                                                                  |
+| S-03       | default-competition-class  | Mark a default competition class per dog                                       | done                  | Implemented 2026-09-12 (dbc428f–773d062); impl-reviewed, not yet archived                                              |
 | S-04       | competition-tags           | Add tags to a competition                                                      | no                    | Needs S-01 done first                                                                                                  |
-| S-05       | password-reset             | Password-reset flow (request link, set new password)                           | yes                   | Run `/10x-plan password-reset`                                                                                         |
+| S-05       | password-reset             | Password-reset flow (request link, set new password)                           | done                  | Implemented 2026-09-06 (aeefad7–3982b9b); impl-reviewed, not yet archived                                              |
 | S-06       | dog-rename                 | Rename a dog                                                                   | yes                   | Run `/10x-plan dog-rename`                                                                                             |
 | S-07       | delete-competition         | Edit or delete a competition entry                                             | no                    | Needs S-01 done first; no PRD FR backs this yet — see Open Roadmap Questions                                           |
 
