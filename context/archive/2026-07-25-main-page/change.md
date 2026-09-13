@@ -1,10 +1,10 @@
 ---
 change_id: main-page
 title: Main page
-status: impl_reviewed
+status: archived
 created: 2026-07-25
-updated: 2026-07-25
-archived_at: null
+updated: 2026-09-13
+archived_at: 2026-09-13T19:24:36Z
 ---
 
 ## Notes
