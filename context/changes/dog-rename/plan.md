@@ -184,13 +184,13 @@ None — no schema change.
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `npm run build`
-- [x] 2.2 Linting passes: `npm run lint`
-- [x] 2.3 Unit tests still pass: `npm run test`
+- [x] 2.1 Type checking passes: `npm run build` — 900ce15
+- [x] 2.2 Linting passes: `npm run lint` — 900ce15
+- [x] 2.3 Unit tests still pass: `npm run test` — 900ce15
 
 #### Manual
 
-- [x] 2.4 Rename dialog opens pre-filled and reloads with new name visible everywhere
-- [x] 2.5 Cancel-then-reopen shows original name, no stale edit
-- [x] 2.6 Empty/whitespace name rejected client- and server-side
-- [x] 2.7 Verified on phone-width and laptop-width viewports
+- [x] 2.4 Rename dialog opens pre-filled and reloads with new name visible everywhere — 900ce15
+- [x] 2.5 Cancel-then-reopen shows original name, no stale edit — 900ce15
+- [x] 2.6 Empty/whitespace name rejected client- and server-side — 900ce15
+- [x] 2.7 Verified on phone-width and laptop-width viewports — 900ce15
