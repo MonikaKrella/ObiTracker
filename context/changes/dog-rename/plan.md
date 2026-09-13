@@ -171,26 +171,26 @@ None — no schema change.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `npm run test`
-- [x] 1.2 Type checking passes: `npm run build`
-- [x] 1.3 Linting passes: `npm run lint`
+- [x] 1.1 Unit tests pass: `npm run test` — 13e6963
+- [x] 1.2 Type checking passes: `npm run build` — 13e6963
+- [x] 1.3 Linting passes: `npm run lint` — 13e6963
 
 #### Manual
 
-- [x] 1.4 `curl PATCH` on own dog returns success with updated name
-- [x] 1.5 `curl PATCH` on another account's dog returns 404, no change persisted
+- [x] 1.4 `curl PATCH` on own dog returns success with updated name — 13e6963
+- [x] 1.5 `curl PATCH` on another account's dog returns 404, no change persisted — 13e6963
 
 ### Phase 2: Frontend — rename dialog
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `npm run build`
-- [ ] 2.2 Linting passes: `npm run lint`
-- [ ] 2.3 Unit tests still pass: `npm run test`
+- [x] 2.1 Type checking passes: `npm run build`
+- [x] 2.2 Linting passes: `npm run lint`
+- [x] 2.3 Unit tests still pass: `npm run test`
 
 #### Manual
 
-- [ ] 2.4 Rename dialog opens pre-filled and reloads with new name visible everywhere
-- [ ] 2.5 Cancel-then-reopen shows original name, no stale edit
-- [ ] 2.6 Empty/whitespace name rejected client- and server-side
-- [ ] 2.7 Verified on phone-width and laptop-width viewports
+- [x] 2.4 Rename dialog opens pre-filled and reloads with new name visible everywhere
+- [x] 2.5 Cancel-then-reopen shows original name, no stale edit
+- [x] 2.6 Empty/whitespace name rejected client- and server-side
+- [x] 2.7 Verified on phone-width and laptop-width viewports
