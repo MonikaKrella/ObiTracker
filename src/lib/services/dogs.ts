@@ -76,6 +76,19 @@ export async function softDeleteDog(supabase: SupabaseClient, dogId: string): Pr
 }
 
 /**
+ * Renames a dog. Returns the updated dog, or null if no row matched (not
+ * found, or not owned — RLS makes a cross-account row invisible). No
+ * uniqueness check is performed — unlike training elements, dogs are keyed
+ * by ID everywhere, so duplicate names are cosmetic.
+ */
+export async function renameDog(supabase: SupabaseClient, dogId: string, name: string): Promise<Dog | null> {
+  const result = await supabase.from("dogs").update({ name }).eq("id", dogId).select().maybeSingle();
+
+  if (result.error) throw result.error;
+  return result.data as Dog | null;
+}
+
+/**
  * Sets or clears (when classNumber is null) the dog's marked default competition
  * class, scoped to the given dog. Returns the updated dog, or null if no row
  * matched (not found, or not owned — RLS makes a cross-account row invisible).

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getDogById, softDeleteDog, setDefaultClassNumber } from "../../src/lib/services/dogs";
+import { getDogById, softDeleteDog, setDefaultClassNumber, renameDog } from "../../src/lib/services/dogs";
 import {
   getTrainingElements,
   createTrainingElement,
@@ -89,6 +89,11 @@ describe("cross-account authorization (Risk #4)", () => {
 
     it("setDefaultClassNumber returns null for another account's dog", async () => {
       const result = await setDefaultClassNumber(authClientB, dogAId, class1Number);
+      expect(result).toBeNull();
+    });
+
+    it("renameDog returns null for another account's dog", async () => {
+      const result = await renameDog(authClientB, dogAId, "Renamed");
       expect(result).toBeNull();
     });
   });
